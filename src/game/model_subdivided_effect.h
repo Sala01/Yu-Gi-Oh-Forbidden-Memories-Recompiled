@@ -29,13 +29,17 @@ typedef struct {
     s32 remaining;
 } ModelSubdividedEffect;
 
+#ifndef MEMORIES_GLES
 typedef char ModelSubdividedEffectConfig_size_must_be_28[
     sizeof(ModelSubdividedEffectConfig) == 28 ? 1 : -1
 ];
+#endif
 #if !defined(__SIZEOF_POINTER__) || __SIZEOF_POINTER__ == 4
+#ifndef MEMORIES_GLES
 typedef char ModelSubdividedEffect_size_must_be_0x1318[
     sizeof(ModelSubdividedEffect) == 0x1318 ? 1 : -1
 ];
+#endif
 #endif
 
 extern VECTOR D_8001185C;

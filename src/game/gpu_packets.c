@@ -35,7 +35,7 @@ void func_8005B260(u32 *src, GsOT *ot, s32 idx, s32 flags)
     if (flags >= 0) {
         GPU_PACKET_BYTES(D_800FE240)[GPU_PACKET_CODE_OFFSET(2)] |= 2;
     }
-    addPrim(&ot->org[index & 0xFFFF], D_800FE240);
+    addPrim(&((GsOT_TAG *)ot->org)[index & 0xFFFF], D_800FE240);
     D_800FE240 = D_800FE240 + (len + 2);
 }
 
@@ -73,7 +73,7 @@ void Graphics_SubmitTextureWindowPacket(
     }
     D_800FE240[len + 2] = 0xE2000000;
     setlen(D_800FE240, len + 2);
-    addPrim(&ot->org[index & 0xFFFF], D_800FE240);
+    addPrim(&((GsOT_TAG *)ot->org)[index & 0xFFFF], D_800FE240);
     D_800FE240 = D_800FE240 + (len + 3);
 }
 
@@ -104,6 +104,6 @@ void func_8005B4D8(u32 *src, GsOT *ot, s32 idx, s32 flags)
     if (flags >= 0) {
         GPU_PACKET_BYTES(D_800FE240)[GPU_PACKET_CODE_OFFSET(3)] |= 2;
     }
-    addPrim(&ot->org[index & 0xFFFF], D_800FE240);
+    addPrim(&((GsOT_TAG *)ot->org)[index & 0xFFFF], D_800FE240);
     D_800FE240 = D_800FE240 + (len + 4);
 }

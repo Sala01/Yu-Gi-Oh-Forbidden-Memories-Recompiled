@@ -76,6 +76,10 @@ void SD_InitState(u8 arg0)
     D_8009B458->field_0509 = 0;
     sec = D_8009B458;
     st2 = g_SDValue;
+#ifdef MEMORIES_GLES
+    sec->field_050C = (u32)SD_UpdateVoiceSlots;
+#else
     sec->field_050C = SD_UpdateVoiceSlots;
+#endif
     st2->flags_0040 = 0;
 }

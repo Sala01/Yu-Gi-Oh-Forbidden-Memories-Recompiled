@@ -59,7 +59,7 @@ void func_80048A28(id, value, word)
         if (v == ff) {
             return;
         }
-        id = a->field_043C[v];
+        id = ((u16 *)a->field_043C)[v];
         if (id == ff) {
             return;
         }
@@ -87,7 +87,7 @@ loop:
                     SDValue *c = g_SDValue;
                     s32 v;
 
-                    v = c->field_0444[vid].volume;
+                    v = ((SDNote *)c->field_0444)[vid].volume;
                     v *= left;
                     c->voice_volume_left[i] = v;
                 }
@@ -95,7 +95,7 @@ loop:
                     SDValue *d = g_SDValue;
                     s32 v;
 
-                    v = d->field_0444[vid].volume;
+                    v = ((SDNote *)d->field_0444)[vid].volume;
                     v *= right;
                     d->voice_volume_right[i] = v;
                 }
@@ -176,8 +176,8 @@ void SD_LoadSequenceBankPair(s32 side, u32 *src)
                 u16 n = g_SDValue->field_0440;
                 u16 v;
 
-                g_SDValue->field_043C[key] = n;
-                g_SDValue->field_0444[n] = cur->data[j];
+                ((u16 *)g_SDValue->field_043C)[key] = n;
+                ((SDNote *)g_SDValue->field_0444)[n] = cur->data[j];
                 e = (SDNote *)(
                     (u32)&((SDNote *)0)[n] +
                     (u32)g_SDValue->field_0444
@@ -232,13 +232,13 @@ void SD_InitSecondaryRuntime(void)
     c->field_157A = -1;
     c->field_157C = -1;
     c->field_157E = -1;
-    c->music_track = (u16 *)0x801EA800;
-    c->field_1560 = (u8 *)0x801E2000;
-    c->music_track[0] = 0xFFFF;
-    c->music_track[1] = 0;
-    *(s32 *)&c->music_track[2] = 0;
-    *(s32 *)&c->music_track[4] = 0;
-    *(s32 *)&c->music_track[6] = 0x40000;
+    c->music_track = 0x801EA800;
+    c->field_1560 = 0x801E2000;
+    ((u16 *)c->music_track)[0] = 0xFFFF;
+    ((u16 *)c->music_track)[1] = 0;
+    *(s32 *)&((u16 *)c->music_track)[2] = 0;
+    *(s32 *)&((u16 *)c->music_track)[4] = 0;
+    *(s32 *)&((u16 *)c->music_track)[6] = 0x40000;
     SD_SetSequenceTickMode(2);
     SD_SetSecondaryObjectCount(0x14);
     SD_EnableSecondarySequenceUpdates();

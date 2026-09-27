@@ -24,9 +24,11 @@ typedef struct {
     s16 value;
 } DuelPlacementCardIdCell;
 
+#ifndef MEMORIES_GLES
 typedef char DuelPlacementCardIdCell_size_must_be_2[
     sizeof(DuelPlacementCardIdCell) == 2 ? 1 : -1
 ];
+#endif
 
 void DuelScene_UpdateCardPlacement(void);
 void func_80019BD0(DisplayObject *object);

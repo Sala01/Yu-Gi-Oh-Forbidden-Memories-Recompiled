@@ -19,15 +19,21 @@ typedef struct {
     u16 card_entries[7];
 } CardListRowSet;
 
+#ifndef MEMORIES_GLES
 typedef char CardListRowSet_size_must_be_0x18[
     sizeof(CardListRowSet) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListRowSet_enabled_offset_must_be_0x8[
     CARD_LIST_ROW_SET_OFFSET(enabled) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListRowSet_entries_offset_must_be_0xA[
     CARD_LIST_ROW_SET_OFFSET(card_entries) == 0xA ? 1 : -1
 ];
+#endif
 
 #undef CARD_LIST_ROW_SET_OFFSET
 

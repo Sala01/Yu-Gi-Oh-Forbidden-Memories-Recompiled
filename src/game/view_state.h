@@ -72,21 +72,31 @@ typedef struct {
 } ViewState;
 
 #define VIEW_STATE_OFFSET(member) ((u32)&(((ViewState *)0)->member))
+#ifndef MEMORIES_GLES
 typedef char ViewState_angle_offset_must_be_0x2[
     VIEW_STATE_OFFSET(angle) == 0x2 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ViewState_projection_offset_must_be_0xE[
     VIEW_STATE_OFFSET(projection) == 0xE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ViewState_view_offset_must_be_0x10[
     VIEW_STATE_OFFSET(view) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ViewState_vrx_offset_must_be_0x1C[
     VIEW_STATE_OFFSET(view.vrx) == 0x1C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ViewState_super_offset_must_be_0x2C[
     VIEW_STATE_OFFSET(view.super) == 0x2C ? 1 : -1
 ];
+#endif
 #undef VIEW_STATE_OFFSET
 
 extern ViewState D_800F2848;

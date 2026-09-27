@@ -139,12 +139,12 @@
 #ifndef ASSEMBLER
 typedef struct  {
 	short	m[3][3];	/* 3x3 rotation matrix */
-        long    t[3];		/* transfer vector */
+        s32    t[3];		/* transfer vector */
 } MATRIX;
 
-typedef struct {		/* long word type 3D vector */
-	long	vx, vy;
-	long	vz, pad;
+typedef struct {		/* s32 word type 3D vector */
+	s32	vx, vy;
+	s32	vz, pad;
 } VECTOR;
 
 typedef struct {		/* short word type 3D vector */
@@ -167,7 +167,7 @@ typedef struct {
 	DVECTOR sxy;		/* Screen 2D Vertex		*/
 	CVECTOR rgb;		/* Vertex Color Data	 	*/
 	short txuv,pad;		/* Texture Mapping Data 	*/
-	long chx,chy;		/* Clip Window Data 		*/
+	s32 chx,chy;		/* Clip Window Data 		*/
 } EVECTOR;
 
 typedef struct {
@@ -287,9 +287,9 @@ extern MATRIX *RotMatrixZYX(SVECTOR *r,MATRIX *m);
 extern MATRIX *RotMatrix_gte(SVECTOR *r,MATRIX *m);
 extern MATRIX *RotMatrixYXZ_gte(SVECTOR *r,MATRIX *m);
 extern MATRIX *RotMatrixZYX_gte(SVECTOR *r,MATRIX *m);
-extern MATRIX *RotMatrixX(long r,MATRIX *m);
-extern MATRIX *RotMatrixY(long r,MATRIX *m);
-extern MATRIX *RotMatrixZ(long r,MATRIX *m);
+extern MATRIX *RotMatrixX(s32 r,MATRIX *m);
+extern MATRIX *RotMatrixY(s32 r,MATRIX *m);
+extern MATRIX *RotMatrixZ(s32 r,MATRIX *m);
 extern MATRIX *RotMatrixC(SVECTOR *r,MATRIX *m);
 extern MATRIX *TransMatrix(MATRIX *m,VECTOR *v);
 extern MATRIX *ScaleMatrix(MATRIX *m,VECTOR *v);
@@ -313,38 +313,38 @@ extern void ReadRotMatrix(MATRIX *m);
 extern void ReadLightMatrix(MATRIX *m);
 extern void ReadColorMatrix(MATRIX *m);
 extern void SetRGBcd(CVECTOR *v);
-extern void SetBackColor(long rbk,long gbk,long bbk);
-extern void SetFarColor(long rfc,long gfc,long bfc);
-extern void SetGeomOffset(long ofx,long ofy);
-extern void SetGeomScreen(long h);
-extern void ReadSZfifo3(long *sz0,long *sz1,long *sz2);
-extern void ReadSZfifo4(long *szx,long *sz0,long *sz1,long *sz2);
-extern void ReadSXSYfifo(long *sxy0,long *sxy1,long *sxy2);
+extern void SetBackColor(s32 rbk,s32 gbk,s32 bbk);
+extern void SetFarColor(s32 rfc,s32 gfc,s32 bfc);
+extern void SetGeomOffset(s32 ofx,s32 ofy);
+extern void SetGeomScreen(s32 h);
+extern void ReadSZfifo3(s32 *sz0,s32 *sz1,s32 *sz2);
+extern void ReadSZfifo4(s32 *szx,s32 *sz0,s32 *sz1,s32 *sz2);
+extern void ReadSXSYfifo(s32 *sxy0,s32 *sxy1,s32 *sxy2);
 extern void ReadRGBfifo(CVECTOR *v0,CVECTOR *v1,CVECTOR *v2);
-extern void ReadGeomOffset(long *ofx,long *ofy);
-extern long ReadGeomScreen();
+extern void ReadGeomOffset(s32 *ofx,s32 *ofy);
+extern s32 ReadGeomScreen();
 
-extern void TransRot_32(VECTOR *v0, VECTOR *v1, long *flag);
-extern long TransRotPers(SVECTOR *v0, long *sxy, long *p, long *flag);
-extern long TransRotPers3(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, long *sxy0,
-		long *sxy1, long *sxy2, long *p, long *flag);
+extern void TransRot_32(VECTOR *v0, VECTOR *v1, s32 *flag);
+extern s32 TransRotPers(SVECTOR *v0, s32 *sxy, s32 *p, s32 *flag);
+extern s32 TransRotPers3(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, s32 *sxy0,
+		s32 *sxy1, s32 *sxy2, s32 *p, s32 *flag);
 
 extern void pers_map(int abuf, SVECTOR **vertex, int tex[4][2], u16 *dtext);
 extern void PhongLine(int istart_x, int iend_x, int p, int q, u16 **pixx,
 		int fs, int ft, int i4, int det);
 
-extern long RotTransPers(SVECTOR *v0,long *sxy,long *p,long *flag);
-extern long RotTransPers3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
-			long *sxy0,long *sxy1,long *sxy2,long *p,long *flag);
-extern void RotTrans(SVECTOR *v0,VECTOR *v1,long *flag);
-extern void RotTransSV(SVECTOR *v0,SVECTOR *v1,long *flag);
+extern s32 RotTransPers(SVECTOR *v0,s32 *sxy,s32 *p,s32 *flag);
+extern s32 RotTransPers3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,s32 *p,s32 *flag);
+extern void RotTrans(SVECTOR *v0,VECTOR *v1,s32 *flag);
+extern void RotTransSV(SVECTOR *v0,SVECTOR *v1,s32 *flag);
 extern void LocalLight(SVECTOR *v0,VECTOR *v1);
 extern void LightColor(VECTOR *v0,VECTOR *v1);
-extern void DpqColorLight(VECTOR *v0,CVECTOR *v1,long p,CVECTOR *v2);
-extern void DpqColor(CVECTOR *v0,long p,CVECTOR *v1);
+extern void DpqColorLight(VECTOR *v0,CVECTOR *v1,s32 p,CVECTOR *v2);
+extern void DpqColor(CVECTOR *v0,s32 p,CVECTOR *v1);
 extern void DpqColor3(CVECTOR *v0,CVECTOR *v1,CVECTOR *v2,
-			long p,CVECTOR *v3,CVECTOR *v4,CVECTOR *v5);
-extern void Intpl(VECTOR *v0,long p,CVECTOR *v1);
+			s32 p,CVECTOR *v3,CVECTOR *v4,CVECTOR *v5);
+extern void Intpl(VECTOR *v0,s32 p,CVECTOR *v1);
 extern VECTOR *Square12(VECTOR *v0,VECTOR *v1);
 extern VECTOR *Square0(VECTOR *v0,VECTOR *v1);
 extern VECTOR *SquareSL12(SVECTOR *v0,VECTOR *v1);
@@ -354,87 +354,87 @@ extern SVECTOR *SquareSS0(SVECTOR *v0,SVECTOR *v1);
 extern void NormalColor(SVECTOR *v0,CVECTOR *v1);
 extern void NormalColor3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 			CVECTOR *v3,CVECTOR *v4,CVECTOR *v5);
-extern void NormalColorDpq(SVECTOR *v0,CVECTOR *v1,long p,CVECTOR *v2);
+extern void NormalColorDpq(SVECTOR *v0,CVECTOR *v1,s32 p,CVECTOR *v2);
 extern void NormalColorDpq3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,CVECTOR *v3,
-			long p,CVECTOR *v4,CVECTOR *v5,CVECTOR *v6);
+			s32 p,CVECTOR *v4,CVECTOR *v5,CVECTOR *v6);
 extern void NormalColorCol(SVECTOR *v0,CVECTOR *v1,CVECTOR *v2);
 extern void NormalColorCol3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,CVECTOR *v3,
 			CVECTOR *v4,CVECTOR *v5,CVECTOR *v6);
-extern void ColorDpq(VECTOR *v0,CVECTOR *v1,long p,CVECTOR *v2);
+extern void ColorDpq(VECTOR *v0,CVECTOR *v1,s32 p,CVECTOR *v2);
 extern void ColorCol(VECTOR *v0,CVECTOR *v1,CVECTOR *v2);
-extern long NormalClip(long sxy0,long sxy1,long sxy2);
-extern long AverageZ3(long sz0,long sz1,long sz2);
-extern long AverageZ4(long sz0,long sz1,long sz2,long sz3);
+extern s32 NormalClip(s32 sxy0,s32 sxy1,s32 sxy2);
+extern s32 AverageZ3(s32 sz0,s32 sz1,s32 sz2);
+extern s32 AverageZ4(s32 sz0,s32 sz1,s32 sz2,s32 sz3);
 extern void OuterProduct12(VECTOR *v0,VECTOR *v1,VECTOR *v2);
 extern void OuterProduct0(VECTOR *v0,VECTOR *v1,VECTOR *v2);
-extern long Lzc(long data);
+extern s32 Lzc(s32 data);
 
 
-extern long RotTransPers4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
-			long *sxy0,long *sxy1,long *sxy2,long *sxy3,
-			long *p,long *flag);
+extern s32 RotTransPers4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,s32 *sxy3,
+			s32 *p,s32 *flag);
 extern void RotTransPersN(SVECTOR *v0,DVECTOR *v1,u16 *sz,u16 *p,
-			u16 *flag,long n);
+			u16 *flag,s32 n);
 extern void RotTransPers3N(SVECTOR *v0,DVECTOR *v1,u16 *sz,u16 *flag,
-			long n);
+			s32 n);
 extern void RotMeshH(short *Yheight,DVECTOR *Vo,u16 *sz,u16 *flag,
 			short Xoffset,short Zoffset,short m,short n,
 			DVECTOR *base);
-extern long RotAverage3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
-			long *sxy0,long *sxy1,long *sxy2,long *p,long *flag);
-extern long RotAverage4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
-			long *sxy0,long *sxy1,long *sxy2,long *sxy3,
-			long *p,long *flag);
-extern long RotNclip3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
-			long *sxy0,long *sxy1,long *sxy2,long *p,long *otz,
-			long *flag);
-extern long RotNclip4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
-			long *sxy0,long *sxy1,long *sxy2,long *sxy3,
-			long *p,long *otz,long *flag);
-extern long RotAverageNclip3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
-			long *sxy0,long *sxy1,long *sxy2,
-			long *p,long *otz,long *flag);
-extern long RotAverageNclip4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
-			long *sxy0,long *sxy1,long *sxy2,long *sxy3,
-			long *p,long *otz,long *flag);
-extern long RotColorDpq(SVECTOR *v0,SVECTOR *v1,CVECTOR *v2,
-			long *sxy,CVECTOR *v3,long *flag);
-extern long RotColorDpq3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 RotAverage3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,s32 *p,s32 *flag);
+extern s32 RotAverage4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,s32 *sxy3,
+			s32 *p,s32 *flag);
+extern s32 RotNclip3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,s32 *p,s32 *otz,
+			s32 *flag);
+extern s32 RotNclip4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,s32 *sxy3,
+			s32 *p,s32 *otz,s32 *flag);
+extern s32 RotAverageNclip3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,
+			s32 *p,s32 *otz,s32 *flag);
+extern s32 RotAverageNclip4(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,s32 *sxy3,
+			s32 *p,s32 *otz,s32 *flag);
+extern s32 RotColorDpq(SVECTOR *v0,SVECTOR *v1,CVECTOR *v2,
+			s32 *sxy,CVECTOR *v3,s32 *flag);
+extern s32 RotColorDpq3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 			SVECTOR *v3,SVECTOR *v4,SVECTOR *v5,CVECTOR *v6,
-			long *sxy0,long *sxy1,long *sxy2,
-			CVECTOR *v7,CVECTOR *v8,CVECTOR *v9,long *flag);
-extern long RotAverageNclipColorDpq3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,
+			CVECTOR *v7,CVECTOR *v8,CVECTOR *v9,s32 *flag);
+extern s32 RotAverageNclipColorDpq3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 			SVECTOR *v3,SVECTOR *v4,SVECTOR *v5,CVECTOR *v6,
-			long *sxy0,long *sxy1,long *sxy2,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,
 			CVECTOR *v7,CVECTOR *v8,CVECTOR *v9,
-			long *otz,long *flag);
-extern long RotAverageNclipColorCol3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+			s32 *otz,s32 *flag);
+extern s32 RotAverageNclipColorCol3(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 			SVECTOR *v3,SVECTOR *v4,SVECTOR *v5,CVECTOR *v6,
-			long *sxy0,long *sxy1,long *sxy2,
+			s32 *sxy0,s32 *sxy1,s32 *sxy2,
 			CVECTOR *v7,CVECTOR *v8,CVECTOR *v9,
-			long *otz,long *flag);
-extern long RotColorMatDpq(SVECTOR *v0,SVECTOR *v1,CVECTOR *v2,long *sxy,
-			CVECTOR *v3,long matc,long flag);
-extern void ColorMatDpq(SVECTOR *v0,CVECTOR *v1,long p,CVECTOR *v2,long matc);
-extern void ColorMatCol(SVECTOR *v0,CVECTOR *v1,CVECTOR *v2,long matc);
-extern void LoadAverage12(VECTOR *v0,VECTOR *v1,long p0,long p1,VECTOR *v2);
-extern void LoadAverageShort12(SVECTOR *v0,SVECTOR *v1,long p0,long p1,
+			s32 *otz,s32 *flag);
+extern s32 RotColorMatDpq(SVECTOR *v0,SVECTOR *v1,CVECTOR *v2,s32 *sxy,
+			CVECTOR *v3,s32 matc,s32 flag);
+extern void ColorMatDpq(SVECTOR *v0,CVECTOR *v1,s32 p,CVECTOR *v2,s32 matc);
+extern void ColorMatCol(SVECTOR *v0,CVECTOR *v1,CVECTOR *v2,s32 matc);
+extern void LoadAverage12(VECTOR *v0,VECTOR *v1,s32 p0,s32 p1,VECTOR *v2);
+extern void LoadAverageShort12(SVECTOR *v0,SVECTOR *v1,s32 p0,s32 p1,
 			SVECTOR *v2);
-extern void LoadAverage0(VECTOR *v0,VECTOR *v1,long p0,long p1,VECTOR *v2);
-extern void LoadAverageShort0(SVECTOR *v0,SVECTOR *v1,long p0,long p1,
+extern void LoadAverage0(VECTOR *v0,VECTOR *v1,s32 p0,s32 p1,VECTOR *v2);
+extern void LoadAverageShort0(SVECTOR *v0,SVECTOR *v1,s32 p0,s32 p1,
 			SVECTOR *v2);
-extern void LoadAverageByte(u8 *v0,u8 *v1,long p0,long p1,u8 *v2);
-extern void LoadAverageCol(u8 *v0,u8 *v1,long p0,long p1,u8 *v2);
-extern long VectorNormal(VECTOR *v0, VECTOR *v1);
-extern long VectorNormalS(VECTOR *v0, SVECTOR *v1);
-extern long VectorNormalSS(SVECTOR *v0, SVECTOR *v1);
-extern long SquareRoot0(long a);
-extern long SquareRoot12(long a);
-extern void InvSquareRoot(long a, long *b, long *c);
-extern void gteMIMefunc(SVECTOR *otp, SVECTOR *dfp, long n, long p);
-extern void SetFogFar(long a,long h);
-extern void SetFogNear(long a,long h);
-extern void SetFogNearFar(long a,long b,long h);
+extern void LoadAverageByte(u8 *v0,u8 *v1,s32 p0,s32 p1,u8 *v2);
+extern void LoadAverageCol(u8 *v0,u8 *v1,s32 p0,s32 p1,u8 *v2);
+extern s32 VectorNormal(VECTOR *v0, VECTOR *v1);
+extern s32 VectorNormalS(VECTOR *v0, SVECTOR *v1);
+extern s32 VectorNormalSS(SVECTOR *v0, SVECTOR *v1);
+extern s32 SquareRoot0(s32 a);
+extern s32 SquareRoot12(s32 a);
+extern void InvSquareRoot(s32 a, s32 *b, s32 *c);
+extern void gteMIMefunc(SVECTOR *otp, SVECTOR *dfp, s32 n, s32 p);
+extern void SetFogFar(s32 a,s32 h);
+extern void SetFogNear(s32 a,s32 h);
+extern void SetFogNearFar(s32 a,s32 b,s32 h);
 extern void SubPol4(POL4 *p, SPOL *sp, int ndiv);
 extern void SubPol3(POL3 *p, SPOL *sp, int ndiv);
 
@@ -445,74 +445,74 @@ extern int csin(int a);
 extern int cln(int a);
 extern int csqrt(int a);
 extern int catan(int a);
-extern long ratan2(long y, long x);
+extern s32 ratan2(s32 y, s32 x);
 
 
-extern void RotPMD_F3(long *pa,u32 *ot,int otlen,int id,int backc);
-extern void RotPMD_G3(long *pa,u32 *ot,int otlen,int id,int backc);
-extern void RotPMD_FT3(long *pa,u32 *ot,int otlen,int id,int backc);
-extern void RotPMD_GT3(long *pa,u32 *ot,int otlen,int id,int backc);
-extern void RotPMD_F4(long *pa,u32 *ot,int otlen,int id,int backc);
-extern void RotPMD_G4(long *pa,u32 *ot,int otlen,int id,int backc);
-extern void RotPMD_FT4(long *pa,u32 *ot,int otlen,int id,int backc);
-extern void RotPMD_GT4(long *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_F3(s32 *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_G3(s32 *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_FT3(s32 *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_GT3(s32 *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_F4(s32 *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_G4(s32 *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_FT4(s32 *pa,u32 *ot,int otlen,int id,int backc);
+extern void RotPMD_GT4(s32 *pa,u32 *ot,int otlen,int id,int backc);
 
-extern void RotPMD_SV_F3(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_F3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
-extern void RotPMD_SV_G3(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_G3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
-extern void RotPMD_SV_FT3(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_FT3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
-extern void RotPMD_SV_GT3(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_GT3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
-extern void RotPMD_SV_F4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_F4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
-extern void RotPMD_SV_G4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_G4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
-extern void RotPMD_SV_FT4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_FT4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
-extern void RotPMD_SV_GT4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotPMD_SV_GT4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int backc);
 
 
-extern void InitClip(EVECTOR *evbfad,long hw,long vw,long h,long near,long far);
-extern long Clip3F(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,EVECTOR **evmx);
-extern long Clip3FP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,EVECTOR **evmx);
-extern long Clip4F(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern void InitClip(EVECTOR *evbfad,s32 hw,s32 vw,s32 h,s32 near,s32 far);
+extern s32 Clip3F(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,EVECTOR **evmx);
+extern s32 Clip3FP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,EVECTOR **evmx);
+extern s32 Clip4F(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 			EVECTOR **evmx);
-extern long Clip4FP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern s32 Clip4FP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 			EVECTOR **evmx);
-extern long Clip3FT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 Clip3FT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 		short *uv0,short *uv1,short *uv2,EVECTOR **evmx);
-extern long Clip3FTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 Clip3FTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 		short *uv0,short *uv1,short *uv2,EVECTOR **evmx);
-extern long Clip4FT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern s32 Clip4FT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 		short *uv0,short *uv1,short *uv2,short *uv3,EVECTOR **evmx);
-extern long Clip4FTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern s32 Clip4FTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 		short *uv0,short *uv1,short *uv2,short *uv3,EVECTOR **evmx);
-extern long Clip3G(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 Clip3G(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,EVECTOR **evmx);
-extern long Clip3GP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 Clip3GP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,EVECTOR **evmx);
-extern long Clip4G(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern s32 Clip4G(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,CVECTOR *rgb3,
 		EVECTOR **evmx);
-extern long Clip4GP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern s32 Clip4GP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,CVECTOR *rgb3,
 		EVECTOR **evmx);
-extern long Clip3GT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 Clip3GT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 		short *uv0,short *uv1,short *uv2,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,
 		EVECTOR **evmx);
-extern long Clip3GTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 Clip3GTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 		short *uv0,short *uv1,short *uv2,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,
 		EVECTOR **evmx);
-extern long Clip4GT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern s32 Clip4GT(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 		short *uv0,short *uv1,short *uv2,short *uv3,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,CVECTOR *rgb3,
 		EVECTOR **evmx);
-extern long Clip4GTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
+extern s32 Clip4GTP(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,SVECTOR *v3,
 		short *uv0,short *uv1,short *uv2,short *uv3,
 		CVECTOR *rgb0,CVECTOR *rgb1,CVECTOR *rgb2,CVECTOR *rgb3,
 		EVECTOR **evmx);
@@ -529,13 +529,13 @@ extern void RotAverageNclipColorDpq3_nom(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 extern void RotAverageNclipColorCol3_nom(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 			SVECTOR *v3,SVECTOR *v4,SVECTOR *v5,CVECTOR *v6);
 extern void RotColorDpq_nom(SVECTOR *v0,SVECTOR *v1,CVECTOR *v2);
-extern long RotColorDpq3_nom(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
+extern s32 RotColorDpq3_nom(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 			SVECTOR *v3,SVECTOR *v4,SVECTOR *v5,CVECTOR *v6);
 extern void NormalColor_nom(SVECTOR *v0);
 extern void NormalColor3_nom(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2);
-extern void NormalColorDpq_nom(SVECTOR *v0,CVECTOR *v1,long p);
+extern void NormalColorDpq_nom(SVECTOR *v0,CVECTOR *v1,s32 p);
 extern void NormalColorDpq3_nom(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
-			CVECTOR *v3,long p);
+			CVECTOR *v3,s32 p);
 extern void NormalColorCol_nom(SVECTOR *v0,CVECTOR *v1);
 extern void NormalColorCol3_nom(SVECTOR *v0,SVECTOR *v1,SVECTOR *v2,
 			CVECTOR *v3);
@@ -642,120 +642,120 @@ extern u32 *GsTMDdivTNG4B(TMD_P_TNG4 *primtop,SVECTOR *vertop,
 
 */
 
-extern void RotSMD_F3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_F3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_G3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_G3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_FT3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_FT3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_GT3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_GT3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_F4(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_F4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_G4(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_G4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_FT4(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_FT4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_GT4(long *pa,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-
-extern void RotSMD_SV_F3(long *pa,long *va,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_SV_G3(long *pa,long *va,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_SV_FT3(long *pa,long *va,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_SV_GT3(long *pa,long *va,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_SV_F4(long *pa,long *va,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_SV_G4(long *pa,long *va,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_SV_FT4(long *pa,long *va,u32 *ot,int otlen,int id,
-			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotSMD_SV_GT4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotSMD_GT4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
 
-
-
-extern void RotRMD_F3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_F3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_G3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_G3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_FT3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_FT3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_GT3(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_GT3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_F4(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_F4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_G4(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_G4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_FT4(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_FT4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_GT4(long *pa,u32 *ot,int otlen,int id,
+extern void RotSMD_SV_GT4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
 
-extern void RotRMD_SV_F3(long *pa,long *va,u32 *ot,int otlen,int id,
+
+
+extern void RotRMD_F3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_SV_G3(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotRMD_G3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_SV_FT3(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotRMD_FT3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_SV_GT3(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotRMD_GT3(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_SV_F4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotRMD_F4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_SV_G4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotRMD_G4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_SV_FT4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotRMD_FT4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
-extern void RotRMD_SV_GT4(long *pa,long *va,u32 *ot,int otlen,int id,
+extern void RotRMD_GT4(s32 *pa,u32 *ot,int otlen,int id,
 			int sclip, int hclip, int vclip, int nclipmode);
 
-extern long p2otz(long p, long projection);
-extern long otz2p(long otz, long projection);
+extern void RotRMD_SV_F3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+extern void RotRMD_SV_G3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+extern void RotRMD_SV_FT3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+extern void RotRMD_SV_GT3(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+extern void RotRMD_SV_F4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+extern void RotRMD_SV_G4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+extern void RotRMD_SV_FT4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+extern void RotRMD_SV_GT4(s32 *pa,s32 *va,u32 *ot,int otlen,int id,
+			int sclip, int hclip, int vclip, int nclipmode);
+
+extern s32 p2otz(s32 p, s32 projection);
+extern s32 otz2p(s32 otz, s32 projection);
 
 /*
 extern void RotMeshPrimS_F3(TMESH *msh,POLY_F3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_G3(TMESH *msh,POLY_G3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_FC3(TMESH *msh,POLY_F3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_GC3(TMESH *msh,POLY_G3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_FT3(TMESH *msh,POLY_FT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_GT3(TMESH *msh,POLY_GT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_FCT3(TMESH *msh,POLY_FT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_GCT3(TMESH *msh,POLY_GT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimS_T3(TMESH *msh,POLY_FT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 
 extern void RotMeshPrimR_F3(TMESH *msh,POLY_F3 *prim,u32 *ot,
-			u32 otlen,long dpq,u _long backc);
+			u32 otlen,s32 dpq,u _long backc);
 extern void RotMeshPrimR_G3(TMESH *msh,POLY_G3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimR_FC3(TMESH *msh,POLY_F3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimR_GC3(TMESH *msh,POLY_G3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimR_FT3(TMESH *msh,POLY_FT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimR_GT3(TMESH *msh,POLY_GT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimR_FCT3(TMESH *msh,POLY_FT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimR_GCT3(TMESH *msh,POLY_GT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 extern void RotMeshPrimR_T3(TMESH *msh,POLY_FT3 *prim,u32 *ot,
-			u32 otlen,long dpq,u32 backc);
+			u32 otlen,s32 dpq,u32 backc);
 
 extern void RotMeshPrimQ_T(QMESH *msh,POLY_FT4 *prim,u32 *ot,
-			u32 otlen,long dpq,long backc);
+			u32 otlen,s32 dpq,s32 backc);
 */
 
 #if defined(_LANGUAGE_C_PLUS_PLUS)||defined(__cplusplus)||defined(c_plusplus)

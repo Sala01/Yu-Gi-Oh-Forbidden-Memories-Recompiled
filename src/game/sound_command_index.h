@@ -13,11 +13,15 @@ typedef struct {
     u16 index_records[16][2];
 } CommandIndexTable;
 
+#ifndef MEMORIES_GLES
 typedef char CommandIndexTable_size_must_be_0x50[
     sizeof(CommandIndexTable) == 0x50 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CommandIndexTable_indices_must_be_at_0x10[
     (u32)&((CommandIndexTable *)0)->index_records == 0x10 ? 1 : -1
 ];
+#endif
 
 #endif

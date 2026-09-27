@@ -82,7 +82,7 @@ void func_8005611C(s32 arg0)
 void func_80056250(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
     ModelSlot *p;
     ModelSlot *q;
-    ModelSlotPart **c;
+    u32 *c;
     ModelSlot *e;
     ModelSlot *r;
     s32 i;
@@ -133,12 +133,12 @@ void func_80056250(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
     q = &D_800F2C40[arg0];
     c = q->field_1E0;
     for (j = 0; j < q->field_E1B; j++) {
-        (*c)->ii = 0xFFFF;
-        (*c)->ti = (*c)->start;
-        (*c)->aframe = 0xFFFF;
-        (*c)->sid = (*c)->start_sid;
-        (*c)->rframe = 0;
-        (*c)->speed = 0x10;
+        ((ModelSlotPart *)*c)->ii = 0xFFFF;
+        ((ModelSlotPart *)*c)->ti = ((ModelSlotPart *)*c)->start;
+        ((ModelSlotPart *)*c)->aframe = 0xFFFF;
+        ((ModelSlotPart *)*c)->sid = ((ModelSlotPart *)*c)->start_sid;
+        ((ModelSlotPart *)*c)->rframe = 0;
+        ((ModelSlotPart *)*c)->speed = 0x10;
         c++;
     }
 

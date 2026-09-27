@@ -305,8 +305,8 @@ void func_800540B4(s32 index)
             found = 0;
             n = slot->field_E1B;
             for (; k < n; k++) {
-                if (slot->field_1E0[k]->rewrite_idx == idx) {
-                    if (slot->field_1E0[k]->aframe == 0xFFFF
+                if (((ModelSlotPart *)slot->field_1E0[k])->rewrite_idx == idx) {
+                    if (((ModelSlotPart *)slot->field_1E0[k])->aframe == 0xFFFF
                         && ((slot->field_BEC[k / 8] >> (k % 8)) & 1)
                         && slot->field_750[slot->field_BF5].values[k] != 0) {
                         found = 1;
@@ -401,9 +401,9 @@ void func_800540B4(s32 index)
             y /= count;
             z /= count;
         } else {
-            x = slot->field_D1C->workm.t[0];
-            y = slot->field_D1C->workm.t[1];
-            z = slot->field_D1C->workm.t[2];
+            x = ((GsCOORDUNIT *)slot->field_D1C)->workm.t[0];
+            y = ((GsCOORDUNIT *)slot->field_D1C)->workm.t[1];
+            z = ((GsCOORDUNIT *)slot->field_D1C)->workm.t[2];
         }
         x = Model_MirrorOffset(index, x, blk[4] * 0x10);
         slot->field_DD0[0] = x;
@@ -415,7 +415,7 @@ void func_800540B4(s32 index)
         e = slot->field_000;
         for (i = 0; i < slot->field_E1A; i++, e++) {
             unit = GS_COORD_UNIT_VIEW(e->field_00);
-            if (unit != slot->field_D1C && unit != slot->field_D18 && unit != 0 && (list = e->field_04) != 0) {
+            if (unit != (GsCOORDUNIT *)slot->field_D1C && unit != (GsCOORDUNIT *)slot->field_D18 && unit != 0 && (list = (u8 *)e->field_04) != 0) {
                 s32 uy;
 
                 if (unit->super == slot->field_D1C) {
@@ -450,7 +450,7 @@ void func_800540B4(s32 index)
         if (count != 0) {
             y /= count;
         } else {
-            y = slot->field_D1C->workm.t[1];
+            y = ((GsCOORDUNIT *)slot->field_D1C)->workm.t[1];
         }
         slot->field_DD0[3] = (y - 700) / 3 + blk[5] * 0x10;
         w = maxx - minx;
@@ -567,7 +567,7 @@ void func_800540B4(s32 index)
             if (D_8009AF92 != 0x8000) {
                 y = (s16)D_8009AF92;
             } else {
-                y = D_800F2C40[2].field_D18->matrix.t[1] + S(D_8009AF88, 0xA2);
+                y = ((GsCOORDUNIT *)D_800F2C40[2].field_D18)->matrix.t[1] + S(D_8009AF88, 0xA2);
             }
             a = w / 2;
             b = d / 2;
@@ -700,7 +700,7 @@ void func_800540B4(s32 index)
                 fn = func_8005FE44;
                 if (s->field_E1F != 0) {
                     for (i = 0; i < s->field_E1A; i++, se++) {
-                        list = se->field_04;
+                        list = (u8 *)se->field_04;
                         if (list != 0) {
                             for (;;) {
                                 if (W(list, 8) != 0) {

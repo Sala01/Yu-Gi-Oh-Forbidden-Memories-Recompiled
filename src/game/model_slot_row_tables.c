@@ -420,14 +420,14 @@ void func_8004D75C(s32 index)
     i = 0;
     if (i < ch->field_E1B) {
         for (; i < ch->field_E1B; i++) {
-            slot = ch->field_1E0[i];
+            slot = (ModelSlotPart *)ch->field_1E0[i];
             if (slot == 0) {
                 break;
             }
             row = 1;
             slot->start_sid = row;
-            key = ch->field_1E0[i]->start;
-            cmd = &ch->field_DD8[key];
+            key = ((ModelSlotPart *)ch->field_1E0[i])->start;
+            cmd = (s32 *)ch->field_DD8 + key;
             ch->field_2C8[row][i] = key;
             while (1) {
                 word = *cmd;
@@ -441,7 +441,7 @@ void func_8004D75C(s32 index)
                         cmd++;
                     } else {
                         ch->field_2C8[row][i] = *(u16 *)cmd;
-                        cmd = &ch->field_DD8[*(u16 *)cmd];
+                        cmd = (s32 *)ch->field_DD8 + *(u16 *)cmd;
                     }
                 } else {
                     ch->field_750[row].values[i] =
@@ -514,11 +514,11 @@ void func_8004D914(s32 arg0)
     do {
         j = 1;
         k = o + sizeof(ch->field_2C8[0]);
-        g = &ch->field_DD8[ch->field_2C8[1][i]];
+        g = (s32 *)ch->field_DD8 + ch->field_2C8[1][i];
 
         do {
             w = *(u16 *)((u8 *)ch + k + MODEL_SLOT_ROW_KEY_TABLE_OFFSET);
-            a = &ch->field_DD8[w];
+            a = (s32 *)ch->field_DD8 + w;
             if (w != ff) {
                 t = a - 1;
                 while (1) {
@@ -530,7 +530,7 @@ void func_8004D914(s32 arg0)
                             + (o + (u32)&((u16 (*)[MODEL_SLOT_PART_COUNT])0)[hi])
                             + MODEL_SLOT_ROW_KEY_TABLE_OFFSET);
                         y = *yp;
-                        c = &ch->field_DD8[y];
+                        c = (s32 *)ch->field_DD8 + y;
                         if (hi == 0) {
                             goto zero;
                         }
@@ -561,14 +561,14 @@ cont:
                     a++;
                 }
 hit:
-                *(s16 *)c = g - ch->field_DD8;
-                *(s16 *)a = c - ch->field_DD8;
+                *(s16 *)c = g - (s32 *)ch->field_DD8;
+                *(s16 *)a = c - (s32 *)ch->field_DD8;
                 goto cont;
 zero:
                 /* Reloaded rather than reusing the base the links above
                    already hold: retail reads the member again here. */
                 *(s16 *)t = (a - (s32 *)*(volatile s32 *)&ch->field_DD8) - 1;
-                *(s16 *)a = (t - ch->field_DD8) + 1;
+                *(s16 *)a = (t - (s32 *)ch->field_DD8) + 1;
             }
             j++;
             k += sizeof(ch->field_2C8[0]);

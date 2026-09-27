@@ -10,9 +10,9 @@
 #include <string.h>
 #include "pc/guest/state.h"
 
-static unsigned long transfer_address;
-static long reverb_on, reverb_reserved;
-static unsigned long reverb_voices;
+static u32 transfer_address;
+static s32 reverb_on, reverb_reserved;
+static u32 reverb_voices;
 static int started;
 static u16 sample_notes[SPU_VOICES];
 
@@ -26,23 +26,23 @@ void SpuInit(void)
 }
 
 void SpuQuit(void) {}
-long SpuSetReverb(long on_off) { return reverb_on = on_off; }
-long SpuGetReverb(void) { return reverb_on; }
-long SpuSetReverbModeParam(SpuReverbAttr *attr) { (void)attr; return 0; }
-long SpuSetReverbModeType(long type) { (void)type; return 0; }
-long SpuReserveReverbWorkArea(long on_off) { return reverb_reserved = on_off; }
-long SpuIsReverbWorkAreaReserved(long on_off) { (void)on_off; return reverb_reserved; }
+s32 SpuSetReverb(s32 on_off) { return reverb_on = on_off; }
+s32 SpuGetReverb(void) { return reverb_on; }
+s32 SpuSetReverbModeParam(SpuReverbAttr *attr) { (void)attr; return 0; }
+s32 SpuSetReverbModeType(s32 type) { (void)type; return 0; }
+s32 SpuReserveReverbWorkArea(s32 on_off) { return reverb_reserved = on_off; }
+s32 SpuIsReverbWorkAreaReserved(s32 on_off) { (void)on_off; return reverb_reserved; }
 
-unsigned long SpuSetReverbVoice(long on_off, unsigned long voice_bit)
+u32 SpuSetReverbVoice(s32 on_off, u32 voice_bit)
 {
     reverb_voices = on_off ? reverb_voices | voice_bit : reverb_voices & ~voice_bit;
     return reverb_voices;
 }
 
-unsigned long SpuGetReverbVoice(void) { return reverb_voices; }
-long SpuSetTransferMode(long transfer_mode) { return transfer_mode; }
+u32 SpuGetReverbVoice(void) { return reverb_voices; }
+s32 SpuSetTransferMode(s32 transfer_mode) { return transfer_mode; }
 
-unsigned long SpuSetTransferStartAddr(unsigned long address)
+u32 SpuSetTransferStartAddr(u32 address)
 {
     if (address >= SPU_RAM_SIZE) {
         return 0;
@@ -50,7 +50,7 @@ unsigned long SpuSetTransferStartAddr(unsigned long address)
     return transfer_address = address & ~7ul;
 }
 
-unsigned long SpuWrite(unsigned char *address, unsigned long size)
+u32 SpuWrite(unsigned char *address, u32 size)
 {
     if (size > SPU_RAM_SIZE - transfer_address) {
         size = SPU_RAM_SIZE - transfer_address;
@@ -60,16 +60,16 @@ unsigned long SpuWrite(unsigned char *address, unsigned long size)
     return size;
 }
 
-long SpuIsTransferCompleted(long flag) { (void)flag; return 1; }
+s32 SpuIsTransferCompleted(s32 flag) { (void)flag; return 1; }
 
-long SpuReadDecodedData(SpuDecodedData *data, long flag)
+s32 SpuReadDecodedData(SpuDecodedData *data, s32 flag)
 {
     (void)flag;
     memset(data, 0, sizeof(*data));
     return 0;
 }
 
-long SpuSetIRQ(long on_off) { return on_off; }
+s32 SpuSetIRQ(s32 on_off) { return on_off; }
 
 /* The library's integer note-to-pitch: notes are semitone in the high byte
  * and 1/128 semitone below; an octave is 1536 units. Within the octave it
@@ -106,7 +106,7 @@ static u16 note_to_pitch(u16 note, u16 sample_note)
 
 void SpuSetVoiceAttr(SpuVoiceAttr *attr)
 {
-    unsigned long mask = attr->mask ? attr->mask : 0xfffffffful;
+    u32 mask = attr->mask ? attr->mask : 0xfffffffful;
     unsigned v;
     for (v = 0; v < SPU_VOICES; v++) {
         u16 adsr1, adsr2;
@@ -163,7 +163,7 @@ void SpuSetVoiceAttr(SpuVoiceAttr *attr)
     }
 }
 
-void SpuSetKey(long on_off, unsigned long voice_bit)
+void SpuSetKey(s32 on_off, u32 voice_bit)
 {
     if (on_off) {
         Spu_KeyOn(voice_bit);
@@ -182,7 +182,7 @@ void SpuSetKeyOnWithAttr(SpuVoiceAttr *attr)
     Spu_KeyOn(attr->voice);
 }
 
-long SpuGetKeyStatus(unsigned long voice_bit)
+s32 SpuGetKeyStatus(u32 voice_bit)
 {
     unsigned v;
     for (v = 0; v < SPU_VOICES; v++) {
@@ -204,7 +204,7 @@ void SpuGetAllKeysStatus(char *status)
 void SpuSetCommonAttr(SpuCommonAttr *attr)
 {
     static SpuCommonAttr current = {0, {0x3fff, 0x3fff}, {0, 0}, {0, 0}, {{0x7fff, 0x7fff}, 0, 1}, {{0, 0}, 0, 0}};
-    unsigned long mask = attr->mask ? attr->mask : 0xfffffffful;
+    u32 mask = attr->mask ? attr->mask : 0xfffffffful;
     if (mask & SPU_COMMON_MVOLL) { current.mvol.left = attr->mvol.left; }
     if (mask & SPU_COMMON_MVOLR) { current.mvol.right = attr->mvol.right; }
     if (mask & SPU_COMMON_CDVOLL) { current.cd.volume.left = attr->cd.volume.left; }

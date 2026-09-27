@@ -115,15 +115,15 @@ next:
     k = 3;
     buf->ordering_tables[0].length = 2;
     buf->ordering_tables[1].org =
-        (GsOT_TAG *)(buf->ordering_table_tags + 0x10);
+        (u32)(buf->ordering_table_tags + 0x10);
     buf->ordering_tables[2].length = 0xC;
     buf->ordering_tables[2].org =
-        (GsOT_TAG *)(buf->ordering_table_tags + 0x110);
-    buf->ordering_tables[0].org = (GsOT_TAG *)buf->ordering_table_tags;
+        (u32)(buf->ordering_table_tags + 0x110);
+    buf->ordering_tables[0].org = (u32)buf->ordering_table_tags;
     buf->ordering_tables[1].length = six;
     buf->ordering_tables[3].length = six;
     buf->ordering_tables[3].org =
-        (GsOT_TAG *)(buf->ordering_table_tags + 0x4110);
+        (u32)(buf->ordering_table_tags + 0x4110);
     do {
         GsClearOt(0, k, &buf->ordering_tables[k]);
         k--;

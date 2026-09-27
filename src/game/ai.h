@@ -22,19 +22,37 @@ typedef struct {
     u8 deck_index;
 } AiActiveCard;
 
+/* script_base/script_cursor/previous_cursor/return_stack: PC-port 64-bit
+ * experiment (notes/pc-port-plan.md's "Memory and 64-bit ABI"). The
+ * decompiled callers (ai_script_vm.c, ai_script_control_flow.c) already
+ * treat these as plain 32-bit words -- every jump/call site does
+ * `offset += (s32)state->script_base` and stores the result back with
+ * `(u8 *)offset` -- because retail MIPS held them in ordinary registers.
+ * Declaring them as u32 here instead of u8* makes that already-integer
+ * treatment the field's real type: identical bit pattern and identical
+ * struct layout on ILP32 (a u32 is 4 bytes exactly like the pointer it
+ * replaces, so sizeof(AiScriptState) and every AI_SCRIPT_STATE_OFFSET check
+ * below hold unchanged), and no 8-byte ballooning on a 64-bit host, since a
+ * host pointer's numeric value is only ever produced/consumed through an
+ * explicit cast at the small number of sites that actually dereference the
+ * stream (AiScript_ReadByte, AiScript_ReadShort, AiScript_Init). NOT YET
+ * VERIFIED against `make match`: the MIPS toolchain was not set up in the
+ * session that wrote this, so the reasoning above is not yet proven not to
+ * change retail's generated code; treat this struct as a draft until that
+ * check runs. */
 typedef struct {
     u8 enabled;
     u8 pad01[3];
-    u8 *script_base;
-    u8 *script_cursor;
-    u8 *previous_cursor;
+    u32 script_base;
+    u32 script_cursor;
+    u32 previous_cursor;
     u8 pad10[4];
     u8 return_depth;
     u8 pad15[3];
     /* func_80070DA8 pops `script_cursor = return_stack[--return_depth]` and
      * prints "ERROR:Can't Return From Routine" when the depth is already
      * zero. */
-    u8 *return_stack[AI_SCRIPT_RETURN_STACK_COUNT];
+    u32 return_stack[AI_SCRIPT_RETURN_STACK_COUNT];
     u8 combo_cards[AI_SCRIPT_COMBO_CARD_COUNT];
     u16 card_set[AI_SCRIPT_CARD_SET_COUNT];
     u8 type_set[AI_SCRIPT_TYPE_SET_COUNT];
@@ -152,96 +170,148 @@ extern u8 gAi_bBestTarget;
    absolute load for element zero. */
 extern u16 gAi_wBestDifference[];
 
+#ifndef MEMORIES_GLES
 typedef char AiActiveCard_size_must_be_0x0C[
     sizeof(AiActiveCard) == AI_ACTIVE_CARD_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiActiveCard_row_slot_count_must_be_the_field_row_size[
     AI_ACTIVE_CARD_ROW_SLOT_COUNT == DUEL_FIELD_ROW_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiActiveCard_opponent_hand_must_start_at_slot_66[
     AI_SLOT_OPPONENT_HAND_FIRST == 66 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiActiveCard_side_stride_must_be_55_records[
     AI_ACTIVE_CARD_SIDE_BYTE_STRIDE == 55 * sizeof(AiActiveCard) ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_size_must_be_0xD4[
     sizeof(AiScriptState) == 0xD4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_card_set_offset_must_be_0x3E[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, card_set) ==
         AI_SCRIPT_CARD_SET_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_card_set_entry_size_must_be_2[
     sizeof(((AiScriptState *)0)->card_set[0]) ==
         AI_SCRIPT_CARD_SET_ENTRY_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_type_set_offset_must_be_0x7E[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, type_set) ==
         AI_SCRIPT_TYPE_SET_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_combo_offset_must_be_0x38[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, combo_cards) ==
         AI_SCRIPT_COMBO_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_field_97_offset_must_be_0x97[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, field_97) == 0x97 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_attack_best_stat_offset_must_be_0x98[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, attack_best_stat) == 0x98 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_attack_best_slot_offset_must_be_0x9A[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, attack_best_slot) == 0x9A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_attack_best_target_offset_must_be_0x9B[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, attack_best_target) == 0x9B ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_count_offset_must_be_0x9C[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_count) ==
         AI_SCRIPT_FUSION_COUNT_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_limit_offset_must_be_0x9D[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_limit) ==
         AI_SCRIPT_FUSION_LIMIT_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_set_offset_must_be_0x9E[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_set) ==
         AI_SCRIPT_FUSION_SET_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_best_stat_offset_must_be_0xA0[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_best_stat) ==
         AI_SCRIPT_FUSION_BEST_STAT_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_depth_offset_must_be_0xA2[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_depth) ==
         AI_SCRIPT_FUSION_DEPTH_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_best_depth_offset_must_be_0xA3[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_best_depth) ==
         AI_SCRIPT_FUSION_BEST_DEPTH_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_path_offset_must_be_0xA4[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_path) ==
         AI_SCRIPT_FUSION_PATH_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiScriptState_fusion_used_offset_must_be_0xAA[
     AI_SCRIPT_STATE_OFFSET(AiScriptState, fusion_used) ==
         AI_SCRIPT_FUSION_USED_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiSelection_size_must_be_0x0C[
     sizeof(AiSelection) == 0x0C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiSelection_value_offset_must_be_0x06[
     AI_SCRIPT_STATE_OFFSET(AiSelection, value) == 0x06 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiSelection_zero_offset_must_be_0x07[
     AI_SCRIPT_STATE_OFFSET(AiSelection, zero) == 0x07 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiSelection_random_offset_must_be_0x08[
     AI_SCRIPT_STATE_OFFSET(AiSelection, random) == 0x08 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AiSelection_field_09_offset_must_be_0x09[
     AI_SCRIPT_STATE_OFFSET(AiSelection, field_09) == 0x09 ? 1 : -1
 ];
+#endif
 
 #undef AI_SCRIPT_STATE_OFFSET
 

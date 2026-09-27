@@ -18,7 +18,7 @@
 #ifdef _WIN32
 #include "pc/platform/win32.h"
 #include <windows.h>
-#else
+#elif !defined(MEMORIES_GLES)
 #include <fontconfig/fontconfig.h>
 #include <iconv.h>
 #endif
@@ -63,6 +63,23 @@ static uint32_t sjis_to_unicode(unsigned code)
     in[0] = (char)(code >> 8);
     in[1] = (char)code;
     return MultiByteToWideChar(932, MB_ERR_INVALID_CHARS, in, 2, out, 2) == 1 ? out[0] : 0;
+}
+#elif defined(MEMORIES_GLES)
+/* No fontconfig or iconv (Bionic's iconv needs API 28, this targets 21) on
+ * Android yet: credits names render with the full-width Latin fallback
+ * below, blank pattern otherwise (render() below already handles !face). */
+static void open_face(void)
+{
+    face_tried = 1;
+    face = NULL;
+}
+
+static uint32_t sjis_to_unicode(unsigned code)
+{
+    if (code >= 0x824F && code <= 0x8258) return '0' + (code - 0x824F);
+    if (code >= 0x8260 && code <= 0x8279) return 'A' + (code - 0x8260);
+    if (code >= 0x8281 && code <= 0x829A) return 'a' + (code - 0x8281);
+    return code == 0x8140 ? ' ' : 0;
 }
 #else
 static void open_face(void)

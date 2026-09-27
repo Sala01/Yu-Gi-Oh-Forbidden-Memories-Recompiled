@@ -23,10 +23,12 @@ extern u8 D_801D4200_raw[] asm("D_801D4200");
 #endif
 extern u16 D_8009B0EC;
 
+#ifndef MEMORIES_GLES
 typedef char FileTransfer_default_image_must_fill_sector[
     FILE_TRANSFER_DEFAULT_IMAGE_WORD_WIDTH * FILE_TRANSFER_DEFAULT_IMAGE_HEIGHT *
         sizeof(u16) == FILE_SECTOR_SIZE ? 1 : -1
 ];
+#endif
 
 void File_InitTransferState(s32);
 void File_GetPosition(s32 *, const char *);

@@ -23,7 +23,11 @@ typedef struct CoordUnit {
     u32 flg;
     MATRIX coord, workm;
     SVECTOR rot;
+#ifdef MEMORIES_GLES
+    u32 super; /* struct CoordUnit* guest address; see libhmd.h's GsCOORDUNIT */
+#else
     struct CoordUnit *super;
+#endif
 } CoordUnit;
 
 typedef struct View2 {
@@ -90,7 +94,11 @@ CoordUnit *GsMapCoordUnit(u32 *base)
     header[0]--;
     for (i = 0; i < count; i++) {
         if (coordinates[i].super) {
+#ifdef MEMORIES_GLES
+            coordinates[i].super = (u32)(uintptr_t)(base + coordinates[i].super);
+#else
             coordinates[i].super = (CoordUnit *)(base + (u32)(uintptr_t)coordinates[i].super);
+#endif
         }
     }
     return coordinates;
@@ -288,7 +296,7 @@ void GsGetLwUnit(CoordUnit *coordinate, MATRIX *m)
         if (coordinate->flg == 0) {
             manual = depth;
         }
-        coordinate = coordinate->super;
+        coordinate = (CoordUnit *)coordinate->super;
         depth++;
     }
     while (depth > 0) {

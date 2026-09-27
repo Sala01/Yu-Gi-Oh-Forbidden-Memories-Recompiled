@@ -48,25 +48,35 @@ typedef struct DuelEffectResourceRecord {
     u8 pad_3D[3];
 } DuelEffectResourceRecord;
 
+#ifndef MEMORIES_GLES
 typedef char DuelEffectResourceRecord_size_must_be_0x40[
     sizeof(DuelEffectResourceRecord) == 0x40 ? 1 : -1
 ];
+#endif
 
 #define DUEL_EFFECT_RESOURCE_RECORD_OFFSET(member) \
     ((u32)&(((DuelEffectResourceRecord *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DuelEffectResourceRecord_field_30_offset_must_be_0x30[
     DUEL_EFFECT_RESOURCE_RECORD_OFFSET(field_30) == 0x30 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectResourceRecord_field_32_offset_must_be_0x32[
     DUEL_EFFECT_RESOURCE_RECORD_OFFSET(field_32) == 0x32 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectResourceRecord_field_3A_offset_must_be_0x3A[
     DUEL_EFFECT_RESOURCE_RECORD_OFFSET(field_3A) == 0x3A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectResourceRecord_field_3C_offset_must_be_0x3C[
     DUEL_EFFECT_RESOURCE_RECORD_OFFSET(field_3C) == 0x3C ? 1 : -1
 ];
+#endif
 
 /* The array itself. Seven sources declared it identically and all seven
  * already include this header, which exists to describe one of its entries,

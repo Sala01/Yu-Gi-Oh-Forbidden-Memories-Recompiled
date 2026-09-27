@@ -22,18 +22,26 @@ typedef struct {
 #define DUEL_CARD_PICK_CURSOR_OFFSET(member) \
     ((u32)&(((DuelCardPickCursor *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DuelCardPickCursor_col_offset_must_be_0xF[
     DUEL_CARD_PICK_CURSOR_OFFSET(col) == 0xF ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardPickCursor_row_offset_must_be_0x10[
     DUEL_CARD_PICK_CURSOR_OFFSET(row) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardPickCursor_status_offset_must_be_0x19[
     DUEL_CARD_PICK_CURSOR_OFFSET(status) == 0x19 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardPickCursor_size_must_be_0x1A[
     sizeof(DuelCardPickCursor) == 0x1A ? 1 : -1
 ];
+#endif
 
 #undef DUEL_CARD_PICK_CURSOR_OFFSET
 

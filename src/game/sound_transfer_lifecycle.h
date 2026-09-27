@@ -30,18 +30,26 @@ typedef struct {
     u32 reserved_1C;
 } SDVabHeader;
 
+#ifndef MEMORIES_GLES
 typedef char SDVabHeader_file_size_offset_must_be_0x0C[
     ((u32)&(((SDVabHeader *)0)->file_size)) == 0x0C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDVabHeader_program_count_offset_must_be_0x12[
     ((u32)&(((SDVabHeader *)0)->program_count)) == 0x12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDVabHeader_master_volume_offset_must_be_0x18[
     ((u32)&(((SDVabHeader *)0)->master_volume)) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDVabHeader_size_must_be_0x20[
     sizeof(SDVabHeader) == 0x20 ? 1 : -1
 ];
+#endif
 
 void SD_ResetSecondaryRuntime(void);
 void SD_Term(void);

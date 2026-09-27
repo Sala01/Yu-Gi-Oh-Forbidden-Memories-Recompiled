@@ -38,7 +38,7 @@
 #include <string.h>
 #ifdef _WIN32
 #include "pc/platform/win32.h"
-#else
+#elif !defined(MEMORIES_GLES)
 #include <fontconfig/fontconfig.h>
 #endif
 
@@ -288,6 +288,10 @@ static const char *serif_file(void)
 {
 #ifdef _WIN32
     return Win32_SerifFontPath();
+#elif defined(MEMORIES_GLES)
+    /* No fontconfig on Android yet: the generated name plate falls back to
+     * the system font FreeType picks with a NULL face path. */
+    return NULL;
 #else
     static char path[1024];
     FcPattern *pattern, *match;

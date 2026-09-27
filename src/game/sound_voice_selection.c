@@ -126,7 +126,7 @@ s32 func_80047AD0(s32 value)
     u16 index = value;
     SDValue *state = g_SDValue;
 
-    if (state->field_0448[index].field_0004 == 0)
+    if (((SDValueLink *)state->field_0448)[index].field_0004 == 0)
         return 1;
     if (state->field_0442 == index)
         return 1;

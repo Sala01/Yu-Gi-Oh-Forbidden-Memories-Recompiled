@@ -19,15 +19,15 @@ s32 func_8004DB14(ModelSlot *p, s32 i)
 
     acc = 0;
     n = 1;
-    e = p->field_1E0[i];
+    e = (ModelSlotPart *)p->field_1E0[i];
     if (e == 0) {
         return 0;
     }
-    lim = p->field_DD8 + e->ti;
+    lim = (s32 *)p->field_DD8 + e->ti;
     if (*lim < 0) {
         return 0;
     }
-    tbl = p->field_DD8;
+    tbl = (s32 *)p->field_DD8;
     for (n = 1; n < 10; n++) {
         k = p->field_2C8[n][i];
         q = tbl + k;
@@ -86,8 +86,8 @@ void func_8004DC38(ModelSlot *p, s32 i, s32 n, u32 pos) {
     off4 = i * 4;
     off2 = i * 2;
     k = p->field_2C8[n][i];
-    tbl = p->field_DD8;
-    e = p->field_1E0[i];
+    tbl = (s32 *)p->field_DD8;
+    e = (ModelSlotPart *)p->field_1E0[i];
     q = tbl + k;
     if (e == 0) {
         return;
@@ -152,12 +152,12 @@ scan:
             goto scan;
         }
     }
-    x = q - p->field_DD8;
+    x = q - (s32 *)p->field_DD8;
     e->ti = x;
     if (x != 0) {
         x = x - 1;
     } else {
-        x = v - p->field_DD8;
+        x = v - (s32 *)p->field_DD8;
     }
     e->ci = x;
     y = ((u8 *)q)[2] << 4;

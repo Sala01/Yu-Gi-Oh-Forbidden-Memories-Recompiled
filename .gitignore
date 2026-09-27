@@ -24,3 +24,17 @@
 # Tool-generated language caches
 **/__pycache__/
 *.py[cod]
+
+# Android Gradle project: build outputs, caches and machine-specific config
+# (source lives in android/app/src/main; compiled libmain.so/libbootstrap.so
+# are rebuilt from tools/pc/build_game_android.py and android/app/src/main/cpp)
+/android/build/
+/android/app/build/
+/android/.gradle/
+/android/local.properties
+/android/app/src/main/jniLibs/
+
+# Python install-manager debris and third-party downloaded asset packs
+/Python/
+/python_install_*.log
+/mods/assets-hd/

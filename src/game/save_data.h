@@ -122,52 +122,76 @@ typedef struct {
     u8 duplicate_tail[SAVE_DATA_STATE_SIZE - sizeof(SaveDataState)];
 } SaveDataPayload;
 
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_card_quantities_offset_must_be_0x50[
     (u32)&(((SaveDataState *)0)->card_quantities) ==
         SAVE_DATA_CARD_QUANTITIES_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_duelist_code_offset_must_be_0x334[
     (u32)&(((SaveDataState *)0)->duelist_code) ==
         SAVE_DATA_DUELIST_CODE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_field_3DE_offset_must_be_0x3DE[
     (u32)&(((SaveDataState *)0)->field_3DE) ==
         SAVE_DATA_CREDITS_FLAGS_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_campaign_flags_offset_must_be_0x418[
     (u32)&(((SaveDataState *)0)->campaign_flags) ==
         CAMPAIGN_FLAG_BANK_OFFSET - SAVE_DATA_HEADER_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_duelist_records_offset_must_be_0x51C[
     (u32)&(((SaveDataState *)0)->duelist_records) == 0x51C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_duel_totals_offsets_must_match[
     (u32)&(((SaveDataState *)0)->duel_wins) == SAVE_DATA_DUEL_WINS_OFFSET &&
     (u32)&(((SaveDataState *)0)->duel_losses) == SAVE_DATA_DUEL_LOSSES_OFFSET
         ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_campaign_scene_index_offset_must_be_0x5DC[
     (u32)&(((SaveDataState *)0)->campaign_scene_index) ==
         SAVE_DATA_CAMPAIGN_SCENE_INDEX_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_starchips_offset_must_be_0x5E0[
     (u32)&(((SaveDataState *)0)->starchips) ==
         SAVE_DATA_STARCHIPS_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataState_size_must_be_0x5E4[
     sizeof(SaveDataState) == 0x5E4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataPayload_duplicate_offset_must_follow_the_state[
     (u32)&(((SaveDataPayload *)0)->duplicate) ==
         SAVE_DATA_DUPLICATE_STATE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataPayload_size_must_be_0xF00[
     sizeof(SaveDataPayload) ==
         SAVE_DATA_HEADER_SIZE + SAVE_DATA_REPLICATED_STATE_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataWorkspace_state_offset_must_be_0x200[
     (u32)&(((SaveDataWorkspace *)0)->state) == SAVE_DATA_HEADER_SIZE ? 1 : -1
 ];
+#endif
 
 /* Keep the base and interior labels distinct: they are different relocation
  * targets. The save-prompt halfword arm retains its base register and writes

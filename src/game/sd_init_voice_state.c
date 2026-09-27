@@ -39,7 +39,7 @@ void SD_InitVoiceState(void) {
     p->voice_attr.a_mode = 1;
     p->voice_attr.s_mode = 1;
     p->voice_attr.r_mode = 3;
-    p->field_0448 = (SDValueLink *)0x801E2800;
+    p->field_0448 = 0x801E2800;
     p->voice_attr.mask = 0xFFFF;
     p->voice_attr.volmode.left = 0;
     p->voice_attr.volmode.right = 0;
@@ -48,20 +48,19 @@ void SD_InitVoiceState(void) {
     p->voice_attr.sr = 0;
     p->voice_attr.rr = 0;
     p->voice_attr.sl = 0;
-    p->field_043C = (u16 *)0x801E4000;
+    p->field_043C = 0x801E4000;
     p->field_0438 = 0x1010;
     p->field_0440 = 0;
     p->field_0442 = 0xFFFF;
     p->field_0444 =
-        (SDNote *)(
-            (((u32)&((u16 *)0)[p->field_0000] + 0xF) & 0xFFF0) +
-            0x801E4000);
+        (((u32)&((u16 *)0)[p->field_0000] + 0xF) & 0xFFF0) +
+        0x801E4000;
 
     i = 0;
     if (p->field_0000 != 0) {
         r = p;
         do {
-            r->field_043C[i] = SD_PENDING_ENTRY_NONE;
+            ((u16 *)r->field_043C)[i] = SD_PENDING_ENTRY_NONE;
             i++;
         } while (i < r->field_0000);
     }

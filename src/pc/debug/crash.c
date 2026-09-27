@@ -216,9 +216,22 @@ void Crash_HandleSignal(int number, siginfo_t *info, void *context)
     ucontext_t *user = context;
     struct sigaction action;
     if (reporting++) _exit(128 + number);
+#ifdef MEMORIES_GLES
+    /* Bionic's arm/arm64 sigcontext has named fields, not x86's gregs[] array. */
+#ifdef __aarch64__
+    report_fatal("signal", (unsigned long)number, info ? (uintptr_t)info->si_addr : 0,
+                 (uintptr_t)user->uc_mcontext.pc, (uintptr_t)user->uc_mcontext.sp,
+                 (uintptr_t)user->uc_mcontext.regs[29]);
+#else
+    report_fatal("signal", (unsigned long)number, info ? (uintptr_t)info->si_addr : 0,
+                 (uintptr_t)user->uc_mcontext.arm_pc, (uintptr_t)user->uc_mcontext.arm_sp,
+                 (uintptr_t)user->uc_mcontext.arm_fp);
+#endif
+#else
     report_fatal("signal", (unsigned long)number, info ? (uintptr_t)info->si_addr : 0,
                  (uintptr_t)user->uc_mcontext.gregs[REG_EIP], (uintptr_t)user->uc_mcontext.gregs[REG_ESP],
                  (uintptr_t)user->uc_mcontext.gregs[REG_EBP]);
+#endif
     memset(&action, 0, sizeof(action));
     action.sa_handler = SIG_DFL;
     sigemptyset(&action.sa_mask);
@@ -301,9 +314,21 @@ void Crash_ReportHang(void *context_pointer)
     Win32_ContextRegisters(context_pointer, &eip, &esp, &ebp);
 #else
     ucontext_t *user = context_pointer;
+#ifdef MEMORIES_GLES
+#ifdef __aarch64__
+    eip = (uintptr_t)user->uc_mcontext.pc;
+    esp = (uintptr_t)user->uc_mcontext.sp;
+    ebp = (uintptr_t)user->uc_mcontext.regs[29];
+#else
+    eip = (uintptr_t)user->uc_mcontext.arm_pc;
+    esp = (uintptr_t)user->uc_mcontext.arm_sp;
+    ebp = (uintptr_t)user->uc_mcontext.arm_fp;
+#endif
+#else
     eip = (uintptr_t)user->uc_mcontext.gregs[REG_EIP];
     esp = (uintptr_t)user->uc_mcontext.gregs[REG_ESP];
     ebp = (uintptr_t)user->uc_mcontext.gregs[REG_EBP];
+#endif
 #endif
     report_fd = -1;
     snprintf(path, sizeof(path), "%s/hang-%ld.txt", Crash_ReportDir, (long)getpid());

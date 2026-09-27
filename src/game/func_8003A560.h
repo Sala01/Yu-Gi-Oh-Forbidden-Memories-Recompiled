@@ -31,9 +31,11 @@ typedef struct {
     RECT clut_rect;
 } DisplayEffectVramSlot;
 
+#ifndef MEMORIES_GLES
 typedef char DisplayEffectVramSlot_size_must_be_0x18C10[
     sizeof(DisplayEffectVramSlot) == 0x18C10 ? 1 : -1
 ];
+#endif
 
 /* DISPLAY_EFFECT_VRAM_SLOT_COUNT bytes, one per DisplayEffectVramSlot of
  * D_80010000 that func_8003A560 walks: it starts slot at the last one, steps

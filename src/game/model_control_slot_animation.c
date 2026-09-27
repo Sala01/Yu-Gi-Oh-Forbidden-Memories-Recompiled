@@ -18,7 +18,7 @@
  * word count the slot's callee-saved register. */
 void Model_ControlSlotAnimation(s32 index, s32 anim, s32 flag) {
     ModelSlot *m;
-    ModelSlotPart **parts;
+    u32 *parts;
     u8 *dst;
     u8 *base;
     u16 *src;
@@ -32,8 +32,8 @@ void Model_ControlSlotAnimation(s32 index, s32 anim, s32 flag) {
     s32 restore_bit;
 
     m = &D_800F2C40[index];
-    dst = m->field_DE0;
-    base = m->field_DDC;
+    dst = (u8 *)m->field_DE0;
+    base = (u8 *)m->field_DDC;
     parts = m->field_1E0;
     if (m->field_E1F == 0) {
         return;
@@ -42,7 +42,7 @@ void Model_ControlSlotAnimation(s32 index, s32 anim, s32 flag) {
     case -1:
         m->field_E10 = 0;
         for (i = 0; i < m->field_E1B; parts++, i++) {
-            (*parts)->ii = 0xFFFF;
+            ((ModelSlotPart *)*parts)->ii = 0xFFFF;
         }
         break;
     case 0:
@@ -111,7 +111,7 @@ void Model_ControlSlotAnimation(s32 index, s32 anim, s32 flag) {
                     1) {
                     copy_words = 5;
                 }
-                (*parts)->ii = ((u8 *)src - (u8 *)m->field_DD8) >> 2;
+                ((ModelSlotPart *)*parts)->ii = ((u8 *)src - (u8 *)m->field_DD8) >> 2;
                 Model_CopyWords((s32 *)dst,
                                 (const s32 *)(base + src[0] * 4), copy_words);
                 dst += copy_words * 4;

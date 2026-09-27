@@ -129,7 +129,7 @@ u32 *func_80033DB0(GsARGUNIT_NORMAL *arg)
                     gt->clut = rec[1];
                     PACKET_OBJECT_VIEW(POLY_GT3, out) = *gt;
                     z = (scr[4] + scr[5] + scr[6]) / 3 >> 4;
-                    addPrim(&arg->tagp->org[z], out);
+                    addPrim(&((GsOT_TAG *)arg->tagp->org)[z], out);
                     out += sizeof(POLY_GT3);
                     goto next;
                 }
@@ -172,7 +172,7 @@ u32 *func_80033DB0(GsARGUNIT_NORMAL *arg)
             setLineG4(lg);
             PACKET_OBJECT_VIEW(LINE_G4, out) = *lg;
             z = (scr[4] + scr[5] + scr[6]) / 3 >> 4;
-            addPrim(&arg->tagp->org[z], out);
+            addPrim(&((GsOT_TAG *)arg->tagp->org)[z], out);
             out += sizeof(LINE_G4);
         next:
             rec += 11;
@@ -222,7 +222,7 @@ u32 *func_80033DB0(GsARGUNIT_NORMAL *arg)
                 gt->clut = rec[1];
                 PACKET_OBJECT_VIEW(POLY_GT3, out) = *gt;
                 z = (scr[4] + scr[5] + scr[6]) / 3 >> 4;
-                addPrim(&arg->tagp->org[z], out);
+                addPrim(&((GsOT_TAG *)arg->tagp->org)[z], out);
                 out += sizeof(POLY_GT3);
             }
             rec += 11;

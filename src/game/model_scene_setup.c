@@ -250,7 +250,7 @@ void func_800528AC(void)
         for (j = 0; j < slot->field_E1B; j++) {
             s32 t = slot->field_BF5;
             if (sid != 0) {
-                slot->field_1E0[j]->sid = sid;
+                ((ModelSlotPart *)slot->field_1E0[j])->sid = sid;
                 t = sid;
             }
             func_8004DC38(slot, j, t, aa);
@@ -269,7 +269,7 @@ void func_800528AC(void)
         for (k = 0; k < slot->field_E1B; k++) {
             s32 t = slot->field_BF5;
             if (keep != 0) {
-                slot->field_1E0[k]->sid = keep;
+                ((ModelSlotPart *)slot->field_1E0[k])->sid = keep;
                 t = keep;
             }
             func_8004DC38(slot, k, t, sv);

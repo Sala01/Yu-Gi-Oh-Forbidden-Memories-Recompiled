@@ -44,19 +44,28 @@ typedef struct {
     MemCardWorkSlot slots[MEM_CARD_WORK_SLOT_CAPACITY];
 } MemCardWorkArea;
 
+#ifndef MEMORIES_GLES
 typedef char MemCardWorkSlot_size_must_match[
     sizeof(MemCardWorkSlot) == MEM_CARD_WORK_SLOT_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MemCardWorkRoot_size_must_match[
     sizeof(MemCardWorkRoot) == MEM_CARD_WORK_ROOT_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MemCardWorkArea_size_must_be_0x4EC[
     sizeof(MemCardWorkArea) == 0x4EC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MemCardWorkSlot_offsets_must_match[
     (u32)&((MemCardWorkSlot *)0)->free_blocks == 0xC &&
     (u32)&((MemCardWorkSlot *)0)->entry_index == 0xD ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MemCardWorkRoot_offsets_must_match[
     (u32)&((MemCardWorkRoot *)0)->blocks == 0x10 &&
     (u32)&((MemCardWorkRoot *)0)->remaining == 0x12 &&
@@ -64,6 +73,7 @@ typedef char MemCardWorkRoot_offsets_must_match[
     (u32)&((MemCardWorkRoot *)0)->chunk == 0x16 &&
     (u32)&((MemCardWorkRoot *)0)->text_index == 0x1A ? 1 : -1
 ];
+#endif
 
 extern MemCardWorkArea D_800EF6D0;
 extern u16 D_8009B3CC;

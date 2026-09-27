@@ -6,7 +6,7 @@
 #include FT_FREETYPE_H
 #ifdef _WIN32
 #include "pc/platform/win32.h"
-#else
+#elif !defined(MEMORIES_GLES)
 #include <fontconfig/fontconfig.h>
 #endif
 #include <stdio.h>
@@ -168,6 +168,9 @@ static void open_system_face(void)
     system_tried = 1;
 #ifdef _WIN32
     open_face(Win32_FontPath(0));
+#elif defined(MEMORIES_GLES)
+    /* No fontconfig on Android yet: added letters (translation.md) with no
+     * retail glyph fall back to the built-in ones only. */
 #else
     {
         FcPattern *pattern, *match;

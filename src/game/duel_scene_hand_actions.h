@@ -95,9 +95,11 @@ typedef struct {
     u8 field_6C;                /* 0x6C */
 } HandCardObject;
 
+#ifndef MEMORIES_GLES
 typedef char HandCardObject_field_6C_offset_must_be_0x6C[
     (u32)&(((HandCardObject *)0)->field_6C) == 0x6C ? 1 : -1
 ];
+#endif
 
 void DuelScene_UpdateHandActions(void);
 

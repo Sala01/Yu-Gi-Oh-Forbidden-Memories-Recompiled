@@ -10,7 +10,7 @@ s32 SD_FindMidiTrackChunk(s32 offset)
     do {
         if (SD_CompareBytes(
                 D_8009AF80,
-                D_8009B458->field_07DC + offset,
+                (u8 *)(D_8009B458->field_07DC + offset),
                 SD_SEQUENCE_MARKER_SIZE) == 0) {
             return offset + SD_SEQUENCE_MARKER_SIZE;
         }

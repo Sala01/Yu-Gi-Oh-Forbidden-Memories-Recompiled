@@ -28,18 +28,26 @@ struct DuelFieldEffectObject {
 #define DUEL_FIELD_EFFECT_OBJECT_OFFSET(member) \
     ((u32)&(((DuelFieldEffectObject *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DuelFieldEffectObject_size_must_be_0x70[
     sizeof(DuelFieldEffectObject) == 0x70 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldEffectObject_callback_offset_must_be_0x24[
     DUEL_FIELD_EFFECT_OBJECT_OFFSET(callback) == 0x24 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldEffectObject_mark_offset_must_be_0x67[
     DUEL_FIELD_EFFECT_OBJECT_OFFSET(mark) == 0x67 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldEffectObject_active_offset_must_be_0x6C[
     DUEL_FIELD_EFFECT_OBJECT_OFFSET(active) == 0x6C ? 1 : -1
 ];
+#endif
 
 #undef DUEL_FIELD_EFFECT_OBJECT_OFFSET
 

@@ -26,7 +26,7 @@ void func_800482B0(s32 id, s16 pitch, u8 volume, s16 pan, u32 mode, u8 value)
     s16 mode_snapshot;
 
     mode_snapshot = mode;
-    if (g_SDValue->field_043C[(u16)sound_id] == 0xFFFF) {
+    if (((u16 *)g_SDValue->field_043C)[(u16)sound_id] == 0xFFFF) {
         return;
     }
     if ((id & 0x8000) != 0) {

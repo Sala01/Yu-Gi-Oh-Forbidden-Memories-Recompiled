@@ -51,15 +51,21 @@ typedef struct {
 #define DUEL_FIELD_DISPLAY_SOURCE_OFFSET(member) \
     ((u32)&(((DuelFieldDisplaySource *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DuelFieldDisplaySource_x_offset_must_be_0x0F[
     DUEL_FIELD_DISPLAY_SOURCE_OFFSET(x) == 0x0F ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldDisplaySource_y_offset_must_be_0x10[
     DUEL_FIELD_DISPLAY_SOURCE_OFFSET(y) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldDisplaySource_table_index_offset_must_be_0x17[
     DUEL_FIELD_DISPLAY_SOURCE_OFFSET(table_index) == 0x17 ? 1 : -1
 ];
+#endif
 
 #undef DUEL_FIELD_DISPLAY_SOURCE_OFFSET
 

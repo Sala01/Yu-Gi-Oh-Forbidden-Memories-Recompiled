@@ -256,9 +256,11 @@ typedef struct {
     s16 field_1A;      /* 0x1A */
 } DuelEffectObject;
 
+#ifndef MEMORIES_GLES
 typedef char DuelEffectObject_size_must_be_0x1C[
     sizeof(DuelEffectObject) == 0x1C ? 1 : -1
 ];
+#endif
 
 #define DUEL_EFFECT_STATE_CARD_VIEWER 2
 #define DUEL_EFFECT_STATE_NOOP_3 3

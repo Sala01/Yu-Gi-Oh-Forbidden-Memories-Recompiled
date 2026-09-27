@@ -149,7 +149,7 @@ long SD_SequenceTimerCallback(void)
                 state->field_0508 = 0;
                 func_8004C84C();
                 func_8004AAFC();
-                callback = D_8009B458->field_050C;
+                callback = (void (*)(void))D_8009B458->field_050C;
                 if (callback != 0)
                     callback();
             }

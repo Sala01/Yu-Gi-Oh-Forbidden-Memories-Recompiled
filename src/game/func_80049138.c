@@ -12,7 +12,7 @@
 s32 SD_RequestMusicPackageLoad(s16 arg0, s32 arg1) {
     SDValue *p = g_SDValue;
 
-    if (*p->music_track != arg0 >> 4) {
+    if (*(u16 *)p->music_track != arg0 >> 4) {
         SDValue *q;
         SDMusicTableEntry *entry;
         s32 off;
@@ -30,7 +30,7 @@ s32 SD_RequestMusicPackageLoad(s16 arg0, s32 arg1) {
                       entry->field_00 << FILE_SECTOR_SHIFT,
                       entry->field_01 << FILE_SECTOR_SHIFT, 0x20);
 
-        *g_SDValue->music_track = 0xFFFF;
+        *(u16 *)g_SDValue->music_track = 0xFFFF;
     }
 
     return 0;

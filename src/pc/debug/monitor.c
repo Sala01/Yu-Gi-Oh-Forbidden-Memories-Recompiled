@@ -23,7 +23,9 @@
 #include "crash.h"
 #include "symbols.h"
 #include "pc/platform/paths.h"
+#ifndef MEMORIES_GLES
 #include <cpuid.h>
+#endif
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -127,6 +129,24 @@ static void read_file_line(const char *relative, char *out, size_t size)
 
 static void cpu_name(char *out, size_t size)
 {
+#ifdef MEMORIES_GLES
+    /* No CPUID on ARM: /proc/cpuinfo's "Hardware" line (SoC name), where present. */
+    char line[256];
+    FILE *info = fopen("/proc/cpuinfo", "r");
+    snprintf(out, size, "unknown");
+    while (info && fgets(line, sizeof(line), info)) {
+        if (!strncmp(line, "Hardware", 8)) {
+            char *value = strchr(line, ':');
+            if (value) {
+                value++;
+                while (*value == ' ') value++;
+                value[strcspn(value, "\r\n")] = '\0';
+                snprintf(out, size, "%s", value);
+            }
+        }
+    }
+    if (info) fclose(info);
+#else
     unsigned words[12], highest = 0, unused, i;
     char *start;
     snprintf(out, size, "unknown");
@@ -136,6 +156,7 @@ static void cpu_name(char *out, size_t size)
     start[47] = '\0';
     while (*start == ' ') start++;
     snprintf(out, size, "%s", start);
+#endif
 }
 
 void Monitor_NoteSystem(void)
@@ -236,7 +257,12 @@ static int wanted(void)
 {
     const char *off = getenv("MEMORIES_NO_MONITOR");
     if (off && *off && strcmp(off, "0")) return 0;
-#ifdef _WIN32
+#ifdef MEMORIES_GLES
+    /* Android's app sandbox does not allow forking a second copy of the app
+     * as an independent watcher process; the game always runs unmonitored
+     * (own_block above), like MEMORIES_NO_MONITOR=1 on desktop. */
+    return 0;
+#elif defined(_WIN32)
     if (IsDebuggerPresent()) return 0;
 #else
     {
@@ -417,6 +443,11 @@ static int remote_read(uintptr_t address, void *buffer, size_t size)
 #ifdef _WIN32
     SIZE_T got = 0;
     return ReadProcessMemory(game_process, (LPCVOID)address, buffer, size, &got) && got == size ? 0 : -1;
+#elif defined(MEMORIES_GLES)
+    /* process_vm_readv needs API 23 (this targets 21); the monitor never
+     * forks on Android anyway (wanted() below), so this never runs. */
+    (void)address; (void)buffer; (void)size;
+    return -1;
 #else
     struct iovec local = {buffer, size}, remote = {(void *)address, size};
     return process_vm_readv(game, &local, 1, &remote, 1, 0) == (ssize_t)size ? 0 : -1;
@@ -600,6 +631,15 @@ static const char *syscall_name(long number)
     }
 }
 
+#ifdef MEMORIES_GLES
+static int thread_registers(pid_t tid, uintptr_t *eip, uintptr_t *esp, uintptr_t *ebp)
+{
+    /* x86 ptrace registers (struct user_regs_struct's eip/esp/ebp); the
+     * monitor never forks on Android anyway (wanted() below). */
+    (void)tid; (void)eip; (void)esp; (void)ebp;
+    return -1;
+}
+#else
 static int thread_registers(pid_t tid, uintptr_t *eip, uintptr_t *esp, uintptr_t *ebp)
 {
     struct user_regs_struct registers;
@@ -636,6 +676,7 @@ static int thread_registers(pid_t tid, uintptr_t *eip, uintptr_t *esp, uintptr_t
         }
     }
 }
+#endif
 
 static void proc_text(pid_t tid, const char *what, char *text, size_t size)
 {
@@ -1244,6 +1285,15 @@ static void forward(int number)
 
 /* -1: no monitor, or this is the game: go on as the game. 0: the game ran
  * and ended, *exit_status. */
+#ifdef MEMORIES_GLES
+static int run_monitor(int *exit_status)
+{
+    /* wanted() is always 0 on Android (the app sandbox does not allow
+     * forking an independent watcher process), so this never runs. */
+    (void)exit_status;
+    return -1;
+}
+#else
 static int run_monitor(int *exit_status)
 {
     int fd = memfd_create("memories-monitor", 0), pipe_fds[2], status = 0;
@@ -1360,6 +1410,7 @@ static int run_monitor(int *exit_status)
     *exit_status = WIFEXITED(status) ? WEXITSTATUS(status) : 1;
     return 0;
 }
+#endif
 
 static int attach(void)
 {

@@ -9,9 +9,11 @@ typedef struct {
     u16 output_x[2];
 } OptionsLayoutBuffer;
 
+#ifndef MEMORIES_GLES
 typedef char OptionsLayoutBuffer_size_must_be_12[
     sizeof(OptionsLayoutBuffer) == 12 ? 1 : -1
 ];
+#endif
 
 /* The byte-array arm is an addressing form, not a second type, and two
  * measurements say it has to stay. options_screen.c is the only unit that

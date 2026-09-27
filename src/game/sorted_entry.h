@@ -34,18 +34,26 @@ typedef struct {
 
 #define SORTED_ENTRY_OFFSET(member) ((u32)&(((SortedEntry *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char SortedEntry_size_must_be_8[
     sizeof(SortedEntry) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SortedEntry_distance_must_be_at_2[
     SORTED_ENTRY_OFFSET(distance) == 2 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SortedEntry_append_index_must_be_at_4[
     SORTED_ENTRY_OFFSET(append_index) == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SortedEntry_sorted_position_must_be_at_6[
     SORTED_ENTRY_OFFSET(sorted_position) == 6 ? 1 : -1
 ];
+#endif
 
 /* The grey fill word. func_80035668 stores 0x808080 here alongside its write
  * to D_8009B30C (src/game/text_render_state.c:8), and four sites read it back:

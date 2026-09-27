@@ -36,9 +36,11 @@ typedef struct {
     u8 field_07;
 } AnimatedBattleModelProperties;
 
+#ifndef MEMORIES_GLES
 typedef char AnimatedBattleModelProperties_size_must_be_0x8[
     sizeof(AnimatedBattleModelProperties) == 0x8 ? 1 : -1
 ];
+#endif
 
 /* Two animated-battle model-property records. Exodia writes only the first
    model id and keeps the measured raw-halfword view. */

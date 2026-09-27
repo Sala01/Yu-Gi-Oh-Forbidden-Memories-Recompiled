@@ -10,9 +10,11 @@ typedef struct {
     s32 metadata;
 } ModelHandlerRunEntry;
 
+#ifndef MEMORIES_GLES
 typedef char ModelHandlerRunEntry_prefix_size_must_be_8[
     sizeof(ModelHandlerRunEntry) == 8 ? 1 : -1
 ];
+#endif
 
 /* Walks a run of variable-length handler entries and rewrites the key of each
  * one the callback accepts.

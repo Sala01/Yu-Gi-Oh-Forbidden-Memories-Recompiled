@@ -17,17 +17,23 @@ typedef struct {
 
 #define DISPLAY_OBJECT_LIFECYCLE_OFFSET(member) \
     ((u32)&((DisplayObjectLifecycle *)0)->member)
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectLifecycle_rgb_offsets_must_match[
     DISPLAY_OBJECT_LIFECYCLE_OFFSET(red) == 0x0C &&
     DISPLAY_OBJECT_LIFECYCLE_OFFSET(green) == 0x0D &&
     DISPLAY_OBJECT_LIFECYCLE_OFFSET(blue) == 0x0E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectLifecycle_fade_step_offset_must_be_0x60[
     DISPLAY_OBJECT_LIFECYCLE_OFFSET(fade_step) == 0x60 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectLifecycle_flags_offset_must_be_0x6C[
     DISPLAY_OBJECT_LIFECYCLE_OFFSET(flags) == 0x6C ? 1 : -1
 ];
+#endif
 #undef DISPLAY_OBJECT_LIFECYCLE_OFFSET
 
 s32 DisplayObject_MarkInitialized(DisplayObjectLifecycle *object);

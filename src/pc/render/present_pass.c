@@ -35,9 +35,18 @@
 #include "present_pass.h"
 #include "pc/platform/settings.h"
 #include <SDL3/SDL.h>
+#ifdef MEMORIES_GLES
+#include <GLES3/gl3.h>
+#else
 #include <SDL3/SDL_opengl.h>
+#endif
 #include <stdio.h>
 
+#ifndef MEMORIES_GLES
+/* Written for the compatibility profile's fixed-function immediate mode
+ * (glOrtho, gl_Vertex, glGetTexLevelParameteriv), which GLES does not have;
+ * see PresentPass_Wanted below, which keeps this whole pass off on Android
+ * until it is ported to the composite shader (sdl.c). */
 #define PASS_FUNCTIONS(X) \
     X(PFNGLCREATESHADERPROC, CreateShader) \
     X(PFNGLSHADERSOURCEPROC, ShaderSource) \
@@ -364,6 +373,9 @@ static void measure_level(GLuint picture, GLint unit, float s0, float t0, float 
 }
 
 /* Whether an effect other than the flash reduction is on, xBR here or not. */
+#endif /* !MEMORIES_GLES */
+
+#ifndef MEMORIES_GLES
 static int others_wanted_with(int xbr)
 {
     return Settings_Get(SET_BRIGHTNESS) != 100 || Settings_Get(SET_CONTRAST) != 100 ||
@@ -372,13 +384,30 @@ static int others_wanted_with(int xbr)
 }
 
 static int others_wanted(void) { return others_wanted_with(Settings_Get(SET_XBR)); }
+#endif /* !MEMORIES_GLES */
 
 int PresentPass_Wanted(void)
 {
+#ifdef MEMORIES_GLES
+    /* Written for the compatibility profile's fixed-function immediate mode
+     * (glOrtho, gl_Vertex); GLES has none. Video > Color/CRT/xBR do nothing
+     * on Android until this is ported to the composite shader (sdl.c). */
+    return 0;
+#else
     if (!Settings_Get(SET_FLASH)) primed = 0; /* what was shown since is not in the level */
     return others_wanted() || Settings_Get(SET_FLASH);
+#endif
 }
 
+#ifdef MEMORIES_GLES
+int PresentPass_Begin(unsigned texture, int source_h, float s0, float t0, float s1, float t1,
+                      int textures_smoothed)
+{
+    (void)texture; (void)source_h; (void)s0; (void)t0; (void)s1; (void)t1; (void)textures_smoothed;
+    return 0; /* PresentPass_Wanted() is always 0 here, so this never runs */
+}
+void PresentPass_End(void) {}
+#else
 int PresentPass_Begin(unsigned texture, int source_h, float s0, float t0, float s1, float t1,
                       int textures_smoothed)
 {
@@ -449,3 +478,4 @@ void PresentPass_End(void)
         pp_ActiveTexture((GLenum)unit);
     }
 }
+#endif /* MEMORIES_GLES */

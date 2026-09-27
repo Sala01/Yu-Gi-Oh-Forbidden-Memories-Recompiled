@@ -27,7 +27,11 @@
 #include "pc/guest/state.h"
 #include "save_icon.h"
 #include <SDL3/SDL.h>
+#ifdef MEMORIES_GLES
+#include <GLES3/gl3.h>
+#else
 #include <SDL3/SDL_opengl.h>
+#endif
 #include "pc/render/gl_picture.h"
 #include "pc/compat/signal.h"
 #include <stdio.h>
@@ -893,7 +897,13 @@ static void relayout(void)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_w, window_h, 0,
+#ifdef MEMORIES_GLES
+                         /* No BGRA format in GLES core; uploaded as-is and
+                          * un-swapped by the composite shader (gles_quad). */
+                         GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+#else
                          GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+#endif
         } else {
             overlay = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
                                         window_w, window_h);
@@ -911,7 +921,11 @@ static void relayout(void)
         if (use_gl) {
             glBindTexture(GL_TEXTURE_2D, gl_overlay);
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, window_w, window_h,
+#ifdef MEMORIES_GLES
+                            GL_RGBA, GL_UNSIGNED_BYTE, overlay_pixels);
+#else
                             GL_BGRA, GL_UNSIGNED_BYTE, overlay_pixels);
+#endif
         } else {
             SDL_UpdateTexture(overlay, NULL, overlay_pixels, window_w * 4);
         }
@@ -995,7 +1009,11 @@ static void resize(int w, int h)
                         Settings_Get(SET_FILTER) ? GL_LINEAR : GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+#ifdef MEMORIES_GLES
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+#else
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+#endif
         picture_pixels = realloc(picture_pixels, (size_t)w * (size_t)h * 4);
         picture_w = w;
         picture_h = h;
@@ -1028,7 +1046,12 @@ static void upload_overlay(int x, int y, int w, int h)
          * the full-width canvas, so upload whole rows for the dirty span. */
         glBindTexture(GL_TEXTURE_2D, gl_overlay);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, layout.win_w);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, GL_BGRA, GL_UNSIGNED_BYTE,
+        glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h,
+#ifdef MEMORIES_GLES
+                        GL_RGBA, GL_UNSIGNED_BYTE,
+#else
+                        GL_BGRA, GL_UNSIGNED_BYTE,
+#endif
                         overlay_pixels + (size_t)y * (size_t)layout.win_w + (size_t)x);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     } else {
@@ -1037,8 +1060,100 @@ static void upload_overlay(int x, int y, int w, int h)
     }
 }
 
+#ifdef MEMORIES_GLES
+/* GLES has no fixed-function pipeline (no glBegin/glVertex/glMatrixMode):
+ * the final composite (the picture and the menu overlay, a handful of
+ * textured quads a frame) goes through this tiny shader and a scratch VBO
+ * instead. gl_picture.c's own shaders are unaffected. */
+static GLuint gles_program, gles_vbo;
+static GLint gles_uniform_scale_offset;
+
+static GLuint gles_compile_shader(GLenum kind, const char *source)
+{
+    GLuint shader = glCreateShader(kind);
+    GLint ok = 0;
+    glShaderSource(shader, 1, &source, NULL);
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+    if (!ok) {
+        char log[512];
+        glGetShaderInfoLog(shader, sizeof(log), NULL, log);
+        fprintf(stderr, "memories-pc: composite shader: %s\n", log);
+    }
+    return shader;
+}
+
+static void gles_init_composite(void)
+{
+    static const char *vertex_source =
+        "#version 300 es\n"
+        "precision highp float;\n"
+        "layout(location = 0) in vec2 position;\n"
+        "layout(location = 1) in vec2 texcoord;\n"
+        "uniform vec4 scale_offset;\n" /* clip = position * scale_offset.xy + .zw */
+        "out vec2 v_uv;\n"
+        "void main() {\n"
+        "    gl_Position = vec4(position * scale_offset.xy + scale_offset.zw, 0.0, 1.0);\n"
+        "    v_uv = texcoord;\n"
+        "}\n";
+    static const char *fragment_source =
+        "#version 300 es\n"
+        "precision mediump float;\n"
+        "in vec2 v_uv;\n"
+        "uniform sampler2D tex;\n"
+        "out vec4 fragment;\n"
+        "void main() {\n"
+        /* .bgra undoes the channel order the textures were uploaded with
+         * (GLES core has no GL_BGRA format token). */
+        "    fragment = texture(tex, v_uv).bgra;\n"
+        "}\n";
+    GLuint vertex_shader = gles_compile_shader(GL_VERTEX_SHADER, vertex_source);
+    GLuint fragment_shader = gles_compile_shader(GL_FRAGMENT_SHADER, fragment_source);
+    GLint linked = 0;
+    gles_program = glCreateProgram();
+    glAttachShader(gles_program, vertex_shader);
+    glAttachShader(gles_program, fragment_shader);
+    glLinkProgram(gles_program);
+    glGetProgramiv(gles_program, GL_LINK_STATUS, &linked);
+    if (!linked) {
+        char log[512];
+        glGetProgramInfoLog(gles_program, sizeof(log), NULL, log);
+        fprintf(stderr, "memories-pc: composite program: %s\n", log);
+    }
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
+    gles_uniform_scale_offset = glGetUniformLocation(gles_program, "scale_offset");
+    glGenBuffers(1, &gles_vbo);
+}
+
+static void gles_set_ortho(int win_w, int win_h)
+{
+    /* Matches glOrtho(0, win_w, win_h, 0, -1, 1): x 0..win_w -> -1..1,
+     * y 0..win_h -> 1..-1 (the console's top-left origin). */
+    glUseProgram(gles_program);
+    glUniform4f(gles_uniform_scale_offset, 2.0f / (float)win_w, -2.0f / (float)win_h, -1.0f, 1.0f);
+}
+#endif
+
 static void gl_quad_part(GLuint texture, float x, float y, float w, float h, float s0, float t0, float s1, float t1)
 {
+#ifdef MEMORIES_GLES
+    float verts[16] = {
+        x,     y,     s0, t0,
+        x + w, y,     s1, t0,
+        x + w, y + h, s1, t1,
+        x,     y + h, s0, t1,
+    };
+    glUseProgram(gles_program);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindBuffer(GL_ARRAY_BUFFER, gles_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+#else
     glBindTexture(GL_TEXTURE_2D, texture);
     glBegin(GL_QUADS);
     glTexCoord2f(s0, t0); glVertex2f(x, y);
@@ -1046,6 +1161,7 @@ static void gl_quad_part(GLuint texture, float x, float y, float w, float h, flo
     glTexCoord2f(s1, t1); glVertex2f(x + w, y + h);
     glTexCoord2f(s0, t1); glVertex2f(x, y + h);
     glEnd();
+#endif
 }
 
 static void gl_quad(GLuint texture, float x, float y, float w, float h)
@@ -1084,16 +1200,20 @@ static void show(void)
         int output_w, output_h, effects;
         if (!gl_picture || !gl_overlay || !SDL_GetWindowSizeInPixels(window, &output_w, &output_h)) return;
         glViewport(0, 0, output_w, output_h);
+#ifdef MEMORIES_GLES
+        gles_set_ortho(layout.win_w, layout.win_h);
+#else
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, layout.win_w, layout.win_h, 0, -1, 1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+        glEnable(GL_TEXTURE_2D);
+        glColor4f(1, 1, 1, 1);
+#endif
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
-        glEnable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
-        glColor4f(1, 1, 1, 1);
         if (gl_pass_shown) {
             int pw = gl_pass_size[0], ph = gl_pass_size[1], x = gl_pass_rect[0], y = gl_pass_rect[1];
             GLuint texture = gl_pass_texture ? gl_pass_texture : (GLuint)GlPicture_Texture(&pw, &ph), shown;
@@ -1465,6 +1585,11 @@ static void pump(void)
 static void create_window(const char *title)
 {
     update_menu_scale(240 * scale + 26 * Menu_AutoScale(240 * scale));
+#ifdef MEMORIES_GLES
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
     window = SDL_CreateWindow(title, 320 * scale, 240 * scale + Menu_Height(),
                               SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_OPENGL);
     gl_context = window ? SDL_GL_CreateContext(window) : NULL;
@@ -1474,6 +1599,9 @@ static void create_window(const char *title)
         window = SDL_CreateWindow(title, 320 * scale, 240 * scale + Menu_Height(),
                                   SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
     }
+#ifdef MEMORIES_GLES
+    if (use_gl) gles_init_composite();
+#endif
 }
 
 static void destroy_window(void)
@@ -1591,7 +1719,22 @@ int Platform_Open(const char *title)
      * cursor/DPI scale from the rest of the desktop. SDL_VIDEODRIVER remains
      * available for diagnostics and compatibility overrides. */
     block_signals(&previous);
+#ifdef MEMORIES_GLES
+    /* SDL_INIT_GAMEPAD pulls in the joystick subsystem, whose Android
+     * backend polls connected devices through JNI (SDLControllerManager).
+     * The game's main loop runs on a stack this port mmap's at a fixed, low
+     * address (Memories_CallOnStack in src/pc/guest/state.c, needed so the
+     * decompiled retail code's 32-bit pointer-in-an-int tricks keep
+     * working), and ART aborts the process the first time a thread whose
+     * stack pointer is that far outside its own pthread-allocated stack
+     * makes a JNI call (SDL_UpdateJoysticks, from the per-frame event pump)
+     * -- confirmed on-device (runtime.cc's JniAbort, JavaVMExt::JniAbort).
+     * No gamepad/controller support on Android until that stack conflict is
+     * solved some other way; touch and keyboard input are unaffected. */
+    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO)) {
+#else
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO)) {
+#endif
         restore_signals(&previous);
         fprintf(stderr, "memories-pc: SDL: %s; set MEMORIES_HEADLESS=1 to run without a window\n", SDL_GetError());
         return -1;
@@ -1683,7 +1826,11 @@ static void finish_present(int w, int h)
 {
     if (use_gl) {
         glBindTexture(GL_TEXTURE_2D, gl_picture);
+#ifdef MEMORIES_GLES
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, picture_pixels);
+#else
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_BYTE, picture_pixels);
+#endif
     } else {
         SDL_UpdateTexture(picture, NULL, picture_pixels, w * 4);
     }

@@ -32,7 +32,11 @@
 #include "pc/compat/signal.h"
 #include "pc/debug/log.h"
 #include <SDL3/SDL.h>
+#ifdef MEMORIES_GLES
+#include <GLES3/gl3.h>
+#else
 #include <SDL3/SDL_opengl.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -237,7 +241,13 @@ static unsigned glyphs_generation = ~0u;
 static GLint u_glyphs;
 
 static const char *vertex_source =
+#ifdef MEMORIES_GLES
+    "#version 300 es\n"
+    "precision highp float;\n"
+    "precision highp int;\n"
+#else
     "#version 130\n"
+#endif
     "uniform vec2 picture_size;\n"
     "in vec2 position;\n"
     "in vec2 texcoord;\n"
@@ -245,10 +255,20 @@ static const char *vertex_source =
     "in ivec4 texture_page;\n"
     "in ivec4 texture_mode;\n"
     "in float persp;\n"
+#ifdef MEMORIES_GLES
+    /* gl_Position.w is always 1 below (this is a flat 2D composite, not a
+     * real 3D projection), so plain and noperspective interpolation are
+     * numerically identical here; GLSL ES 3.00 has no noperspective. */
+    "out float q;\n"
+    "in ivec4 texture_bounds;\n"
+    "out vec2 uv;\n"
+    "out vec3 rgb;\n"
+#else
     "noperspective out float q;\n"
     "in ivec4 texture_bounds;\n"
     "noperspective out vec2 uv;\n"
     "noperspective out vec3 rgb;\n"
+#endif
     "flat out int flags;\n"
     "flat out ivec4 page;\n"
     "flat out ivec4 mode;\n"
@@ -351,7 +371,16 @@ static const char *vertex_source =
  * them. pass: 0 every fragment, 1 the opaque ones, 2 the semi-transparent.
  * op 1: VRAM into the picture. op 2: the scratch copy into the picture. */
 static const char *fragment_source =
+#ifdef MEMORIES_GLES
+    "#version 300 es\n"
+    "precision highp float;\n"
+    "precision highp int;\n"
+    "precision highp sampler2D;\n"
+    "precision highp usampler2D;\n"
+    "precision highp usampler2DArray;\n"
+#else
     "#version 130\n"
+#endif
     "uniform usampler2D vram;\n"
     "uniform usampler2DArray banks;\n"
     "uniform sampler2D scratch;\n"
@@ -367,9 +396,15 @@ static const char *fragment_source =
     "uniform int scale;\n"
     "uniform ivec2 copy_offset;\n"
     "uniform int tex_xbr;\n"
+#ifdef MEMORIES_GLES
+    "in vec2 uv;\n"
+    "in float q;\n"
+    "in vec3 rgb;\n"
+#else
     "noperspective in vec2 uv;\n"
     "noperspective in float q;\n"
     "noperspective in vec3 rgb;\n"
+#endif
     "flat in int flags;\n"
     "flat in ivec4 page;\n"
     "flat in ivec4 mode;\n"

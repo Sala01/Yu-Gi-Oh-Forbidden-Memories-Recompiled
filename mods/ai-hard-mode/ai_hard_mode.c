@@ -38,7 +38,7 @@ static int active(void)
 {
     return D_8009B1D5 < 2 && D_8009B360[D_8009B1D5] >= 0 &&
         gDuel_bOpponentID >= 1 && gDuel_bOpponentID < AI_OPPONENT_COUNT &&
-        (gAiScript_State.script_base == D_801A8000 || gAiScript_State.script_base == D_801A9800);
+        (gAiScript_State.script_base == (u32)D_801A8000 || gAiScript_State.script_base == (u32)D_801A9800);
 }
 static int sees_hidden(void)
 {
@@ -172,7 +172,7 @@ static void search(int which, int hide_operand, int dest_operand)
     u8 operands[5], *cursor;
     int reg, i, used, saved, count = dest_operand + 1;
     if (!active()) { ((void (*)(void))original_search[which])(); return; }
-    cursor = gAiScript_State.script_cursor;
+    cursor = (u8 *)gAiScript_State.script_cursor;
     memcpy(operands, cursor, count);
     for (reg = 0; reg < AI_SCRIPT_MEMORY_COUNT; reg++) {
         used = 0;
@@ -183,9 +183,9 @@ static void search(int which, int hide_operand, int dest_operand)
     saved = gAiScript_aMemory[reg];
     operands[hide_operand] = reg;
     gAiScript_aMemory[reg] = !sees_hidden();
-    gAiScript_State.script_cursor = operands;
+    gAiScript_State.script_cursor = (u32)operands;
     ((void (*)(void))original_search[which])();
-    gAiScript_State.script_cursor = cursor + count;
+    gAiScript_State.script_cursor = (u32)(cursor + count);
     gAiScript_aMemory[reg] = saved;
 }
 static void strongest(void) { search(0, 2, 4); }
@@ -220,7 +220,7 @@ static s32 run(void)
     HmDecision d, retail = {{0}, 0, 0, 0};
     int hand, fallback = 0;
     if (!active()) return ((s32 (*)(void))original_run)();
-    o = options(); hand = gAiScript_State.script_base == D_801A8000;
+    o = options(); hand = gAiScript_State.script_base == (u32)D_801A8000;
     if ((hand && !o.hand) || (!hand && (!o.attacks || !o.defense || !o.spells))) {
         retail.result = ((s32 (*)(void))original_run)();
         if (!retail.result) return 0;

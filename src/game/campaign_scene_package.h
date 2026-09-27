@@ -27,12 +27,16 @@
     (CAMPAIGN_DIALOG_PORTRAIT_PHASE_SIZE - \
      CAMPAIGN_DIALOG_PORTRAIT_USED_SIZE)
 
+#ifndef MEMORIES_GLES
 typedef char CampaignDialogPortrait_record_size_must_be_0x980[
     CAMPAIGN_DIALOG_PORTRAIT_RECORD_SIZE == 0x980 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CampaignDialogPortrait_spill_size_must_be_0x280[
     CAMPAIGN_DIALOG_PORTRAIT_SPILL_SIZE == 0x280 ? 1 : -1
 ];
+#endif
 
 /* Initializes the fixed scene presentation package: seeds the event-script
  * flag word D_8009B2A4 from its argument, clears the viewport origin, and

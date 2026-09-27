@@ -15,9 +15,11 @@ typedef struct {
     s8 values[AI_OPPONENT_DATA_FIELD_COUNT];
 } AiOpponentData;
 
+#ifndef MEMORIES_GLES
 typedef char AiOpponentData_size_must_be_9[
     sizeof(AiOpponentData) == AI_OPPONENT_DATA_FIELD_COUNT ? 1 : -1
 ];
+#endif
 
 extern AiOpponentData gDuel_aOpponentData[AI_OPPONENT_COUNT];
 

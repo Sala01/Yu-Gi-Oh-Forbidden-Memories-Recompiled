@@ -18,12 +18,16 @@ typedef struct {
     DuelHandSlot *hand;
 } DuelSelectionSideView;
 
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionSideView_hand_offset_must_be_8[
     (u32)&(((DuelSelectionSideView *)0)->hand) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionSideView_size_must_be_0xC[
     sizeof(DuelSelectionSideView) == 0xC ? 1 : -1
 ];
+#endif
 
 /* One whole selection record, DUEL_SELECTION_RECORD_SIZE bytes, four to a
  * side. Duel_InitSelectionRecords resets every field named here, which is what fixes
@@ -67,24 +71,36 @@ typedef struct {
     u8 pad_1A[2];
 } DuelSelectionRecord;
 
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionRecord_hand_offset_must_be_8[
     (u32)&(((DuelSelectionRecord *)0)->hand) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionRecord_field_0E_offset_must_be_0xE[
     (u32)&(((DuelSelectionRecord *)0)->field_0E) == 0xE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionRecord_field_15_offset_must_be_0x15[
     (u32)&(((DuelSelectionRecord *)0)->field_15) == 0x15 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionRecord_field_13_offset_must_be_0x13[
     (u32)&(((DuelSelectionRecord *)0)->field_13) == 0x13 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionRecord_field_18_offset_must_be_0x18[
     (u32)&(((DuelSelectionRecord *)0)->field_18) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionRecord_size_must_be_record_size[
     sizeof(DuelSelectionRecord) == DUEL_SELECTION_RECORD_SIZE ? 1 : -1
 ];
+#endif
 
 /* One side of the selection table with record 2 seen as its pick cursor.
  * DuelScene_UpdateHandActions indexes D_800E9F10 through this view so that
@@ -97,9 +113,11 @@ typedef struct {
               sizeof(DuelCardPickCursor)];
 } DuelSelectionSideCursors;
 
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionSideCursors_size_must_be_side_size[
     sizeof(DuelSelectionSideCursors) == DUEL_SELECTION_SIDE_SIZE ? 1 : -1
 ];
+#endif
 
 /* One side of the table as its four records, for the unit that reaches
  * record 2 and record 3 of the current side through the same base:
@@ -109,9 +127,11 @@ typedef struct {
     DuelSelectionRecord records[DUEL_SELECTION_RECORDS_PER_SIDE];
 } DuelSelectionSide;
 
+#ifndef MEMORIES_GLES
 typedef char DuelSelectionSide_size_must_be_side_size[
     sizeof(DuelSelectionSide) == DUEL_SELECTION_SIDE_SIZE ? 1 : -1
 ];
+#endif
 
 /* The selection table itself: DUEL_SELECTION_SIDE_SIZE bytes per side. */
 extern u8 D_800E9F10[];

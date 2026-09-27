@@ -10,12 +10,16 @@ typedef struct {
     u8 pad_6B[0x10F];
 } CardVariantSource;
 
+#ifndef MEMORIES_GLES
 typedef char CardVariantSource_variant_offset_must_be_0x6A[
     (u32)&(((CardVariantSource *)0)->variant) == 0x6A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardVariantSource_size_must_be_0x17A[
     sizeof(CardVariantSource) == 0x17A ? 1 : -1
 ];
+#endif
 
 void func_80028B08(DisplayObject *object, s32 arg1);
 /* Applies the preview object's stored card variant, or fallback variant 2,

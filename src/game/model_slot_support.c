@@ -15,7 +15,7 @@ void *Model_GetSlotDataEntry(s32 index, s32 slot)
     if (slot > entry->entry_count) {
         slot = entry->field_E18;
     }
-    return entry->entries + slot * MODEL_SLOT_DATA_ENTRY_SIZE;
+    return (void *)(entry->entries + slot * MODEL_SLOT_DATA_ENTRY_SIZE);
 }
 
 u32 Model_GetCurrentDataEntry(s32 index)

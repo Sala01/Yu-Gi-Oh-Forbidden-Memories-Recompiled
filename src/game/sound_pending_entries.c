@@ -16,13 +16,13 @@ void func_8004763C(void) {
     a1->field_0442 = SD_VALUE_LINK_INDEX_NONE;
     if (i < a1->field_0000) {
         do {
-            a1->field_043C[i] = SD_PENDING_ENTRY_NONE;
+            ((u16 *)a1->field_043C)[i] = SD_PENDING_ENTRY_NONE;
             i++;
         } while (i < a1->field_0000);
     }
     g_SDValue->field_0440 = g_SDValue->field_0004;
     g_SDValue->field_0438 =
-        g_SDValue->field_0448->field_0004 + 0x1010;
+        ((SDValueLink *)g_SDValue->field_0448)->field_0004 + 0x1010;
 }
 
 /* Imports one pending-input block: each live key is bound to the next free
@@ -33,9 +33,9 @@ void func_800476B4(SDSeqBlock *input, u32 rate) {
 
     for (i = 0; i < input->count; i++) {
         if (input->keys[i] != SD_PENDING_ENTRY_NONE) {
-            g_SDValue->field_043C[input->keys[i]] = g_SDValue->field_0440;
-            g_SDValue->field_0444[g_SDValue->field_0440] = input->data[i];
-            g_SDValue->field_0444[g_SDValue->field_0440].field_0006 +=
+            ((u16 *)g_SDValue->field_043C)[input->keys[i]] = g_SDValue->field_0440;
+            ((SDNote *)g_SDValue->field_0444)[g_SDValue->field_0440] = input->data[i];
+            ((SDNote *)g_SDValue->field_0444)[g_SDValue->field_0440].field_0006 +=
                 rate >> 4;
             g_SDValue->field_0440++;
         }

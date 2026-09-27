@@ -8,9 +8,17 @@
  * bases, followed by the two primary modules entered at +4. This is an
  * address-block prefix, not a homogeneous arena table or a payload layout.
  * The remaining module, data-argument and SU words keep separate labels. */
+/* PC-port 64-bit note: this is an overlay onto guest addresses 0x80010000+,
+ * immediately followed by other individually pinned globals (D_80010014
+ * etc, high_memory_addresses.h) at their own fixed retail offsets from the
+ * same base. Native pointer fields here would grow to 8 bytes on a 64-bit
+ * host and push those neighbours' apparent offsets out from under them, so
+ * (unlike most structs in this tree) these stay explicit 32-bit guest
+ * addresses on every architecture; see ai.h's AiScriptState for the same
+ * pattern with dereferencing consumers. */
 typedef struct {
-    u8 *payload_bases[3];
-    u8 *primary_modules[2];
+    u32 payload_bases[3];
+    u32 primary_modules[2];
 } HighMemoryModelAddressPrefix;
 
 typedef char HighMemoryModelAddressPrefix_size_must_be_0x14[
@@ -25,9 +33,11 @@ typedef struct {
     u16 count;
 } CardCountEntry;
 
+#ifndef MEMORIES_GLES
 typedef char CardCountEntry_size_must_be_4[
     sizeof(CardCountEntry) == 4 ? 1 : -1
 ];
+#endif
 
 /* Unpacked colour channels used by the tint pipeline. Most callers keep the
  * BGR555 0..31 range; the inverse transform may clamp a channel to 0xFF. */
@@ -108,27 +118,41 @@ typedef struct {
     u8 out[4];
 } ClipState;
 
+#ifndef MEMORIES_GLES
 typedef char Color_size_must_be_3[
     sizeof(Color) == 3 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char HsvT_size_must_be_8[
     sizeof(HsvT) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ProjectedPair_size_must_be_4[
     sizeof(ProjectedPair) == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ScreenPair_size_must_be_4[
     sizeof(ScreenPair) == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SpritePrim_size_must_be_0x24[
     sizeof(SpritePrim) == 0x24 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SpritePrim_cy_must_be_at_0x12[
     (u32)&(((SpritePrim *)0)->cxcy.h.cy) == 0x12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ClipState_size_must_be_0x24[
     sizeof(ClipState) == 0x24 ? 1 : -1
 ];
+#endif
 
 typedef u8 *(*ModelHandler)(u8 **);
 typedef void (*ScriptCommandHandler)(void);
@@ -210,36 +234,56 @@ typedef union {
     } parts;
 } PasswordGlyphCoordinates;
 
+#ifndef MEMORIES_GLES
 typedef char DuelCardRenderHolder_size_must_be_0x1C[
     sizeof(DuelCardRenderHolder) == 0x1C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelAnimationSample_size_must_be_0x12[
     sizeof(ModelAnimationSample) == 0x12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelSeparationPair_size_must_be_8[
     sizeof(ModelSeparationPair) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char Func80028B08Ctx_size_must_be_0xC[
     sizeof(Func80028B08Ctx) == 0xC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char Func80028B08Extra_size_must_be_8[
     sizeof(Func80028B08Extra) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SoundCommandPair_size_must_be_8[
     sizeof(SoundCommandPair) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SoundIndexList_indices_offset_must_be_0x10[
     (u32)&(((SoundIndexList *)0)->indices) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MainMenuTradeBlock16_size_must_be_0x10[
     sizeof(MainMenuTradeBlock16) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MainMenuTradeBlock1024_size_must_be_0x400[
     sizeof(MainMenuTradeBlock1024) == 0x400 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char PasswordGlyphCoordinates_size_must_be_8[
     sizeof(PasswordGlyphCoordinates) == 8 ? 1 : -1
 ];
+#endif
 
 /* Eight bytes copied as one unit. Two retained candidates use this shape as
    the source and destination of a whole-struct assignment: func_80015EF4
@@ -267,34 +311,42 @@ typedef struct {
     u8 b[8];
 } Bytes8;
 
+#ifndef MEMORIES_GLES
 typedef char Bytes8_size_must_be_8[
     sizeof(Bytes8) == 8 ? 1 : -1
 ];
+#endif
 
 typedef struct {
     u8 bytes[20];
 } TextDecimalDigitKeyBlock;
 
+#ifndef MEMORIES_GLES
 typedef char TextDecimalDigitKeyBlock_size_must_be_20[
     sizeof(TextDecimalDigitKeyBlock) == 20 ? 1 : -1
 ];
+#endif
 
 typedef struct {
     u16 positions[3];
 } OptionsLayoutPositionBlock;
 
+#ifndef MEMORIES_GLES
 typedef char OptionsLayoutPositionBlock_size_must_be_6[
     sizeof(OptionsLayoutPositionBlock) == 6 ? 1 : -1
 ];
+#endif
 
 typedef struct {
     OptionsLayoutPositionBlock positions;
     u16 pad_06;
 } OptionsLayoutPositionData;
 
+#ifndef MEMORIES_GLES
 typedef char OptionsLayoutPositionData_size_must_be_8[
     sizeof(OptionsLayoutPositionData) == 8 ? 1 : -1
 ];
+#endif
 
 typedef struct {
     s32 key;
@@ -325,36 +377,54 @@ typedef struct {
     u8 pad_19[3];
 } DuelEffectEntry;
 
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_size_must_be_0x1C[
     sizeof(DuelEffectEntry) == 0x1C ? 1 : -1
 ];
+#endif
 typedef char DuelEffectEntry_must_be_four_byte_aligned[
     sizeof(struct { u8 lead; DuelEffectEntry entry; }) == 0x20 ? 1 : -1
 ];
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_code_00_offset_must_be_0[
     YGO_TYPE_OFFSET(DuelEffectEntry, code_00) == 0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_x_0C_offset_must_be_0x0C[
     YGO_TYPE_OFFSET(DuelEffectEntry, x_0C) == 0x0C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_field_10_offset_must_be_0x10[
     YGO_TYPE_OFFSET(DuelEffectEntry, field_10) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_flags_11_offset_must_be_0x11[
     YGO_TYPE_OFFSET(DuelEffectEntry, flags_11) == 0x11 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_field_12_offset_must_be_0x12[
     YGO_TYPE_OFFSET(DuelEffectEntry, field_12) == 0x12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_field_13_offset_must_be_0x13[
     YGO_TYPE_OFFSET(DuelEffectEntry, field_13) == 0x13 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_field_15_offset_must_be_0x15[
     YGO_TYPE_OFFSET(DuelEffectEntry, field_15) == 0x15 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectEntry_field_18_offset_must_be_0x18[
     YGO_TYPE_OFFSET(DuelEffectEntry, field_18) == 0x18 ? 1 : -1
 ];
+#endif
 
 #define TEXT_STREAM_SLOT_COUNT 22
 
@@ -401,21 +471,31 @@ struct DuelEffectChannel;
 typedef void (*SceneScriptRecordCallback)(void *, s32);
 typedef void (*TextBoxStateCallback)(struct DuelEffectChannel *);
 
+#ifndef MEMORIES_GLES
 typedef char TextStreamOwner_stream_index_offset_must_be_0x58[
     YGO_TYPE_OFFSET(TextStreamOwner, stream_index) == 0x58 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char EffectObject_depth_offset_must_be_0x58[
     YGO_TYPE_OFFSET(EffectObject, depth) == 0x58 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SceneScriptSlot_size_must_be_0x14[
     sizeof(SceneScriptSlot) == 0x14 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ScriptImageEntry_size_must_be_0x14[
     sizeof(ScriptImageEntry) == 0x14 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ScriptImageEntry_field_10_offset_must_be_0x10[
     YGO_TYPE_OFFSET(ScriptImageEntry, field_10) == 0x10 ? 1 : -1
 ];
+#endif
 
 struct DisplayObject;
 
@@ -447,21 +527,31 @@ typedef struct {
     struct DisplayObject *render;
 } LibraryMotionState;
 
+#ifndef MEMORIES_GLES
 typedef char LibraryMotionState_x_offset_must_be_0x8[
     YGO_TYPE_OFFSET(LibraryMotionState, x) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char LibraryMotionState_frames_offset_must_be_0x16[
     YGO_TYPE_OFFSET(LibraryMotionState, frames) == 0x16 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char LibraryMotionState_velocity_x_offset_must_be_0x18[
     YGO_TYPE_OFFSET(LibraryMotionState, velocity_x) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char LibraryMotionState_render_offset_must_be_0x44[
     YGO_TYPE_OFFSET(LibraryMotionState, render) == 0x44 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char LibraryMotionState_size_must_be_0x48[
     sizeof(LibraryMotionState) == 0x48 ? 1 : -1
 ];
+#endif
 
 /* One text-box record, 0x64 bytes, the element type of D_800EB0F8. 0x00 is the
    decoded string the record is playing back (TextBox_BuildStep stores it
@@ -554,54 +644,86 @@ typedef struct DuelEffectChannel {
     u8 pad_63;
 } DuelEffectChannel;
 
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_size_must_be_0x64[
     sizeof(DuelEffectChannel) == 0x64 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_entry_end_20_offset_must_be_0x20[
     YGO_TYPE_OFFSET(DuelEffectChannel, entry_end_20) == 0x20 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_entry_head_24_offset_must_be_0x24[
     YGO_TYPE_OFFSET(DuelEffectChannel, entry_head_24) == 0x24 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_28_offset_must_be_0x28[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_28) == 0x28 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_2C_offset_must_be_0x2C[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_2C) == 0x2C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_30_offset_must_be_0x30[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_30) == 0x30 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_flags_34_offset_must_be_0x34[
     YGO_TYPE_OFFSET(DuelEffectChannel, flags_34) == 0x34 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_3C_offset_must_be_0x3C[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_3C) == 0x3C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_state_51_offset_must_be_0x51[
     YGO_TYPE_OFFSET(DuelEffectChannel, state_51) == 0x51 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_53_offset_must_be_0x53[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_53) == 0x53 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_56_offset_must_be_0x56[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_56) == 0x56 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_index_57_offset_must_be_0x57[
     YGO_TYPE_OFFSET(DuelEffectChannel, index_57) == 0x57 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_stream_58_offset_must_be_0x58[
     YGO_TYPE_OFFSET(DuelEffectChannel, stream_58) == 0x58 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_5A_offset_must_be_0x5A[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_5A) == 0x5A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_range_start_5C_offset_must_be_0x5C[
     YGO_TYPE_OFFSET(DuelEffectChannel, range_start_5C) == 0x5C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectChannel_field_61_offset_must_be_0x61[
     YGO_TYPE_OFFSET(DuelEffectChannel, field_61) == 0x61 ? 1 : -1
 ];
+#endif
 
 typedef void (*NameEntryGlyphUpdate)(u8 *sprite);
 
@@ -625,24 +747,36 @@ typedef struct {
     u8 sequence;
 } GlyphSprite;
 
+#ifndef MEMORIES_GLES
 typedef char GlyphSprite_size_must_be_0x6C[
     sizeof(GlyphSprite) == 0x6C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GlyphSprite_scale_offset_must_be_0x44[
     YGO_TYPE_OFFSET(GlyphSprite, scale_x) == 0x44 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GlyphSprite_source_offset_must_be_0x4C[
     YGO_TYPE_OFFSET(GlyphSprite, sourceGlyph) == 0x4C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GlyphSprite_saved_x_offset_must_be_0x5A[
     YGO_TYPE_OFFSET(GlyphSprite, savedSourceX) == 0x5A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GlyphSprite_frame_offset_must_be_0x60[
     YGO_TYPE_OFFSET(GlyphSprite, frame) == 0x60 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GlyphSprite_sequence_offset_must_be_0x6A[
     YGO_TYPE_OFFSET(GlyphSprite, sequence) == 0x6A ? 1 : -1
 ];
+#endif
 
 /* Dialog panel reached through the text box, not the keyboard selection
    frame. slide is signed distance remaining on the panel's own transition. */
@@ -658,18 +792,26 @@ typedef struct {
     u8 status;
 } DialogCaret;
 
+#ifndef MEMORIES_GLES
 typedef char DialogCaret_size_must_be_0x6E[
     sizeof(DialogCaret) == 0x6E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DialogCaret_position_offset_must_be_0x30[
     YGO_TYPE_OFFSET(DialogCaret, x) == 0x30 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DialogCaret_slide_offset_must_be_0x60[
     YGO_TYPE_OFFSET(DialogCaret, slide) == 0x60 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DialogCaret_status_offset_must_be_0x6C[
     YGO_TYPE_OFFSET(DialogCaret, status) == 0x6C ? 1 : -1
 ];
+#endif
 
 /* The drawing callback and keyboard tween operate on the same allocation.
    Their old prefixes agreed at every common offset; this joins their fields. */
@@ -693,9 +835,11 @@ typedef struct {
 
 typedef SelectionFrame NameEntrySelectionFrameView;
 
+#ifndef MEMORIES_GLES
 typedef char SelectionFrame_size_must_be_0x62[
     sizeof(SelectionFrame) == 0x62 ? 1 : -1
 ];
+#endif
 
 /* Known prefixes of the password shop's preview and digit-cursor objects. */
 typedef struct {
@@ -729,18 +873,26 @@ typedef struct {
     u8 updateFlags;
 } PasswordCursorView;
 
+#ifndef MEMORIES_GLES
 typedef char PasswordCursorView_phase_offset_must_be_0x22[
     YGO_TYPE_OFFSET(PasswordCursorView, phase) == 0x22 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char PasswordCursorView_step_x_offset_must_be_0x36[
     YGO_TYPE_OFFSET(PasswordCursorView, step_x) == 0x36 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char PasswordCursorView_timer_offset_must_be_0x60[
     YGO_TYPE_OFFSET(PasswordCursorView, timer) == 0x60 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char PasswordCursorView_update_flags_offset_must_be_0x6C[
     YGO_TYPE_OFFSET(PasswordCursorView, updateFlags) == 0x6C ? 1 : -1
 ];
+#endif
 
 typedef struct {
     u8 flags;
@@ -778,27 +930,41 @@ typedef struct {
     u8 unknown4DE[0xB2];
 } PasswordModuleState;
 
+#ifndef MEMORIES_GLES
 typedef char PasswordModuleState_size_must_be_0x190[
     sizeof(PasswordModuleState) == 0x190 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SelectionFrame_priority_offset_must_be_0x14[
     YGO_TYPE_OFFSET(SelectionFrame, priority) == 0x14 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SelectionFrame_position_offset_must_be_0x30[
     YGO_TYPE_OFFSET(SelectionFrame, x) == 0x30 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SelectionFrame_velocity_offset_must_be_0x36[
     YGO_TYPE_OFFSET(SelectionFrame, stepX) == 0x36 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SelectionFrame_extent_offset_must_be_0x3C[
     YGO_TYPE_OFFSET(SelectionFrame, width) == 0x3C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SelectionFrame_bonus_offset_must_be_0x5E[
     YGO_TYPE_OFFSET(SelectionFrame, widthBonus) == 0x5E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SelectionFrame_timer_offset_must_be_0x60[
     YGO_TYPE_OFFSET(SelectionFrame, timer) == 0x60 ? 1 : -1
 ];
+#endif
 
 #define NAME_ENTRY_STARTER_DECK_POOL_PADDING_SIZE 18
 
@@ -808,12 +974,16 @@ typedef struct {
     u8 padding[NAME_ENTRY_STARTER_DECK_POOL_PADDING_SIZE];
 } NameEntryStarterDeckPool;
 
+#ifndef MEMORIES_GLES
 typedef char NameEntryStarterDeckPool_size_must_be_0x5B8[
     sizeof(NameEntryStarterDeckPool) == 0x5B8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char NameEntryStarterDeckPool_weights_offset_must_be_2[
     YGO_TYPE_OFFSET(NameEntryStarterDeckPool, weights) == 2 ? 1 : -1
 ];
+#endif
 
 /* Live overworld records: camera setup/tween, marker placement and exit
    selection all read the same 66-byte stride. The alternate map is separate. */
@@ -842,24 +1012,36 @@ typedef struct {
     CampaignMapExit exits[4];
 } MapLocation;
 
+#ifndef MEMORIES_GLES
 typedef char CampaignMapExit_size_must_be_12[
     sizeof(CampaignMapExit) == 12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CampaignMapExit_input_mask_offset_must_be_6[
     YGO_TYPE_OFFSET(CampaignMapExit, input_mask) == 6 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CampaignMapExit_destination_offset_must_be_9[
     YGO_TYPE_OFFSET(CampaignMapExit, destination) == 9 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MapLocation_size_must_be_66[
     sizeof(MapLocation) == 66 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MapLocation_marker_offset_must_be_12[
     YGO_TYPE_OFFSET(MapLocation, f12) == 12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MapLocation_exits_offset_must_be_18[
     YGO_TYPE_OFFSET(MapLocation, exits) == 18 ? 1 : -1
 ];
+#endif
 
 typedef struct {
     u8 pad0[8];
@@ -874,12 +1056,16 @@ typedef struct {
     s16 f96;
 } MapObject;
 
+#ifndef MEMORIES_GLES
 typedef char MapObject_position_offset_must_be_48[
     YGO_TYPE_OFFSET(MapObject, f48) == 48 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MapObject_transition_offset_must_be_96[
     YGO_TYPE_OFFSET(MapObject, f96) == 96 ? 1 : -1
 ];
+#endif
 
 /* The two endpoint blocks in each model-effect request. `packed` preserves
    func_8005F91C's unaligned two-word copies from generic byte pointers. */
@@ -890,12 +1076,16 @@ typedef struct {
     s16 kind;
 } __attribute__((packed)) ModelEffectEndpoint;
 
+#ifndef MEMORIES_GLES
 typedef char ModelEffectEndpoint_size_must_be_0x8[
     sizeof(ModelEffectEndpoint) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelEffectEndpoint_kind_offset_must_be_0x6[
     YGO_TYPE_OFFSET(ModelEffectEndpoint, kind) == 0x6 ? 1 : -1
 ];
+#endif
 
 /* Four halfwords produced by func_80059000. The fourth is the maximum of the
    first three after the slot-specific overrides are applied. */
@@ -906,12 +1096,16 @@ typedef struct {
     s16 max;
 } ModelEffectAdjustment;
 
+#ifndef MEMORIES_GLES
 typedef char ModelEffectAdjustment_size_must_be_0x8[
     sizeof(ModelEffectAdjustment) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelEffectAdjustment_max_offset_must_be_0x6[
     YGO_TYPE_OFFSET(ModelEffectAdjustment, max) == 0x6 ? 1 : -1
 ];
+#endif
 
 typedef struct FileTransferDescriptor FileTransferDescriptor;
 typedef void (*FileTransferCallback)();
@@ -964,48 +1158,76 @@ struct FileTransferDescriptor {
     u8 substate;
 };
 
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_size_must_be_0x48[
     sizeof(FileTransferDescriptor) == 0x48 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_w_offset_must_be_0x04[
     YGO_TYPE_OFFSET(FileTransferDescriptor, w) == 0x04 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_h_offset_must_be_0x06[
     YGO_TYPE_OFFSET(FileTransferDescriptor, h) == 0x06 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_value_08_offset_must_be_0x08[
     YGO_TYPE_OFFSET(FileTransferDescriptor, value_08) == 0x08 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_total_bytes_offset_must_be_0x10[
     YGO_TYPE_OFFSET(FileTransferDescriptor, total_bytes) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_phase_size_offset_must_be_0x1C[
     YGO_TYPE_OFFSET(FileTransferDescriptor, phase_size) == 0x1C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_phase_callback_offset_must_be_0x20[
     YGO_TYPE_OFFSET(FileTransferDescriptor, phase_callback) == 0x20 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_absolute_lba_offset_must_be_0x24[
     YGO_TYPE_OFFSET(FileTransferDescriptor, absolute_lba) == 0x24 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_status_flags_offset_must_be_0x2C[
     YGO_TYPE_OFFSET(FileTransferDescriptor, status_flags) == 0x2C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_counter_offset_must_be_0x30[
     YGO_TYPE_OFFSET(FileTransferDescriptor, field_30.h.counter) == 0x30 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_field_32_offset_must_be_0x32[
     YGO_TYPE_OFFSET(FileTransferDescriptor, field_30.h.field_32) == 0x32 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_callback_data_offset_must_be_0x38[
     YGO_TYPE_OFFSET(FileTransferDescriptor, callback_data) == 0x38 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_done_offset_must_be_0x46[
     YGO_TYPE_OFFSET(FileTransferDescriptor, done) == 0x46 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_substate_offset_must_be_0x47[
     YGO_TYPE_OFFSET(FileTransferDescriptor, substate) == 0x47 ? 1 : -1
 ];
+#endif
 
 #define FILE_TRANSFER_DESCRIPTOR_WORD_COUNT 18
 
@@ -1016,9 +1238,11 @@ typedef struct {
     s32 value[FILE_TRANSFER_DESCRIPTOR_WORD_COUNT];
 } FileTransferDescriptorWords;
 
+#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptorWords_size_must_match_descriptor[
     sizeof(FileTransferDescriptorWords) == sizeof(FileTransferDescriptor) ? 1 : -1
 ];
+#endif
 
 /* Sound's staged command and the loader's two request slots are the same
    record: func_80045514 passes it to func_80014C40 for a 0x20-byte copy. */
@@ -1035,36 +1259,56 @@ typedef struct {
     u8 field_1F;
 } FileRequestSlot;
 
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_size_must_be_0x20[
     sizeof(FileRequestSlot) == 0x20 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_00_offset_must_be_0x00[
     YGO_TYPE_OFFSET(FileRequestSlot, field_00) == 0x00 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_04_offset_must_be_0x04[
     YGO_TYPE_OFFSET(FileRequestSlot, field_04) == 0x04 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_0C_offset_must_be_0x0C[
     YGO_TYPE_OFFSET(FileRequestSlot, field_0C) == 0x0C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_10_offset_must_be_0x10[
     YGO_TYPE_OFFSET(FileRequestSlot, field_10) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_14_offset_must_be_0x14[
     YGO_TYPE_OFFSET(FileRequestSlot, field_14) == 0x14 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_18_offset_must_be_0x18[
     YGO_TYPE_OFFSET(FileRequestSlot, field_18) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_1C_offset_must_be_0x1C[
     YGO_TYPE_OFFSET(FileRequestSlot, field_1C) == 0x1C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_1E_offset_must_be_0x1E[
     YGO_TYPE_OFFSET(FileRequestSlot, field_1E) == 0x1E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FileRequestSlot_field_1F_offset_must_be_0x1F[
     YGO_TYPE_OFFSET(FileRequestSlot, field_1F) == 0x1F ? 1 : -1
 ];
+#endif
 
 /* One row of the eight-byte transfer request table func_8005FB30 walks: the
    model id it is asked to stage and the state it reports back. */
@@ -1074,15 +1318,21 @@ typedef struct {
     s16 state;
 } ModelTransferItem;
 
+#ifndef MEMORIES_GLES
 typedef char ModelTransferItem_size_must_be_8[
     sizeof(ModelTransferItem) == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelTransferItem_id_offset_must_be_0[
     YGO_TYPE_OFFSET(ModelTransferItem, id) == 0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelTransferItem_state_offset_must_be_6[
     YGO_TYPE_OFFSET(ModelTransferItem, state) == 6 ? 1 : -1
 ];
+#endif
 
 /* One movie-stream entry. sector_count advances to the next stream and a
    nonzero end_frame overrides the caller's frame limit. */
@@ -1091,12 +1341,16 @@ typedef struct {
     u16 end_frame;
 } MovieStreamRange;
 
+#ifndef MEMORIES_GLES
 typedef char MovieStreamRange_size_must_be_4[
     sizeof(MovieStreamRange) == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MovieStreamRange_end_frame_offset_must_be_2[
     YGO_TYPE_OFFSET(MovieStreamRange, end_frame) == 2 ? 1 : -1
 ];
+#endif
 
 /* The updater selects the duel outcome with a halfword cursor; the text
    producer reads the same two counters with signed extension. */
@@ -1108,12 +1362,16 @@ typedef union {
     u16 counts[2];
 } SaveDataDuelistRecord;
 
+#ifndef MEMORIES_GLES
 typedef char SaveDataDuelistRecord_size_must_be_4[
     sizeof(SaveDataDuelistRecord) == FREE_DUEL_GRID_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SaveDataDuelistRecord_losses_offset_must_be_2[
     YGO_TYPE_OFFSET(SaveDataDuelistRecord, result.losses) == sizeof(u16) ? 1 : -1
 ];
+#endif
 #undef YGO_TYPE_OFFSET
 
 #define FADE_BAND_COUNT 30
@@ -1132,27 +1390,41 @@ typedef struct {
     u8 band_levels[FADE_BAND_COUNT];
 } FadeTransitionState;
 
+#ifndef MEMORIES_GLES
 typedef char FadeTransitionState_size_must_be_0x28[
     sizeof(FadeTransitionState) == FADE_TRANSITION_STATE_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FadeTransitionState_level_offset_must_be_0x04[
     (u32)&((FadeTransitionState *)0)->level == 0x04 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FadeTransitionState_target_level_offset_must_be_0x05[
     (u32)&((FadeTransitionState *)0)->target_level == 0x05 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FadeTransitionState_flags_offset_must_be_0x06[
     (u32)&((FadeTransitionState *)0)->flags == 0x06 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FadeTransitionState_step_offset_must_be_0x07[
     (u32)&((FadeTransitionState *)0)->step == 0x07 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FadeTransitionState_field_08_offset_must_be_0x08[
     (u32)&((FadeTransitionState *)0)->field_08 == 0x08 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FadeTransitionState_band_levels_offset_must_be_0x0A[
     (u32)&((FadeTransitionState *)0)->band_levels == 0x0A ? 1 : -1
 ];
+#endif
 
 /* Display-object script state shared by the seven D_80090FEC handlers,
    DisplayObjectStream_Stop through DisplayObjectStream_ConfigureRotation.
@@ -1179,33 +1451,51 @@ typedef struct {
     s16 field_5A;
 } DisplayObjectStreamState;
 
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_size_must_be_0x5C[
     sizeof(DisplayObjectStreamState) == 0x5C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_22_offset_must_be_0x22[
     (u32)&((DisplayObjectStreamState *)0)->field_22 == 0x22 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_48_offset_must_be_0x48[
     (u32)&((DisplayObjectStreamState *)0)->field_48 == 0x48 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_4A_offset_must_be_0x4A[
     (u32)&((DisplayObjectStreamState *)0)->field_4A == 0x4A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_4C_offset_must_be_0x4C[
     (u32)&((DisplayObjectStreamState *)0)->field_4C == 0x4C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_current_offset_must_be_0x50[
     (u32)&((DisplayObjectStreamState *)0)->current == 0x50 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_base_offset_must_be_0x54[
     (u32)&((DisplayObjectStreamState *)0)->base == 0x54 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_58_offset_must_be_0x58[
     (u32)&((DisplayObjectStreamState *)0)->field_58 == 0x58 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_5A_offset_must_be_0x5A[
     (u32)&((DisplayObjectStreamState *)0)->field_5A == 0x5A ? 1 : -1
 ];
+#endif
 
 typedef struct {
     u32 field_00;
@@ -1218,12 +1508,16 @@ typedef struct {
     u32 field_14;
 } DuelStatusDigitPacket;
 
+#ifndef MEMORIES_GLES
 typedef char DuelStatusDigitPacket_size_must_be_0x18[
     sizeof(DuelStatusDigitPacket) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelStatusDigitPacket_field_14_offset_must_be_0x14[
     (u32)&((DuelStatusDigitPacket *)0)->field_14 == 0x14 ? 1 : -1
 ];
+#endif
 
 /* Two words written together as a pair. free_duel/screen_runtime.c and
  * password/shop.c formerly defined this identically to view D_801D5608, and
@@ -1248,9 +1542,11 @@ typedef union {
     Pair w;
 } Pair64;
 
+#ifndef MEMORIES_GLES
 typedef char Pair_size_must_be_8[
     sizeof(Pair) == 8 ? 1 : -1
 ];
+#endif
 
 /* One colour triple with a carried fourth byte. game/triangle_subdivision.c
    subdivides a triangle and writes its corners through this type; the four
@@ -1275,8 +1571,10 @@ typedef struct {
     u8 pad_08[4];
 } ValueSetupEntry;
 
+#ifndef MEMORIES_GLES
 typedef char ValueSetupEntry_size_must_be_0xC[
     sizeof(ValueSetupEntry) == 0xC ? 1 : -1
 ];
+#endif
 
 #endif

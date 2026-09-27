@@ -274,18 +274,32 @@ extern DRAWENV D_800FE048[];
 #endif
 extern DISPENV D_800FE0A8;
 
+#ifndef MEMORIES_GLES
 typedef char GraphicsDrawEnvSize[sizeof(DRAWENV) == 0x5C ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GraphicsDrawEnvDitherOffset[
     (u32)&((DRAWENV *)0)->dtd == 0x16 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GraphicsDrawEnvClearOffset[
     (u32)&((DRAWENV *)0)->isbg == 0x18 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GraphicsDrawEnvRedOffset[
     (u32)&((DRAWENV *)0)->r0 == 0x19 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GraphicsDrawEnvGreenOffset[
     (u32)&((DRAWENV *)0)->g0 == 0x1A ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GraphicsDrawEnvBlueOffset[
     (u32)&((DRAWENV *)0)->b0 == 0x1B ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GraphicsDispEnvSize[sizeof(DISPENV) == 0x14 ? 1 : -1];
+#endif
 
 /* Two scratch rectangles for the VRAM transfers. Every user fills x, y, w, h
  * and hands the address to LoadImage2, StoreImage2 or MoveImage in the same

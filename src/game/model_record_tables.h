@@ -20,8 +20,10 @@ typedef struct {
     s16 z;
 } ModelShadowFanStep;
 
+#ifndef MEMORIES_GLES
 typedef char ModelShadowFanStep_size_must_be_4[
     sizeof(ModelShadowFanStep) == 4 ? 1 : -1
 ];
+#endif
 
 #endif

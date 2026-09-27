@@ -19,7 +19,20 @@
 #include <ucontext.h>
 #endif
 
+#ifndef MEMORIES_GLES
 _Static_assert(sizeof(void *) == 4, "the guest image model requires an ILP32 build");
+#endif
+/* MEMORIES_GLES (Android): guest RAM is still mapped by plain mmap(MAP_FIXED)
+ * at its literal address (architecture-independent -- proven on a real
+ * arm64-v8a device), and Memories_Resolve widens a 32-bit guest address into
+ * a real pointer explicitly, so this file itself needs no ILP32 assumption.
+ * What DOES still assume 4-byte pointers is every game-side struct field
+ * declared as a native pointer (src/game/*.h): its sizeof grows to 8 on
+ * LP64 (aarch64-android), which can move other fields' offsets in the same
+ * struct and break retail-address pinning for anything after it. Each one
+ * has to become an explicit u32 "guest address" instead (ai.h/AiScriptState
+ * is the first one done, see its comment) -- the build below is expected to
+ * fail on more of them one at a time; that failure is the todo list. */
 
 /* The first 64 KiB. On the console that is kernel RAM, and retail code reaches
  * it through null pointers: CardList_CreateSlotTextBox clears a flag in
@@ -305,6 +318,7 @@ static int map_at(uint32_t address, size_t length, int fd, off_t offset)
     return 0;
 }
 
+#ifndef MEMORIES_GLES
 /* ModRM/SIB register numbers to gregs[]. */
 static const int register_slot[8] = {REG_EAX, REG_ECX, REG_EDX, REG_EBX, REG_ESP, REG_EBP, REG_ESI, REG_EDI};
 
@@ -329,11 +343,34 @@ static void on_step(int number, siginfo_t *info, void *context)
     }
     user->uc_mcontext.gregs[REG_EFL] &= ~0x100; /* trap flag */
 }
+#endif /* !MEMORIES_GLES */
 
 static void on_fault(int number, siginfo_t *info, void *context)
 {
     ucontext_t *user = context;
     uint32_t address = (uint32_t)(uintptr_t)info->si_addr;
+#ifdef MEMORIES_GLES
+#ifdef __aarch64__
+    uint32_t eip = (uint32_t)user->uc_mcontext.pc;
+#else
+    uint32_t eip = (uint32_t)user->uc_mcontext.arm_pc;
+#endif
+    void *target;
+    /* The null-pointer-to-kernel-RAM fixup below needs x86 instruction
+     * decoding (ModRM/SIB) and the x86 trap flag for single-stepping;
+     * ARM has neither in the same form. That access is one specific,
+     * documented, harmless retail quirk (see the comment above low_memory),
+     * so on Android it reports and crashes like any other bad access
+     * instead of being silently patched around. */
+    if (eip == address && (target = guest_call_target(address)) != NULL) {
+#ifdef __aarch64__
+        user->uc_mcontext.pc = (unsigned long)(uintptr_t)target;
+#else
+        user->uc_mcontext.arm_pc = (unsigned long)(uintptr_t)target;
+#endif
+        return;
+    }
+#else
     uint32_t eip = (uint32_t)user->uc_mcontext.gregs[REG_EIP];
     void *target;
     if (address < 0x10000u && eip != address && low_memory && !low_fixup.active) {
@@ -353,9 +390,29 @@ static void on_fault(int number, siginfo_t *info, void *context)
         user->uc_mcontext.gregs[REG_EIP] = (greg_t)(uintptr_t)target;
         return;
     }
+#endif
     report_guest_fault(address, eip);
     Crash_HandleSignal(number, info, context);
 }
+
+#ifdef MEMORIES_GLES
+#include <fcntl.h>
+/* memfd_create needs API 30; Bionic at this target (21) has no anonymous
+ * shared-memory syscall at all, so an unlinked file in the app's own
+ * writable directory (its cache dir, passed from Java at startup; see
+ * android/app/src/main/cpp/bootstrap.c) stands in for it: the same
+ * mmap(MAP_SHARED) calls below need only a file descriptor. */
+static int android_anon_fd(void)
+{
+    const char *dir = getenv("MEMORIES_ANDROID_TMPDIR");
+    char path[512];
+    int fd;
+    snprintf(path, sizeof(path), "%s/guest-ram.tmp", dir && *dir ? dir : "/data/local/tmp");
+    fd = open(path, O_CREAT | O_RDWR | O_TRUNC, 0600);
+    if (fd >= 0) unlink(path);
+    return fd;
+}
+#endif
 
 int Memories_GuestMap(void)
 {
@@ -365,9 +422,15 @@ int Memories_GuestMap(void)
     action.sa_sigaction = on_fault;
     action.sa_flags = SA_SIGINFO | SA_ONSTACK;
     sigaction(SIGSEGV, &action, NULL);
+#ifndef MEMORIES_GLES
     action.sa_sigaction = on_step;
     sigaction(SIGTRAP, &action, NULL);
+#endif
+#ifdef MEMORIES_GLES
+    fd = android_anon_fd();
+#else
     fd = memfd_create("memories-ram", 0);
+#endif
     if (fd < 0 || ftruncate(fd, MEMORIES_GUEST_RAM_SIZE) != 0) {
         perror("guest RAM");
         return -1;

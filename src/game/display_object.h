@@ -430,42 +430,66 @@ typedef struct DisplayObject {
 
 #define DISPLAY_OBJECT_OFFSET(member) ((u32)&(((DisplayObject *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_size_must_match_record_size[
     sizeof(DisplayObject) == DISPLAY_OBJECT_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_22_must_be_at_0x22[
     DISPLAY_OBJECT_OFFSET(field_20.h.field_22) == 0x22 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_update_must_be_at_0x24[
     DISPLAY_OBJECT_OFFSET(update) == 0x24 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_position_must_be_at_0x28[
     DISPLAY_OBJECT_OFFSET(position) == 0x28 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_3E_must_be_at_0x3E[
     DISPLAY_OBJECT_OFFSET(field_3C.h.field_3E) == 0x3E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_42_must_be_at_0x42[
     DISPLAY_OBJECT_OFFSET(field_40.h.field_42) == 0x42 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_4A_must_be_at_0x4A[
     DISPLAY_OBJECT_OFFSET(field_48.h.field_4A) == 0x4A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_3A_must_be_at_0x3A[
     DISPLAY_OBJECT_OFFSET(field_38.h.field_3A) == 0x3A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_52_must_be_at_0x52[
     DISPLAY_OBJECT_OFFSET(field_50.h.field_52) == 0x52 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_58_must_be_at_0x58[
     DISPLAY_OBJECT_OFFSET(field_58) == 0x58 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_64_must_be_at_0x64[
     DISPLAY_OBJECT_OFFSET(field_64) == 0x64 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayObject_field_65_must_be_at_0x65[
     DISPLAY_OBJECT_OFFSET(field_65) == 0x65 ? 1 : -1
 ];
+#endif
 
 /* The DISPLAY_OBJECT_LIST_COUNT list heads, immediately below the pool.
  *

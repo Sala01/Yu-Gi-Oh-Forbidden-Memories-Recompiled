@@ -10,12 +10,16 @@ struct GraphicsFrameBuffer {
     GsOT ordering_tables[4];
 };
 
+#ifndef MEMORIES_GLES
 typedef char GraphicsFrameBuffer_ordering_tables_offset_must_be_0x5110[
     (u32)&((GraphicsFrameBuffer *)0)->ordering_tables == 0x5110 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char GraphicsFrameBuffer_size_must_be_0x5160[
     sizeof(GraphicsFrameBuffer) == 0x5160 ? 1 : -1
 ];
+#endif
 
 #ifdef MEMORIES_PC
 extern GraphicsFrameBuffer gGraphics_aFrameBuffers[];

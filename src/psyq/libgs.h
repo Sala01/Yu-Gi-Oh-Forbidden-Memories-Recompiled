@@ -39,7 +39,7 @@ typedef struct {
 }       GsCOORD2PARAM;
 
 typedef struct _GsCOORDINATE2 {
-	unsigned long flg;
+	u32 flg;
 	MATRIX  coord;
 	MATRIX  workm;
 	GsCOORD2PARAM *param;
@@ -53,9 +53,9 @@ typedef struct {
 }       GsVIEW2;
 
 typedef struct {
-	long    vpx, vpy, vpz;
-	long    vrx, vry, vrz;
-	long    rz;
+	s32    vpx, vpy, vpz;
+	s32    vrx, vry, vrz;
+	s32    rz;
 	GsCOORDINATE2 *super;
 }       GsRVIEW2;
 
@@ -72,46 +72,60 @@ typedef struct {
 
 
 typedef struct {
-	unsigned long length;
+	u32 length;
+#ifdef MEMORIES_GLES
+	/* Raw-byte-offset code (src/pc/compat/libgs_ot.c's Memories_GsClearOt/
+	   Memories_GsSortOt) reads/writes this struct at fixed retail offsets
+	   (org at +4, tag at +16), matching the ILP32 20-byte GsOT. A real
+	   8-byte pointer here on a 64-bit host would both misalign offset/point
+	   and truncate whichever half of the pointer landed in the 4-byte slot,
+	   so these stay guest addresses, same treatment as GsCOORDUNIT.super
+	   (libhmd.h) and ModelSlot's fields (model.h). */
+	u32 org; /* GsOT_TAG* guest address */
+	u32 offset;
+	u32 point;
+	u32 tag; /* GsOT_TAG* guest address */
+#else
 	GsOT_TAG *org;
-	unsigned long offset;
-	unsigned long point;
+	u32 offset;
+	u32 point;
 	GsOT_TAG *tag;
+#endif
 }       GsOT;
 
 typedef struct {
-	unsigned long attribute;/* pers,trans,rotate,disp */
+	u32 attribute;/* pers,trans,rotate,disp */
 	GsCOORDINATE2 *coord2;	/* local dmatrix */
-	unsigned long *tmd;
-	unsigned long id;
+	u32 *tmd;
+	u32 id;
 }       GsDOBJ2;
 
 typedef struct {
-	unsigned long attribute;/* pers,trans,rotate,disp */
+	u32 attribute;/* pers,trans,rotate,disp */
 	GsCOORDINATE2 *coord2;	/* local dmatrix */
-	unsigned long *pmd;	/* pmd top address */
-	unsigned long *base;	/* object base address */
-	unsigned long *sv;	/* shared vertex base */
-	unsigned long id;
+	u32 *pmd;	/* pmd top address */
+	u32 *base;	/* object base address */
+	u32 *sv;	/* shared vertex base */
+	u32 id;
 }       GsDOBJ3;
 
 typedef struct {
-	unsigned long attribute;/* pers,trans,rotate,disp */
+	u32 attribute;/* pers,trans,rotate,disp */
 	GsCOORDINATE2 *coord2;	/* local dmatrix */
-	unsigned long *tmd;
-	unsigned long id;
+	u32 *tmd;
+	u32 id;
 }       GsDOBJ4;
 
 typedef struct {
-	unsigned long attribute;
+	u32 attribute;
 	GsCOORDINATE2 *coord2;
-	unsigned long *tmd;
-	unsigned long *packet;
-	unsigned long id;
+	u32 *tmd;
+	u32 *packet;
+	u32 id;
 }       GsDOBJ5;
 
 typedef struct {
-	unsigned long attribute;
+	u32 attribute;
 	short   x, y;
 	unsigned short w, h;
 	unsigned short tpage;
@@ -120,7 +134,7 @@ typedef struct {
 	unsigned char r, g, b;
 	short   mx, my;
 	short   scalex, scaley;
-	long    rotate;
+	s32    rotate;
 }       GsSPRITE;
 
 typedef struct {
@@ -138,7 +152,7 @@ typedef struct {
 }       GsMAP;
 
 typedef struct {
-	unsigned long attribute;
+	u32 attribute;
 	short   x, y;
 	short   w, h;
 	short   scrollx, scrolly;
@@ -146,18 +160,18 @@ typedef struct {
 	GsMAP  *map;
 	short   mx, my;
 	short   scalex, scaley;
-	long    rotate;
+	s32    rotate;
 }       GsBG;
 
 typedef struct {
-	unsigned long attribute;
+	u32 attribute;
 	short   x0, y0;
 	short   x1, y1;
 	unsigned char r, g, b;
 }       GsLINE;
 
 typedef struct {
-	unsigned long attribute;
+	u32 attribute;
 	short   x0, y0;
 	short   x1, y1;
 	unsigned char r0, g0, b0;
@@ -165,7 +179,7 @@ typedef struct {
 }       GsGLINE;
 
 typedef struct {
-	unsigned long attribute;
+	u32 attribute;
 	short   x, y;
 	unsigned short w, h;
 	unsigned char r, g, b;
@@ -173,19 +187,19 @@ typedef struct {
 
 typedef struct {
 	short   dqa;
-	long    dqb;
+	s32    dqb;
 	unsigned char rfc, gfc, bfc;
 }       GsFOGPARAM;
 
 
 typedef struct {
-	unsigned long pmode;
+	u32 pmode;
 	short   px, py;
 	unsigned short pw, ph;
-	unsigned long *pixel;
+	u32 *pixel;
 	short   cx, cy;
 	unsigned short cw, ch;
-	unsigned long *clut;
+	u32 *clut;
 }       GsIMAGE;
 
 typedef struct {
@@ -594,15 +608,15 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg0;		/* gte flag */
-	long    flg;		/* gte flag */
+	s32    flg0;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -617,15 +631,15 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg0;		/* gte flag */
-	long    flg;		/* gte flag */
+	s32    flg0;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -639,15 +653,15 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg0;		/* gte flag */
-	long    flg;		/* gte flag */
+	s32    flg0;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -660,15 +674,15 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg0;		/* gte flag */
-	long    flg;		/* gte flag */
+	s32    flg0;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -682,14 +696,14 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -702,14 +716,14 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -722,14 +736,14 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -742,14 +756,14 @@ typedef struct {
 
 typedef struct {
 	u32  limit;		/* divide limit */
-	long    hwd, vwd;	/* dummy */
+	s32    hwd, vwd;	/* dummy */
 	int     shift;		/* OT shift */
 	u32 *org;		/* OT org */
 	u32 *pk;		/* packet base */
-	long    otz;		/* gte otz */
-	long    adivz;		/* active divide codition z */
+	s32    otz;		/* gte otz */
+	s32    adivz;		/* active divide codition z */
 	short   adivw, adivh;	/* active divide condition w,h */
-	long    flg;		/* gte flag */
+	s32    flg;		/* gte flag */
 	short   minx, miny, maxx, maxy;	/* polygon min-max */
 	short   hwd0, vwd0;	/* resolution of screen */
 	u32 *tag;		/* work temprly for addPrim */
@@ -770,13 +784,13 @@ extern  "C" {
 	void    GsInitGraph(unsigned short x, unsigned short y, unsigned short intmode,
 		              unsigned short dith, unsigned short varmmode);
 	void    GsInit3D(void);
-	void    GsMapModelingData(unsigned long *p);
+	void    GsMapModelingData(u32 *p);
 
-	void    GsSetProjection(long h);
+	void    GsSetProjection(s32 h);
 	int     GsSetFlatLight(int id, GsF_LIGHT * lt);
 	void    GsSetLightMode(int mode);
 	void    GsSetFogParam(GsFOGPARAM * fogparm);
-	void    GsSetAmbient(long r, long g, long b);
+	void    GsSetAmbient(s32 r, s32 g, s32 b);
 	void    GsDrawOt(GsOT * ot);
 	void    GsSetWorkBase(PACKET * outpacketp);
 
@@ -808,15 +822,15 @@ extern  "C" {
 	GsOT   *GsCutOt(GsOT * ot_src, GsOT * ot_dest);
 	void    GsDefDispBuff(unsigned short x0, unsigned short y0, unsigned short x1, unsigned short y1);
 	void    GsSortClear(unsigned char, unsigned char, unsigned char, GsOT *);
-	void    GsGetTimInfo(unsigned long *im, GsIMAGE * tim);
+	void    GsGetTimInfo(u32 *im, GsIMAGE * tim);
 	void    GsSwapDispBuff(void);
 	int     GsGetActiveBuff(void);
 	void    GsSetDrawBuffClip(void);
 	void    GsSetDrawBuffOffset(void);
 	void    GsSetClip(RECT * clip);
 	DRAWENV *GsSetClip2(RECT * clip);
-	void    GsSetOffset(long x, long y);
-	void    GsSetOrign(long x, long y);
+	void    GsSetOffset(s32 x, s32 y);
+	void    GsSetOrign(s32 x, s32 y);
 
 	void    GsInitCoordinate2(GsCOORDINATE2 * super, GsCOORDINATE2 * base);
 	void    GsMulCoord0(MATRIX * m1, MATRIX * m2, MATRIX * m3);
@@ -826,9 +840,9 @@ extern  "C" {
 	void    GsGetLs(GsCOORDINATE2 * m, MATRIX * out);
 	void    GsGetLws(GsCOORDINATE2 * m, MATRIX * outw, MATRIX * outs);
 
-	u32  GsLinkObject3(unsigned long pmd_base, GsDOBJ3 * objp);
-	void    GsLinkObject4(unsigned long tmd_base, GsDOBJ2 * objp, int n);
-	void    GsLinkObject5(unsigned long tmd_base, GsDOBJ5 * objp, int n);
+	u32  GsLinkObject3(u32 pmd_base, GsDOBJ3 * objp);
+	void    GsLinkObject4(u32 tmd_base, GsDOBJ2 * objp, int n);
+	void    GsLinkObject5(u32 tmd_base, GsDOBJ5 * objp, int n);
 
 	void    GsSetLightMatrix(MATRIX * mp);
 	void    GsSetLightMatrix2(MATRIX * mp);
@@ -838,7 +852,7 @@ extern  "C" {
 	void    GsSetLsMatrix(MATRIX * mp);
 	void    GsSetClip2D(RECT * rectp);
 	void    GsInitVcount();
-	long    GsGetVcount();
+	s32    GsGetVcount();
 	void    GsClearVcount();
 	void	GsDefDispBuff2(u16 x0, u16 y0, u16 x1, u16 y1);
 	void	GsDrawOtIO(GsOT *ot);
@@ -1022,12 +1036,12 @@ extern DRAWENV GsDRAWENV;	/* DRAWENV of Gs */
 extern DISPENV GsDISPENV;	/* DISPENV of Gs */
 extern MATRIX GsWSMATRIX;	/* Current World-Screen Matrix of Gs */
 extern MATRIX GsWSMATRIX_ORG;	/* Original World-Screen Matrix of Gs */
-extern long HWD0, VWD0;		/* rezolution of Holyzontal and Vertical */
+extern s32 HWD0, VWD0;		/* rezolution of Holyzontal and Vertical */
 extern MATRIX GsLIGHTWSMATRIX;	/* World-Screen Light Matrix of Gs */
 extern MATRIX GsIDMATRIX;	/* Unit Matrix */
 extern MATRIX GsIDMATRIX2;	/* Unit Matrix including Aspect retio */
 extern PACKET *GsOUT_PACKET_P;	/* Work Base pointer */
-extern long GsADIVZ;		/* Active sub divide condition (z) */
+extern s32 GsADIVZ;		/* Active sub divide condition (z) */
 extern short GsADIVW, GsADIVH;	/* Active sub divide condition (w,h) */
 extern int GsLIGHT_MODE;	/* lighting mode global */
 extern u32 GsMATE_C, GsLMODE, GsLIGNR, GsLIOFF, GsZOVER, GsBACKC, GsNDIV;

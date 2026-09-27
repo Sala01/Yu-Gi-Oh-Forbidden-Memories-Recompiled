@@ -64,12 +64,16 @@ typedef struct {
     u8 vab_header[1];
 } SDMusicPackage;
 
+#ifndef MEMORIES_GLES
 typedef char SDMusicPackage_spu_address_offset_must_be_0x0C[
     ((u32)&(((SDMusicPackage *)0)->spu_address)) == 0x0C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDMusicPackage_vab_header_offset_must_be_0x50[
     ((u32)&(((SDMusicPackage *)0)->vab_header)) == 0x50 ? 1 : -1
 ];
+#endif
 
 typedef struct {
     u8 volume;
@@ -86,9 +90,11 @@ typedef struct {
     s32 words[2];
 } __attribute__((packed)) SDBankHeaderWords;
 
+#ifndef MEMORIES_GLES
 typedef char SDBankHeaderWords_size_must_be_8[
     sizeof(SDBankHeaderWords) == 8 ? 1 : -1
 ];
+#endif
 
 /* A 0x800-byte mixer-out bank staging buffer, viewed from its tail. The last
  * eight bytes are the "VolInfo" signature func_80046A08 checks before it
@@ -105,9 +111,11 @@ typedef struct {
     u8 volume;
 } SDBankStagingBuffer;
 
+#ifndef MEMORIES_GLES
 typedef char SDBankStagingBuffer_size_must_be_0x800[
     sizeof(SDBankStagingBuffer) == 0x800 ? 1 : -1
 ];
+#endif
 
 /* An output-level accumulator: func_80045054 sums sample squares into the
    word and reads back its signed high half (halves[1]) as the level. */
@@ -190,11 +198,29 @@ typedef struct {
     u8 field_0435;
     u8 pad0436[2];
     u32 field_0438;
+#ifdef MEMORIES_GLES
+    /* g_SDValue is a real, byte-precise retail structure at a hardcoded
+       guest address (SD_InitState: `g_SDValue = (SDValue *)0x801E0000`), not
+       a symbol the linker pins, so nothing but this struct's own C layout
+       keeps every fixed byte offset below (mix_multiplier at 0x533,
+       field_1649 at 0x1649, etc, all still checked in the desktop build)
+       correct. A real 8-byte pointer here would grow and shift the whole
+       tail of the struct on a 64-bit host; kept as a guest address instead,
+       same treatment as ModelSlot's fields (model.h) and GsOT.org
+       (libgs.h). */
+    u32 field_043C; /* u16* guest address */
+#else
     u16 *field_043C;
+#endif
     u16 field_0440;
     u16 field_0442;
+#ifdef MEMORIES_GLES
+    u32 field_0444; /* SDNote* guest address */
+    u32 field_0448; /* SDValueLink* guest address */
+#else
     SDNote *field_0444;
     SDValueLink *field_0448;
+#endif
     u16 field_044C[SD_VOICE_LOOKUP_BANK_COUNT][SD_VOICE_LOOKUP_BANK_ENTRY_COUNT];
     s32 field_04CC;
     u8 pad04D0[0x510 - (SD_VOICE_LOOKUP_END_BYTE_OFFSET + 4)];
@@ -205,7 +231,11 @@ typedef struct {
     /* The three mixer-out bank bases func_80046A08 installs once the
        "VolInf" signature checks out: the bank itself and the two records
        that follow it. */
+#ifdef MEMORIES_GLES
+    u32 bank_0518[3]; /* u8* guest addresses */
+#else
     u8 *bank_0518[3];
+#endif
     u8 pad0524[4];
     u32 field_0528;
     u32 field_052C;
@@ -218,12 +248,21 @@ typedef struct {
     s32 decoded_half;
     u8 buffer_053C[4][0x200];
     u8 pad0D3C[0x800];
+#ifdef MEMORIES_GLES
+    u32 buffer_ptrs_153C[4]; /* u8* guest addresses */
+#else
     u8 *buffer_ptrs_153C[4];
+#endif
     SDLevelWord output_level;
     SDLevelWord field_1550;
     u8 pad1554[0xC];
+#ifdef MEMORIES_GLES
+    u32 field_1560; /* u8* guest address */
+    u32 music_track; /* u16* guest address */
+#else
     u8 *field_1560;
     u16 *music_track;
+#endif
     u8 pad1568[0x10];
     s16 field_1578;
     s16 field_157A;
@@ -387,19 +426,41 @@ typedef struct {
     u8 field_0508;
     u8 field_0509;
     u8 pad050A[2];
+#ifdef MEMORIES_GLES
+    /* D_8009B458 is a real, byte-precise retail structure at a hardcoded
+       guest address (SD_InitSecondaryWorkArea: `D_8009B458 = (SDSecondaryState
+       *)data`, called with the literal 0x801E1670), same situation as
+       SDValue above. A real 8-byte function pointer here would shift the
+       fixed byte offsets checked below (object_count at 0x510, tracks at
+       0x518, etc). This still holds a real native function's address, not a
+       guest one, which is only safe to truncate to 32 bits because this
+       port's own code is deliberately linked below 4GB (IMAGE_BASE,
+       tools/pc/build_game_android.py); see the callers for the matching
+       cast back to a function pointer. */
+    u32 field_050C;
+#else
     void (*field_050C)(void);
+#endif
     s16 object_count;
     s16 field_0512;
     u16 field_0514;
     u16 field_0516;
     SDSequenceTrack tracks[SD_SEQUENCE_TRACK_COUNT];
     u8 pad07D8[4];
+#ifdef MEMORIES_GLES
+    u32 field_07DC; /* u8* guest address */
+#else
     u8 *field_07DC;
+#endif
     s16 field_07E0;
     s16 field_07E2;
     s16 field_07E4;
     s16 field_07E6;
+#ifdef MEMORIES_GLES
+    u32 field_07E8; /* u8* guest address */
+#else
     u8 *field_07E8;
+#endif
     s32 field_07EC;
     s32 field_07F0;
     s32 field_07F4;
@@ -425,259 +486,413 @@ typedef struct {
     u8 pad0846[2];
 } SDSecondaryState;
 
+#ifndef MEMORIES_GLES
 typedef char SDCommand_size_must_be_0x30[
     sizeof(SDCommand) == SD_COMMAND_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDCommandTail_size_must_be_0x20[
     sizeof(SDCommandTail) == 0x20 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDCommand_field_0002_offset_must_be_0x02[
     SD_STATE_OFFSET(SDCommand, field_0002) == 0x02 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDCommand_field_0004_offset_must_be_0x04[
     SD_STATE_OFFSET(SDCommand, field_0004) == 0x04 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDCommand_field_0010_offset_must_be_0x10[
     SD_STATE_OFFSET(SDCommand, field_0010) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDNote_size_must_be_0x08[
     sizeof(SDNote) == SD_NOTE_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValueLink_size_must_be_0x08[
     sizeof(SDValueLink) == SD_VALUE_LINK_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValueLink_sector_offset_must_be_at_0x00[
     SD_STATE_OFFSET(SDValueLink, sector_offset) == 0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_size_must_be_0x164C[
     sizeof(SDValue) == 0x164C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDCommandShiftView_queue_must_overlay_commands[
     SD_STATE_OFFSET(SDCommandShiftView, c) ==
         SD_STATE_OFFSET(SDValue, commands) ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDCommandShiftView_must_fit_inside_SDValue[
     sizeof(SDCommandShiftView) <= sizeof(SDValue) ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_lookup_bank_size_must_match_stride[
     sizeof(((SDValue *)0)->field_044C[0]) ==
         SD_VOICE_LOOKUP_BANK_BYTE_STRIDE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDVoiceLookup_tag_must_fit_code_mask[
     (SD_VOICE_LOOKUP_CODE_TAG & SD_VOICE_LOOKUP_CODE_MASK) ==
         SD_VOICE_LOOKUP_CODE_TAG ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDVoiceLookup_selector_fields_must_not_overlap[
     (SD_VOICE_LOOKUP_CODE_MASK &
         (SD_VOICE_LOOKUP_INDEX_MASK | SD_VOICE_LOOKUP_BANK_FLAG)) == 0 &&
     (SD_VOICE_LOOKUP_INDEX_MASK & SD_VOICE_LOOKUP_BANK_FLAG) == 0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_lookup_offset_must_be_0x44C[
     SD_STATE_OFFSET(SDValue, field_044C) ==
         SD_VOICE_LOOKUP_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_lookup_end_must_match_extent[
     SD_STATE_OFFSET(SDValue, field_044C) +
         sizeof(((SDValue *)0)->field_044C) ==
         SD_VOICE_LOOKUP_END_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_commands_offset_must_be_0x80[
     SD_STATE_OFFSET(SDValue, commands) == SD_COMMAND_QUEUE_BYTE_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_voice_attr_offset_must_be_0x384[
     SD_STATE_OFFSET(SDValue, voice_attr) == 0x384 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_voice_attr_note_offset_must_be_0x39A[
     SD_STATE_OFFSET(SDValue, voice_attr) +
         SD_STATE_OFFSET(SpuVoiceAttr, note) == 0x39A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_voice_attr_must_end_at_field_03C4[
     SD_STATE_OFFSET(SDValue, voice_attr) + sizeof(SpuVoiceAttr) ==
         SD_STATE_OFFSET(SDValue, field_03C4) ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_0044_offset_must_be_0x44[
     SD_STATE_OFFSET(SDValue, field_0044) == 0x44 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_0002_offset_must_be_0x02[
     SD_STATE_OFFSET(SDValue, field_0002) == 0x02 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_bank_0518_offset_must_be_0x518[
     SD_STATE_OFFSET(SDValue, bank_0518) == 0x518 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_mix_multiplier_offset_must_be_0x533[
     SD_STATE_OFFSET(SDValue, mix_multiplier) == 0x533 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_1649_offset_must_be_0x1649[
     SD_STATE_OFFSET(SDValue, field_1649) == 0x1649 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_164A_offset_must_be_0x164A[
     SD_STATE_OFFSET(SDValue, field_164A) == 0x164A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_004E_offset_must_be_0x4E[
     SD_STATE_OFFSET(SDValue, field_004E) == 0x4E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_007C_offset_must_be_0x7C[
     SD_STATE_OFFSET(SDValue, field_007C) == 0x7C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_1580_offset_must_be_0x1580[
     SD_STATE_OFFSET(SDValue, field_1580) == 0x1580 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_158A_offset_must_be_0x158A[
     SD_STATE_OFFSET(SDValue, field_158A) == 0x158A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_15EC_offset_must_be_0x15EC[
     SD_STATE_OFFSET(SDValue, field_15EC) == 0x15EC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_field_15F4_offset_must_be_0x15F4[
     SD_STATE_OFFSET(SDValue, field_15F4) == 0x15F4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_decoded_half_offset_must_be_0x538[
     SD_STATE_OFFSET(SDValue, decoded_half) == 0x538 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDValue_output_level_offset_must_be_0x154C[
     SD_STATE_OFFSET(SDValue, output_level) == 0x154C &&
     SD_STATE_OFFSET(SDValue, field_1550) == 0x1550 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryObject_size_must_be_0x28[
     sizeof(SDSecondaryObject) == SD_SECONDARY_OBJECT_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDToneEnvelopeView_offsets_must_match[
     SD_STATE_OFFSET(SDToneEnvelopeView, adsr1) == 0x20 &&
     SD_STATE_OFFSET(SDToneEnvelopeView, adsr2) == 0x22 &&
     SD_STATE_OFFSET(SDToneEnvelopeView, a_mode) == 0x24 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryObject_channel_index_offset_must_be_0x03[
     SD_STATE_OFFSET(SDSecondaryObject, channel_index) == 0x03 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryObject_gain_offsets_must_match[
     SD_STATE_OFFSET(SDSecondaryObject, field_0008) == 0x08 &&
     SD_STATE_OFFSET(SDSecondaryObject, field_0009) == 0x09 &&
     SD_STATE_OFFSET(SDSecondaryObject, field_000E) == 0x0E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryObject_pan_offsets_must_match[
     SD_STATE_OFFSET(SDSecondaryObject, field_000A) == 0x0A &&
     SD_STATE_OFFSET(SDSecondaryObject, field_000B) == 0x0B &&
     SD_STATE_OFFSET(SDSecondaryObject, pan) == 0x0C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryObject_level_offsets_must_match[
     SD_STATE_OFFSET(SDSecondaryObject, level_left) == 0x14 &&
     SD_STATE_OFFSET(SDSecondaryObject, level_right) == 0x16 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_size_must_be_0x18[
     sizeof(SDSecondaryRecord) == SD_SEQUENCE_CHANNEL_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_program_offset_must_be_0x00[
     SD_STATE_OFFSET(SDSecondaryRecord, program) == 0x00 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_pan_offset_must_be_0x01[
     SD_STATE_OFFSET(SDSecondaryRecord, pan) == 0x01 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_volume_offset_must_be_0x03[
     SD_STATE_OFFSET(SDSecondaryRecord, volume) == 0x03 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_expression_offset_must_be_0x05[
     SD_STATE_OFFSET(SDSecondaryRecord, expression) == 0x05 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_pitch_bend_msb_offset_must_be_0x07[
     SD_STATE_OFFSET(SDSecondaryRecord, pitch_bend_msb) == 0x07 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_parameter_selector_offset_must_be_0x11[
     SD_STATE_OFFSET(SDSecondaryRecord, parameter_selector) == 0x11 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_control_mode_offset_must_be_0x12[
     SD_STATE_OFFSET(SDSecondaryRecord, control_mode) == 0x12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryRecord_control_value_offset_must_be_0x13[
     SD_STATE_OFFSET(SDSecondaryRecord, control_value) == 0x13 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSequenceTrack_size_must_be_0x2C[
     sizeof(SDSequenceTrack) == SD_SEQUENCE_TRACK_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSequenceTrack_tempo_accumulator_offset_must_be_0x14[
     SD_STATE_OFFSET(SDSequenceTrack, tempo_accumulator) == 0x14 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSequenceTrack_delta_remaining_offset_must_be_0x1C[
     SD_STATE_OFFSET(SDSequenceTrack, delta_remaining) == 0x1C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSequenceTrack_ended_offset_must_be_0x24[
     SD_STATE_OFFSET(SDSequenceTrack, ended) == 0x24 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSequenceTrack_running_status_offset_must_be_0x29[
     SD_STATE_OFFSET(SDSequenceTrack, running_status) == 0x29 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryTransfer_size_must_be_0x1C[
     sizeof(SDSecondaryTransfer) == 0x1C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_size_must_be_0x848[
     sizeof(SDSecondaryState) == 0x848 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_channels_offset_must_be_0x00[
     SD_STATE_OFFSET(SDSecondaryState, channels) == 0x00 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_objects_offset_must_be_0x180[
     SD_STATE_OFFSET(SDSecondaryState, objects) == 0x180 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_transfer_offset_must_be_0x4A4[
     SD_STATE_OFFSET(SDSecondaryState, transfer) == 0x4A4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_transfer_gain_pan_offsets_must_match[
     SD_STATE_OFFSET(SDSecondaryState, transfer.field_0018) == 0x4BC &&
     SD_STATE_OFFSET(SDSecondaryState, transfer.field_001B) == 0x4BF ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_spatial_level_offsets_must_match[
     SD_STATE_OFFSET(SDSecondaryState, field_0512) == 0x512 &&
     SD_STATE_OFFSET(SDSecondaryState, field_07E4) == 0x7E4 &&
     SD_STATE_OFFSET(SDSecondaryState, field_07E6) == 0x7E6 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_pan_override_offset_must_be_0x815[
     SD_STATE_OFFSET(SDSecondaryState, field_0815) == 0x815 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_flag_0500_offset_must_be_0x500[
     SD_STATE_OFFSET(SDSecondaryState, flag_0500) == 0x500 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_event_guard_offset_must_be_0x503[
     SD_STATE_OFFSET(SDSecondaryState, event_guard) == 0x503 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_event_handle_offset_must_be_0x504[
     SD_STATE_OFFSET(SDSecondaryState, event_handle) == 0x504 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_voice_attr_offset_must_be_0x4C0[
     SD_STATE_OFFSET(SDSecondaryState, voice_attr) == 0x4C0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SpuVoiceAttr_size_must_be_0x40[
     sizeof(SpuVoiceAttr) == 0x40 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_object_count_offset_must_be_0x510[
     SD_STATE_OFFSET(SDSecondaryState, object_count) == 0x510 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_field_07DC_offset_must_be_0x7DC[
     SD_STATE_OFFSET(SDSecondaryState, field_07DC) == 0x7DC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_field_07E0_offset_must_be_0x7E0[
     SD_STATE_OFFSET(SDSecondaryState, field_07E0) == 0x7E0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_tracks_offset_must_be_0x518[
     SD_STATE_OFFSET(SDSecondaryState, tracks) ==
         SD_SEQUENCE_TRACK_ARRAY_OFFSET ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_track_count_offset_must_be_0x7FA[
     SD_STATE_OFFSET(SDSecondaryState, track_count) == 0x7FA ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_field_0801_offset_must_be_0x801[
     SD_STATE_OFFSET(SDSecondaryState, field_0801) == 0x801 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_timebase_offset_must_be_0x7FC[
     SD_STATE_OFFSET(SDSecondaryState, timebase) == 0x7FC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_bytes_consumed_offset_must_be_0x818[
     SD_STATE_OFFSET(SDSecondaryState, bytes_consumed) == 0x818 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_field_081C_offset_must_be_0x81C[
     SD_STATE_OFFSET(SDSecondaryState, field_081C) == 0x81C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char SDSecondaryState_field_0844_offset_must_be_0x844[
     SD_STATE_OFFSET(SDSecondaryState, field_0844) == 0x844 ? 1 : -1
 ];
+#endif
 
 #undef SD_STATE_OFFSET
 

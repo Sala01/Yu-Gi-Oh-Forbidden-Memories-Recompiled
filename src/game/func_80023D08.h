@@ -25,18 +25,26 @@ typedef struct {
 #define DUEL_FIELD_CURSOR_OBJECT_OFFSET(member) \
     ((u32)&(((DuelFieldCursorObject *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DuelFieldCursorObject_x_offset_must_be_0x28[
     DUEL_FIELD_CURSOR_OBJECT_OFFSET(x) == 0x28 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldCursorObject_step_x_offset_must_be_0x36[
     DUEL_FIELD_CURSOR_OBJECT_OFFSET(step_x) == 0x36 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldCursorObject_steps_offset_must_be_0x60[
     DUEL_FIELD_CURSOR_OBJECT_OFFSET(steps) == 0x60 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelFieldCursorObject_moving_offset_must_be_0x6C[
     DUEL_FIELD_CURSOR_OBJECT_OFFSET(moving) == 0x6C ? 1 : -1
 ];
+#endif
 
 #undef DUEL_FIELD_CURSOR_OBJECT_OFFSET
 

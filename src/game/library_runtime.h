@@ -8,9 +8,11 @@ typedef struct {
     s32 values[4];
 } LibraryViewQuad;
 
+#ifndef MEMORIES_GLES
 typedef char LibraryViewQuad_size_must_be_0x10[
     sizeof(LibraryViewQuad) == 0x10 ? 1 : -1
 ];
+#endif
 
 /* The Library state base. func_8002BAB4 dispatches on
  * `D_800EA1E8[0] & 0xF`; func_8002BFCC also holds this byte declaration,

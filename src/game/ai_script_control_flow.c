@@ -124,7 +124,7 @@ void AiScript_Jump(void)
     register AiScriptState *state = &gAiScript_State;
 
     state->script_cursor =
-        (u8 *)(result + (s32)state->script_base);
+        (u32)(result + state->script_base);
 }
 
 /* The AI script VM's control-flow opcodes: the six conditional jumps, which
@@ -147,8 +147,8 @@ void AiScript_JumpGreaterEqual(void)
 
     if (values[a] >= values[b]) {
         register AiScriptState *s = &gAiScript_State;
-        offset += (s32)s->script_base;
-        s->script_cursor = (u8 *)offset;
+        offset += s->script_base;
+        s->script_cursor = (u32)offset;
     }
 }
 
@@ -161,8 +161,8 @@ void AiScript_JumpGreater(void)
 
     if (values[a] > values[b]) {
         register AiScriptState *s = &gAiScript_State;
-        offset += (s32)s->script_base;
-        s->script_cursor = (u8 *)offset;
+        offset += s->script_base;
+        s->script_cursor = (u32)offset;
     }
 }
 
@@ -174,8 +174,8 @@ void AiScript_JumpEqual(void)
 
     if (gAiScript_aMemory[first] == gAiScript_aMemory[second]) {
         AiScriptState *state = &gAiScript_State;
-        offset += (s32)state->script_base;
-        state->script_cursor = (u8 *)offset;
+        offset += state->script_base;
+        state->script_cursor = (u32)offset;
     }
 }
 
@@ -188,8 +188,8 @@ void AiScript_JumpNotEqual(void)
 
     if (values[first] != values[second]) {
         register AiScriptState *state = &gAiScript_State;
-        offset += (s32)state->script_base;
-        state->script_cursor = (u8 *)offset;
+        offset += state->script_base;
+        state->script_cursor = (u32)offset;
     }
 }
 
@@ -205,8 +205,8 @@ void AiScript_JumpBetween(void)
         value <= gAiScript_aMemory[second] &&
         gAiScript_aMemory[third] <= value
     ) {
-        offset += (s32)gAiScript_State.script_base;
-        gAiScript_State.script_cursor = (u8 *)offset;
+        offset += gAiScript_State.script_base;
+        gAiScript_State.script_cursor = (u32)offset;
     }
 }
 
@@ -220,8 +220,8 @@ void AiScript_JumpRandom(void)
     limit = values[index];
     result = AiScript_ReadShort();
     if (rand() % AI_SCRIPT_PERCENT_SCALE < limit) {
-        result += (s32)gAiScript_State.script_base;
-        gAiScript_State.script_cursor = (u8 *)result;
+        result += gAiScript_State.script_base;
+        gAiScript_State.script_cursor = (u32)result;
     }
 }
 
@@ -242,8 +242,8 @@ void AiScript_Call(void) {
 
     {
         AiScriptState *state = &gAiScript_State;
-        val += (s32)state->script_base;
-        state->script_cursor = (u8 *)val;
+        val += state->script_base;
+        state->script_cursor = (u32)val;
     }
 }
 

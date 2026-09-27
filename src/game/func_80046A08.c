@@ -132,9 +132,9 @@ void func_80046A08(void) {
                     printf(D_800107F4, g_SDValue->field_1649);
                 }
             }
-            g_SDValue->bank_0518[0] = (u8 *)0x801E8800;
-            g_SDValue->bank_0518[1] = (u8 *)0x801E9000;
-            g_SDValue->bank_0518[2] = (u8 *)0x801EA000;
+            g_SDValue->bank_0518[0] = 0x801E8800;
+            g_SDValue->bank_0518[1] = 0x801E9000;
+            g_SDValue->bank_0518[2] = 0x801EA000;
             g_SDValue->field_003C += 1;
             return;
         }

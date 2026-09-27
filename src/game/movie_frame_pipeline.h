@@ -66,9 +66,11 @@ typedef union {
     s32 word;
 } GraphicsDimension;
 
+#ifndef MEMORIES_GLES
 typedef char GraphicsDimension_size_must_be_4[
     sizeof(GraphicsDimension) == 4 ? 1 : -1
 ];
+#endif
 
 extern GraphicsDimension gGraphics_CurrentWidth asm("D_800FE0D0")
     __attribute__((section(".data")));

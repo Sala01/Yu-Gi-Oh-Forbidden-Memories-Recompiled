@@ -25,15 +25,21 @@ typedef struct {
     u8 pad_0A[2];
 } DuelHandSlot;
 
+#ifndef MEMORIES_GLES
 typedef char DuelHandSlot_size_must_be_0xC[
     sizeof(DuelHandSlot) == 0xC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelHandSlot_child_offset_must_be_0x04[
     DUEL_HAND_SLOT_OFFSET(child) == 0x04 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelHandSlot_active_09_offset_must_be_0x09[
     DUEL_HAND_SLOT_OFFSET(active_09) == 0x09 ? 1 : -1
 ];
+#endif
 
 #undef DUEL_HAND_SLOT_OFFSET
 
@@ -72,18 +78,26 @@ typedef struct {
 #define DUEL_HAND_STACK_STATE_OFFSET(member) \
     ((u32)&(((DuelHandStackState *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DuelHandStackState_position_object_offset_must_be_0x4[
     DUEL_HAND_STACK_STATE_OFFSET(position_object) == 0x4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelHandStackState_slot_index_offset_must_be_0xE[
     DUEL_HAND_STACK_STATE_OFFSET(slot_index) == 0xE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelHandStackState_count_offset_must_be_0x15[
     DUEL_HAND_STACK_STATE_OFFSET(count) == 0x15 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelHandStackState_size_must_be_0x18[
     sizeof(DuelHandStackState) == 0x18 ? 1 : -1
 ];
+#endif
 
 #undef DUEL_HAND_STACK_STATE_OFFSET
 

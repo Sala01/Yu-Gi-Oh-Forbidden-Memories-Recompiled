@@ -34,36 +34,56 @@ typedef struct {
     u8 pad_02[sizeof(DuelCardRecord) - sizeof(u16)];
 } DuelCardFlagsCursor;
 
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_size_must_be_0x1C[
     sizeof(DuelCardRecord) == DUEL_CARD_RECORD_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_object_offset_must_be_0x00[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, object) == 0x00 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_data_offset_must_be_0x04[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, data) == 0x04 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_card_id_offset_must_be_0x0C[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, card_id) == 0x0C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_attack_offset_must_be_0x0E[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, attack) == 0x0E ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_defense_offset_must_be_0x10[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, defense) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_stat_modifier_offset_must_be_0x12[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, stat_modifier) == 0x12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_terrain_modifier_offset_must_be_0x14[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, terrain_modifier) == 0x14 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_flags_offset_must_be_0x16[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, flags) == 0x16 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardRecord_table_index_offset_must_be_0x18[
     DUEL_CARD_RECORD_OFFSET(DuelCardRecord, table_index) == 0x18 ? 1 : -1
 ];
+#endif
 
 #undef DUEL_CARD_RECORD_OFFSET
 

@@ -616,7 +616,13 @@ typedef struct DividePolygon4 {
     DivideLevel level[5];
 } DividePolygon4;
 
+#ifndef MEMORIES_GLES
+/* Pure runtime scratch layout (never read from a file or touched by the
+   guest MIPS interpreter), so the retail byte size only needs to hold on
+   ILP32 hosts; a 64-bit host's real corner/unused_return pointers grow it,
+   which is fine since caller and callee agree on the same, larger size. */
 _Static_assert(sizeof(DivideVertex) == 0x18 && sizeof(DivideLevel) == 0x8c, "DIVPOLYGON4 layout");
+#endif
 
 static uint32_t *emit_ft4(uint32_t *packet, DividePolygon4 *work, const DivideVertex *a, const DivideVertex *b,
                           const DivideVertex *c, const DivideVertex *d)

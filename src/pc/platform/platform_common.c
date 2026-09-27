@@ -181,7 +181,15 @@ static void on_alarm(int number, siginfo_t *info, void *context)
     ucontext_t *user = context;
     (void)number;
     (void)info;
+#ifdef MEMORIES_GLES
+#ifdef __aarch64__
+    on_tick((uintptr_t)user->uc_mcontext.pc, context);
+#else
+    on_tick((uintptr_t)user->uc_mcontext.arm_pc, context);
+#endif
+#else
     on_tick((uintptr_t)user->uc_mcontext.gregs[REG_EIP], context);
+#endif
 }
 #endif
 

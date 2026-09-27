@@ -98,7 +98,7 @@ void Model_RunSlotHandlers(s32 index)
         return;
     }
     for (i = 0; i < base->field_E1A; i++, slot++) {
-        node = slot->field_04;
+        node = (u32 *)slot->field_04;
         if (node != 0) {
             while (1) {
                 if (node[2] != 0) {

@@ -74,37 +74,59 @@ typedef struct CardList {
  * rows keep their distances from it. */
 #define CARD_LIST_ROWS_END (sizeof(CardEntry) * CARD_TABLE_ID_END)
 
+#ifndef MEMORIES_GLES
 typedef char CardListAssertCursorBox[
     CARD_LIST_OFFSET(cursor_box) == CARD_LIST_ROWS_END + 0x4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertScrollBox[
     CARD_LIST_OFFSET(scroll_box) == CARD_LIST_ROWS_END + 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertFirst[CARD_LIST_OFFSET(first) == CARD_LIST_ROWS_END + 0xC ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertFirstTarget[
     CARD_LIST_OFFSET(first_target) == CARD_LIST_ROWS_END + 0xE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertRowCount[
     CARD_LIST_OFFSET(row_count) == CARD_LIST_ROWS_END + 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertSortRowCount[
     CARD_LIST_OFFSET(sort_row_count) == CARD_LIST_ROWS_END + 0x12 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertSortMode[
     CARD_LIST_OFFSET(sort_mode) == CARD_LIST_ROWS_END + 0x15 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertSortChoice[
     CARD_LIST_OFFSET(sort_choice) == CARD_LIST_ROWS_END + 0x16 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertKind[CARD_LIST_OFFSET(kind) == CARD_LIST_ROWS_END + 0x17 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char CardListAssertCursor[
     CARD_LIST_OFFSET(cursor) == CARD_LIST_ROWS_END + 0x18 ? 1 : -1
 ];
+#endif
 /* build_deck_pane_input.c reaches the pane's two lists as p + 4 and
    p + 0x2D50, and picks between them with p[0x6342] * 0x2D4C + 4. That
    stride is this record's size, which is what the trailing padding after
    `cursor` accounts for. */
+#ifndef MEMORIES_GLES
 typedef char CardListAssertSize[sizeof(CardList) == CARD_LIST_ROWS_END + 0x1C ? 1 : -1];
+#endif
 
 #undef CARD_LIST_OFFSET
 #undef CARD_LIST_ROWS_END

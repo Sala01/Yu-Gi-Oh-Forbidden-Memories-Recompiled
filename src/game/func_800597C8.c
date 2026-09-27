@@ -20,7 +20,7 @@ void func_800597C8(s32 idx, s32 flag, s32 val)
             s32 arg2 = rec->field_BF5;
 
             if (flag != 0) {
-                ModelSlotPart *part = rec->field_1E0[i];
+                ModelSlotPart *part = (ModelSlotPart *)rec->field_1E0[i];
                 arg2 = flag;
                 part->sid = flag;
             }

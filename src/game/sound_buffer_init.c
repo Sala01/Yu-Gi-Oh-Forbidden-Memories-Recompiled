@@ -10,11 +10,11 @@ void SD_InitBufferState(void)
     SD_ResetCdPan();
     func_80044DC0(255);
     base = g_SDValue;
-    base->buffer_ptrs_153C[0] = base->buffer_053C[0];
-    base->buffer_ptrs_153C[1] = base->buffer_053C[1];
-    base->buffer_ptrs_153C[2] = base->buffer_053C[2];
+    base->buffer_ptrs_153C[0] = (u32)base->buffer_053C[0];
+    base->buffer_ptrs_153C[1] = (u32)base->buffer_053C[1];
+    base->buffer_ptrs_153C[2] = (u32)base->buffer_053C[2];
     base->field_0512 = 0;
-    base->buffer_ptrs_153C[3] = base->buffer_053C[3];
+    base->buffer_ptrs_153C[3] = (u32)base->buffer_053C[3];
 }
 
 void SD_ResetCdPan(void)

@@ -27,7 +27,7 @@
 #include "pc/saves/deck_menu.h"
 #ifdef _WIN32
 #include "win32.h"
-#else
+#elif !defined(MEMORIES_GLES)
 #include <fontconfig/fontconfig.h>
 #endif
 #include "pc/debug/crash.h"
@@ -272,7 +272,7 @@ static void load_font(void)
     FT_Face face;
 #ifdef _WIN32
     const char *file = Win32_FontPath(0);
-#else
+#elif !defined(MEMORIES_GLES)
     FcPattern *pattern, *match;
     FcResult result;
     FcChar8 *file = NULL;
@@ -290,6 +290,10 @@ static void load_font(void)
     if (FT_New_Face(library, file, 0, &face) || FT_Set_Pixel_Sizes(face, 0, FONT_PX)) {
         return;
     }
+#elif defined(MEMORIES_GLES)
+    /* No fontconfig on Android yet: the built-in 5x7 font is used instead
+     * (below, font_loaded stays 0). */
+    return;
 #else
     if (!FcInit() || FT_Init_FreeType(&library)) {
         return;
@@ -328,7 +332,7 @@ static void load_font(void)
     font_ascent = (int)(face->size->metrics.ascender >> 6);
     font_descent = (int)(-face->size->metrics.descender >> 6);
     font_loaded = 1;
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(MEMORIES_GLES)
     FcPatternDestroy(pattern);
     FcPatternDestroy(match);
 #endif

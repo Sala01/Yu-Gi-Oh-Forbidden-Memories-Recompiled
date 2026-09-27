@@ -52,12 +52,16 @@ typedef union {
     } fields;
 } ModelDebugState;
 
+#ifndef MEMORIES_GLES
 typedef char ModelDebugState_size_must_be_4[
     sizeof(ModelDebugState) == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelDebugState_height_offset_must_be_2[
     (u32)&((ModelDebugState *)0)->fields.height == 2 ? 1 : -1
 ];
+#endif
 
 extern ModelDebugState D_8009B004;
 typedef union {
@@ -65,9 +69,11 @@ typedef union {
     u8 display_enabled;
 } ModelDebugDisplayState;
 
+#ifndef MEMORIES_GLES
 typedef char ModelDebugDisplayState_size_must_be_4[
     sizeof(ModelDebugDisplayState) == 4 ? 1 : -1
 ];
+#endif
 
 extern ModelDebugDisplayState D_8009B008;
 #ifdef MODEL_HANDLER_DIAGNOSTICS_AS_ARRAY

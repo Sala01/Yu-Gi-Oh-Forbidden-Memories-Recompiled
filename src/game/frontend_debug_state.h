@@ -65,17 +65,29 @@ extern u8 *D_8009B2EC;
 extern u8 gDebugMenu_bPage;
 extern u8 D_800EAED8[];
 
+#ifndef MEMORIES_GLES
 typedef char FrontendDebugColumnsSize[
     sizeof(FrontendDebugColumns) == 3 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FrontendDebugDigitCountsSize[
     sizeof(FrontendDebugDigitCounts) == 3 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FrontendDebugValuesSize[
     sizeof(FrontendDebugValues) == 6 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FrontendDebugValueRow1Offset[
     (u32)&((FrontendDebugValues *)0)->row[1] == 2 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FrontendDebugValueRow2Offset[
     (u32)&((FrontendDebugValues *)0)->row[2] == 4 ? 1 : -1];
+#endif
+#ifndef MEMORIES_GLES
 typedef char FrontendDebugSoundValuesSize[
     sizeof(FrontendDebugSoundValues) == 4 ? 1 : -1];
+#endif
 
 #endif

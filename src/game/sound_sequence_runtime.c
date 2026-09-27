@@ -66,7 +66,7 @@ s32 SD_ReadSequenceByte(SDSequenceTrack *reader)
 {
     SDSecondaryState *state = D_8009B458;
     int offset = reader->pos;
-    int value = state->field_07DC[offset];
+    int value = ((u8 *)state->field_07DC)[offset];
 
     offset++;
     reader->pos = offset;

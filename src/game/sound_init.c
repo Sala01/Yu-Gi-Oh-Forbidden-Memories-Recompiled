@@ -23,7 +23,7 @@ void SD_RequestBgmPlayback(s32 value, s32 data)
         SD_ResetMusicState();
         return;
     }
-    if (*g_SDValue->music_track != (small >> 4))
+    if (*(u16 *)g_SDValue->music_track != (small >> 4))
         SD_RequestMusicPackageLoad(small, 1);
     command.command = 0x48;
     command.field_0002 = value;
@@ -58,7 +58,7 @@ void SD_OpenMusicVab(void)
     }
     {
         register SDValue *final = g_SDValue;
-        register u16 *entry = final->music_track;
+        register u16 *entry = (u16 *)final->music_track;
         final->field_1578 = *entry;
     }
 }
@@ -67,10 +67,10 @@ void SD_SetMusicTrackBuffer(u16 *track)
 {
     SD_ResetMusicState();
     if (track != 0)
-        g_SDValue->music_track = track;
+        g_SDValue->music_track = (u32)track;
     else
-        g_SDValue->music_track = (u16 *)0x801EA800;
-    *g_SDValue->music_track = 0xFFFF;
+        g_SDValue->music_track = 0x801EA800;
+    *(u16 *)g_SDValue->music_track = 0xFFFF;
 }
 
 void SD_ResetMusicTrackBuffer(void)
@@ -79,10 +79,18 @@ void SD_ResetMusicTrackBuffer(void)
 
     SD_ResetMusicState();
     entry = (u16 *)0x801EA800;
+#ifdef MEMORIES_GLES
+    /* music_track is a u32 guest address here (see sound.h), not a real
+       pointer, so the retail register-allocation trick below -- storing
+       through the member's address as void** -- would overwrite 8 bytes at
+       a 4-byte field on a 64-bit host and corrupt whatever follows it. */
+    g_SDValue->music_track = (u32)entry;
+#else
     /* Stored through the member's address as void **: a plain member store
        (or a u16 ** cast, which fold turns back into one) picks a different
        register for the pointer and changes seven words. Measured. */
     *(void **)&g_SDValue->music_track = entry;
+#endif
     entry[0] = 0xFFFF;
 }
 

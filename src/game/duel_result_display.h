@@ -27,27 +27,41 @@ typedef struct {
     u8 pad_3E[2];
 } DuelResultDisplayState;
 
+#ifndef MEMORIES_GLES
 typedef char DuelResultDisplayState_children_offset_must_be_0x4[
     DUEL_RESULT_DISPLAY_OFFSET(children) == 0x4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelResultDisplayState_page_text_ids_offset_must_be_0x34[
     DUEL_RESULT_DISPLAY_OFFSET(page_text_ids) == 0x34 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelResultDisplayState_page_index_offset_must_be_0x37[
     DUEL_RESULT_DISPLAY_OFFSET(page_index) == 0x37 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelResultDisplayState_rank_tier_offset_must_be_0x38[
     DUEL_RESULT_DISPLAY_OFFSET(rank_tier) == 0x38 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelResultDisplayState_starchip_prize_offset_must_be_0x3A[
     DUEL_RESULT_DISPLAY_OFFSET(starchip_prize) == 0x3A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelResultDisplayState_dropped_card_id_offset_must_be_0x3C[
     DUEL_RESULT_DISPLAY_OFFSET(dropped_card_id) == 0x3C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelResultDisplayState_size_must_be_0x40[
     sizeof(DuelResultDisplayState) == 0x40 ? 1 : -1
 ];
+#endif
 
 #undef DUEL_RESULT_DISPLAY_OFFSET
 

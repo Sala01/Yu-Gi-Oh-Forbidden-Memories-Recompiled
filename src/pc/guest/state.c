@@ -23,7 +23,7 @@
 #include "pc/compat/posix.h"
 #ifdef _WIN32
 #include "pc/platform/win32.h"
-#else
+#elif !defined(MEMORIES_GLES)
 #include <ucontext.h>
 #endif
 
@@ -31,6 +31,16 @@
 #define STACK_BASE 0xB0000000u /* 32-bit Windows loads system DLLs around 0x70000000; mods use 0x90000000 */
 #define OTHER_STACK_BASE 0x70000000u
 #define OTHER_SYSTEM "Linux"
+#elif defined(MEMORIES_GLES)
+/* Inside bootstrap.c's own GAME_IMAGE_BASE/GAME_IMAGE_RESERVE reservation
+ * (0x40000000 + 256MiB), past libmain.so's own ~28MiB, so it is guaranteed
+ * free every run regardless of ASLR: 0x70000000 (what every other platform
+ * here uses) is not safe on Android, since ART's own allocations and shared
+ * libraries land at addresses that vary per run and were observed
+ * colliding with it on a real device ("game stack: File exists"). */
+#define STACK_BASE 0x48000000u
+#define OTHER_STACK_BASE 0xB0000000u
+#define OTHER_SYSTEM "desktop"
 #else
 #define STACK_BASE 0x70000000u
 #define OTHER_STACK_BASE 0xB0000000u
@@ -50,6 +60,16 @@ extern const unsigned Memories_GameFingerprint; /* generated: hash of the game s
 void Memories_StateReturn(const MemoriesStateEntry *entry, int value) __attribute__((noreturn));
 
 MemoriesStateEntry Memories_StateEntry;
+
+#ifdef MEMORIES_GLES
+/* The game's own VSync calls (src/psyq/libetc.h), normally the assembly
+ * entry (state_i386.S) that records the caller's registers for save states
+ * before falling into Memories_VSync (libetc.c); save/load are not
+ * supported on Android yet (see the block comment further down), so
+ * Memories_StateEntry is never read and this is a direct call. */
+int Memories_VSync(int mode);
+int VSync(int mode) { return Memories_VSync(mode); }
+#endif
 
 typedef struct Region {
     const char *name;
@@ -118,9 +138,13 @@ static void resume_game(void)
 {
     Memories_StateReturn(&resume_entry, 263); /* one field, as VSync(0) reports it */
 }
-#else
+#elif !defined(MEMORIES_GLES)
 static ucontext_t service_context, game_context;
 #endif
+/* MEMORIES_GLES: save states need a register-preserving resume across a
+ * dedicated, overwritable game stack (the _WIN32/#else code above and
+ * state_i386.S), ARM-specific low-level work not yet done; see load()/save()
+ * and Memories_StateRunGame below, which run the game directly instead. */
 static int (*game_entry)(void);
 static int game_result;
 static volatile int requested, requested_slot = 1;
@@ -306,6 +330,11 @@ static int save(const char *path)
 {
     MemoriesState state = {0, NULL, NULL, 0};
     MemoriesStateEntry entry = Memories_StateEntry;
+#ifdef MEMORIES_GLES
+    (void)state; (void)entry;
+    fprintf(stderr, "memories-pc: save states are not supported on Android yet\n");
+    return -1;
+#else
     char partial[600], tag[32];
     uint32_t header[2] = {VERSION, build_id};
     unsigned i;
@@ -355,8 +384,10 @@ static int save(const char *path)
     }
     fprintf(stderr, "memories-pc: state saved to %s\n", path);
     return 0;
+#endif
 }
 
+#ifndef MEMORIES_GLES
 /* Runs on the service (process) stack: the game stack is about to be replaced. */
 static void apply(void)
 {
@@ -431,6 +462,7 @@ static void apply(void)
     Memories_StateReturn(&entry, 263); /* one field, as VSync(0) reports it */
 #endif
 }
+#endif /* !MEMORIES_GLES */
 
 /* Relocation across game-source changes. A state holds addresses of game
  * code: return addresses on the stack, and callbacks stored in guest RAM, in
@@ -645,7 +677,13 @@ static int load(const char *path)
 {
     MemoriesState state = {1, NULL, NULL, 0};
     MemoriesStateEntry entry;
-    FILE *file = fopen(path, "rb");
+    FILE *file;
+#ifdef MEMORIES_GLES
+    (void)state; (void)entry;
+    fprintf(stderr, "memories-pc: save states are not supported on Android yet\n");
+    return -1;
+#endif
+    file = fopen(path, "rb");
     const uint8_t *chunk;
     uint8_t *image;
     uint32_t header[2];
@@ -716,7 +754,7 @@ static int load(const char *path)
     /* Leave the game stack; the service context applies the state. */
 #ifdef _WIN32
     leave_game_stack();
-#else
+#elif !defined(MEMORIES_GLES)
     swapcontext(&game_context, &service_context);
 #endif
     return 0; /* not reached: the state resumes in its own VSync caller */
@@ -836,6 +874,37 @@ static int add_region(const char *name, char *data, char *data_end, char *bss, c
     return 0;
 }
 
+#ifdef MEMORIES_GLES
+int Memories_CallOnStack(void *stack_top, int (*fn)(void)); /* setjmp_arm.S / setjmp_aarch64.S */
+
+int Memories_StateRunGame(int (*entry)(void))
+{
+    /* No register-preserving resume here (see the block comment above):
+     * save/load (above) refuse instead of using it. The game still needs a
+     * dedicated, fixed-address stack, though, for the same reason guest RAM
+     * needs a fixed address: decompiled retail code routinely takes the
+     * address of a local/stack variable and round-trips it through an
+     * s32/u32 (idiomatic for the original MIPS o32 compiler, where every
+     * pointer was 32 bits). On a pthread's own stack, which Android puts at
+     * a real 64-bit address, that truncates and corrupts -- confirmed
+     * empirically (a SIGSEGV in Text_InitDecimalDigitGlyphMap dereferencing
+     * a local buffer through its truncated address). Running on a stack
+     * mmap'd at STACK_BASE, same as the desktop ports, fixes it.
+     *
+     * Plain MAP_FIXED, not MAP_FIXED_NOREPLACE: STACK_BASE sits inside
+     * bootstrap.c's own GAME_IMAGE_BASE/GAME_IMAGE_RESERVE reservation,
+     * still held (PROT_NONE) past the part android_dlopen_ext actually used
+     * for libmain.so's segments, so NOREPLACE would always refuse it. */
+    void *stack = mmap((void *)(uintptr_t)STACK_BASE, STACK_SIZE, PROT_READ | PROT_WRITE,
+                       MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (stack != (void *)(uintptr_t)STACK_BASE) {
+        perror("game stack");
+        return 1;
+    }
+    read_build_id();
+    return Memories_CallOnStack((void *)(uintptr_t)STACK_TOP, entry);
+}
+#else
 int Memories_StateRunGame(int (*entry)(void))
 {
     void *stack = mmap((void *)(uintptr_t)STACK_BASE, STACK_SIZE, PROT_READ | PROT_WRITE,
@@ -888,3 +957,4 @@ int Memories_StateRunGame(int (*entry)(void))
     }
     return game_result;
 }
+#endif /* MEMORIES_GLES */

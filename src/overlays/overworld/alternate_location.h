@@ -50,12 +50,16 @@ typedef struct {
 
 /* 66 bytes is the stride the selector's index arithmetic uses, and the exit
    array has to start at +0x12 for the same reason. */
+#ifndef MEMORIES_GLES
 typedef char AlternateLocation_size_must_be_66[
     sizeof(AlternateLocation) == 66 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char AlternateExit_size_must_be_12[
     sizeof(AlternateExit) == 12 ? 1 : -1
 ];
+#endif
 
 /* The alternate marker/map object held in D_8016A278 and D_8016A288.
    CampaignMap_UpdateAlternateLocation toggles bit 0x40 of `f8` and writes the
@@ -82,9 +86,11 @@ typedef struct {
     u8 unknown4A[0x0A];
 } __attribute__((packed)) AlternateLocationState;
 
+#ifndef MEMORIES_GLES
 typedef char AlternateLocationState_size_must_be_0x54[
     sizeof(AlternateLocationState) == 0x54 ? 1 : -1
 ];
+#endif
 
 /* The three symbols both sources share. The comments above already name two
  * of them while describing the layouts, so the declarations belong here too.

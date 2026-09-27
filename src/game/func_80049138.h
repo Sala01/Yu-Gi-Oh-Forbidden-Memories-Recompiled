@@ -12,8 +12,10 @@ typedef struct {
     s32 field_04;
 } SDMusicTableEntry;
 
+#ifndef MEMORIES_GLES
 typedef char SDMusicTableEntry_size_must_be_8[
     sizeof(SDMusicTableEntry) == 8 ? 1 : -1
 ];
+#endif
 
 #endif

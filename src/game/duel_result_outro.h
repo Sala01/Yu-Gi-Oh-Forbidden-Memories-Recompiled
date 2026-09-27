@@ -32,12 +32,16 @@ typedef struct {
     u8 pad_04[0xC - 4];
 } DuelResultSpriteSlot;
 
+#ifndef MEMORIES_GLES
 typedef char DuelResultSpriteSpec_size_must_be_4[
     sizeof(DuelResultSpriteSpec) == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelResultSpriteSlot_size_must_be_0xC[
     sizeof(DuelResultSpriteSlot) == 0xC ? 1 : -1
 ];
+#endif
 
 extern u16 D_8009B1E0;
 

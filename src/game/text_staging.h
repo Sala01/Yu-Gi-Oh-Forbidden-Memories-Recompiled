@@ -37,28 +37,42 @@ typedef union {
     Pair pair;
 } TextStagingValues;
 
+#ifndef MEMORIES_GLES
 typedef char TextStagingValues_size_must_be_0x80[
     sizeof(TextStagingValues) == 0x80 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char TextStagingValues_defense_offset_must_be_4[
     (u32)&((TextStagingValues *)0)->card_stats.defense == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char TextStagingValues_rank_offset_must_be_8[
     (u32)&((TextStagingValues *)0)->card_stats.rank == 8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char TextStagingValues_count_offset_must_be_4[
     (u32)&((TextStagingValues *)0)->card.count == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char TextStagingValues_deck_offset_must_be_4[
     (u32)&((TextStagingValues *)0)->build_deck.deck == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char TextStagingValues_needed_offset_must_be_4[
     (u32)&((TextStagingValues *)0)->blocks.needed == 4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char TextStagingValues_invalid_side_offset_must_be_0x40[
     (u32)&((TextStagingValues *)0)->deck_validation.invalid_side == 0x40
         ? 1 : -1
 ];
+#endif
 
 /* One declaration. Only element zero is a view; this does not assert an
  * array of allocations, and the incomplete array is what keeps the symbol

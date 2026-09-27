@@ -60,7 +60,7 @@ void SD_SEPlay(s32 arg0, s32 arg1, s32 arg2)
         if (v == 0xFFFF) {
             return;
         }
-        n = a->field_043C[v];
+        n = ((u16 *)a->field_043C)[v];
         if (n == 0xFFFF) {
             return;
         }
@@ -72,7 +72,7 @@ void SD_SEPlay(s32 arg0, s32 arg1, s32 arg2)
     } else {
         SDValue *b = g_SDValue;
 
-        n = b->field_043C[tags.words.copy & 0xFFFF];
+        n = ((u16 *)b->field_043C)[tags.words.copy & 0xFFFF];
         if (n == 0xFFFF) {
             return;
         }
@@ -121,7 +121,7 @@ void func_80048768(s32 arg0, s32 arg1)
         if (pt == arg0) {
             return;
         }
-        key = ((SDValue *)base)->field_043C[pt];
+        key = ((u16 *)((SDValue *)base)->field_043C)[pt];
         if (key == arg0) {
             return;
         }
@@ -141,12 +141,12 @@ loop:
             if (env[0] != 0) {
                 if (pan != 0) {
                     if (near) {
-                        prod = g_SDValue->field_0444[v].volume;
+                        prod = ((SDNote *)g_SDValue->field_0444)[v].volume;
                         prod *= lo;
                         g_SDValue->voice_volume_left[i] = prod;
                     }
                     if ((u16)(pan2 + 0x80) < 0x80) {
-                        prod = g_SDValue->field_0444[v].volume;
+                        prod = ((SDNote *)g_SDValue->field_0444)[v].volume;
                         prod *= hi;
                         g_SDValue->voice_volume_right[i] = prod;
                     }

@@ -157,7 +157,7 @@ u32 *func_80034830(GsARGUNIT_NORMAL *arg)
                     gt->clut = rec[1];
                     *(POLY_GT4 *)out = *gt;
                     z = (scr[4] + scr[5] + scr[6] + scr[7]) / 4 >> 4;
-                    addPrim(&arg->tagp->org[z], out);
+                    addPrim(&((GsOT_TAG *)arg->tagp->org)[z], out);
                     out += 0x34;
                     goto next;
                 }
@@ -204,14 +204,14 @@ u32 *func_80034830(GsARGUNIT_NORMAL *arg)
             setLineG4(lg);
             *(LINE_G4 *)out = *lg;
             z = (scr[4] + scr[5] + scr[6] + scr[7]) / 4 >> 4;
-            addPrim(&arg->tagp->org[z], out);
+            addPrim(&((GsOT_TAG *)arg->tagp->org)[z], out);
             out += 0x28;
             *(u32 *)&LINE_G2_VIEW(out)->x0 = *(u32 *)&lg->x0;
             *(u32 *)&LINE_G2_VIEW(out)->x1 = *(u32 *)&lg->x3;
             *(u32 *)&LINE_G2_VIEW(out)->r0 = *(u32 *)&lg->r0;
             *(u32 *)&LINE_G2_VIEW(out)->r1 = *(u32 *)&lg->r3;
             setLineG2(LINE_G2_VIEW(out));
-            addPrim(&arg->tagp->org[z], out);
+            addPrim(&((GsOT_TAG *)arg->tagp->org)[z], out);
             out += 0x14;
         next:
             rec += 14;
@@ -270,7 +270,7 @@ u32 *func_80034830(GsARGUNIT_NORMAL *arg)
                 gt->clut = rec[1];
                 *(POLY_GT4 *)out = *gt;
                 z = (scr[4] + scr[5] + scr[6] + scr[7]) / 4 >> 4;
-                addPrim(&arg->tagp->org[z], out);
+                addPrim(&((GsOT_TAG *)arg->tagp->org)[z], out);
                 out += 0x34;
             }
             rec += 14;

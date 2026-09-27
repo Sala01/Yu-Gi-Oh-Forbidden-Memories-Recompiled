@@ -7,18 +7,26 @@
 
 /* The BIOS fills these same records through firstfile/nextfile and LIBMCRD.
  * Keep the SDK type rather than maintaining a second game-owned layout. */
+#ifndef MEMORIES_GLES
 typedef char MemCardDirectoryEntry_size_must_match[
     sizeof(struct DIRENTRY) == MEM_CARD_DIRECTORY_ENTRY_SIZE ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MemCardDirectoryEntry_name_offset_must_match[
     (u32)&((struct DIRENTRY *)0)->name == 0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MemCardDirectoryEntry_size_offset_must_match[
     (u32)&((struct DIRENTRY *)0)->size == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char MemCardDirectoryEntry_head_offset_must_match[
     (u32)&((struct DIRENTRY *)0)->head == 0x20 ? 1 : -1
 ];
+#endif
 
 /* Walks a run of memory card directory entries.
  *

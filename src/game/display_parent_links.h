@@ -24,18 +24,26 @@ typedef struct DisplayParent {
     u8 index;
 } DisplayParent;
 
+#ifndef MEMORIES_GLES
 typedef char DisplayLinkEntry_size_must_be_0xC[
     sizeof(DisplayLinkEntry) == 0xC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayParent_entries_offset_must_be_0x8[
     DISPLAY_PARENT_OFFSET(entries) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayParent_index_offset_must_be_0x17[
     DISPLAY_PARENT_OFFSET(index) == 0x17 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DisplayParent_size_must_be_0x18[
     sizeof(DisplayParent) == 0x18 ? 1 : -1
 ];
+#endif
 
 #undef DISPLAY_PARENT_OFFSET
 

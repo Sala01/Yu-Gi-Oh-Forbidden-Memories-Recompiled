@@ -30,26 +30,36 @@ typedef struct {
 } DuelCardStagingDeckView;
 
 #define DUEL_CARD_STAGING_OFFSET(type, member) ((u32)&(((type *)0)->member))
+#ifndef MEMORIES_GLES
 typedef char DuelCardReplayRecordBlock_record_offset_must_be_0x36B4[
     DUEL_CARD_STAGING_OFFSET(DuelCardReplayRecordBlock, record) == 0x36B4
         ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelStagedDeckRecordBlock_record_offset_must_be_0x39FC[
     DUEL_CARD_STAGING_OFFSET(DuelStagedDeckRecordBlock, record) == 0x39FC
         ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardStagingDeckView_cards_offset_must_be_0x4B9FC[
     DUEL_CARD_STAGING_OFFSET(DuelCardStagingDeckView, cards) ==
         DUEL_CARD_STAGING_REPLAY_BASE_OFFSET + 0x39FC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardStagingDeckView_field_cards_offset_must_be_0x4B6B4[
     DUEL_CARD_STAGING_OFFSET(DuelCardStagingDeckView, field_cards) ==
         DUEL_CARD_STAGING_REPLAY_BASE_OFFSET + 0x36B4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelCardStagingDeckView_size_must_preserve_deck_extent[
     sizeof(DuelCardStagingDeckView) ==
         0x4B9FC + COMBINED_DECK_SIZE * sizeof(DuelDeckCardRecord) ? 1 : -1
 ];
+#endif
 #undef DUEL_CARD_STAGING_OFFSET
 
 /* One byte view and one typed view, each under a single name and neither

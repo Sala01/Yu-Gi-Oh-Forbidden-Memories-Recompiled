@@ -56,7 +56,7 @@ void func_8004DE24(void)
     vbase = D_8009AF88[0xAC];
     ubase = (BACKGROUND_FIELD_AA & 0x3F) <<
         (2 - ((BACKGROUND_FIELD_A8 >> 13) & 3));
-    height = slot->field_D18->matrix.t[1] + 300;
+    height = ((GsCOORDUNIT *)slot->field_D18)->matrix.t[1] + 300;
     if (!slot->field_E1F)
         return;
     if (slot->field_DA0[0] == -4096 &&

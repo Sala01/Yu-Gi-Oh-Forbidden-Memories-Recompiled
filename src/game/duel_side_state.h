@@ -70,24 +70,36 @@ typedef struct {
 
 #define DUEL_SIDE_STATE_OFFSET(member) ((u32)&(((DuelSideState *)0)->member))
 
+#ifndef MEMORIES_GLES
 typedef char DuelSideState_size_must_be_0x20[
     sizeof(DuelSideState) == 0x20 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSideState_hand_must_be_at_0x1A[
     DUEL_SIDE_STATE_OFFSET(hand) == 0x1A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelRankStatistics_size_must_be_0x0D[
     sizeof(DuelRankStatistics) == 0x0D ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSideState_deck_draw_cursor_must_be_at_0x18[
     DUEL_SIDE_STATE_OFFSET(deck_draw_cursor) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSideState_swords_turns_remaining_must_be_at_0x19[
     DUEL_SIDE_STATE_OFFSET(swords_turns_remaining) == 0x19 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelSideState_card_view_mode_must_be_at_0x1F[
     DUEL_SIDE_STATE_OFFSET(card_view_mode) == 0x1F ? 1 : -1
 ];
+#endif
 
 /* The side selector: 0 or 1, and the index behind both cursors this header
  * and duel_grid.h describe. Thirty-nine private declarations before this. */

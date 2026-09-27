@@ -23,16 +23,16 @@ s32 func_8005A3D0(ModelSlot *model, GsCOORDUNIT *parent)
     link = (GsCOORDUNIT *)model->entries;
     do {
         backlink_index = 0;
-        if (link->super != parent)
+        if ((GsCOORDUNIT *)link->super != parent)
             goto next;
         if (current_count == 0)
             goto next;
         count = current_count;
-        entries = model->entries;
+        entries = (u8 *)model->entries;
         target = (GsCOORDUNIT *)(entries + offset);
         backlink = (GsCOORDUNIT *)entries;
 inner:
-        if (backlink->super == target)
+        if ((GsCOORDUNIT *)backlink->super == target)
             goto after_inner;
         backlink_index++;
         if (backlink_index < count) {

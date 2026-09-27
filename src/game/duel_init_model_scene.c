@@ -10,5 +10,5 @@ void Duel_InitModelScene(void)
 {
     func_800530C4();
     func_800533D8();
-    func_80056250(2, D_80010000[0].payload_bases[0], 0x63000, 4);
+    func_80056250(2, (u8 *)D_80010000[0].payload_bases[0], 0x63000, 4);
 }

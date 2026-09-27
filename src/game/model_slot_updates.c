@@ -56,14 +56,14 @@ extern char ModelSlotPart_seq_fields_must_agree[
 void func_8005A468(s32 arg0, s32 arg1)
 {
     ModelSlot *rec = &D_800F2C40[arg0];
-    ModelSlotPart **p;
+    u32 *p;
     s32 i;
 
     p = rec->field_1E0;
     i = 0;
     if (rec->field_E1B != 0) {
         do {
-            (*p)->speed = arg1;
+            ((ModelSlotPart *)*p)->speed = arg1;
             p++;
             i++;
         } while (i < rec->field_E1B);
@@ -76,12 +76,12 @@ void func_8005A468(s32 arg0, s32 arg1)
 void func_8005A4C4(ModelSlot *e, int a, int b, int c, int d)
 {
     if (e->field_D18) {
-        e->field_D18->rot.vx = 0;
-        e->field_D18->rot.vy = d;
-        e->field_D18->rot.vz = 0;
-        e->field_D18->matrix.t[0] = a;
-        e->field_D18->matrix.t[1] = b;
-        e->field_D18->matrix.t[2] = c;
+        ((GsCOORDUNIT *)e->field_D18)->rot.vx = 0;
+        ((GsCOORDUNIT *)e->field_D18)->rot.vy = d;
+        ((GsCOORDUNIT *)e->field_D18)->rot.vz = 0;
+        ((GsCOORDUNIT *)e->field_D18)->matrix.t[0] = a;
+        ((GsCOORDUNIT *)e->field_D18)->matrix.t[1] = b;
+        ((GsCOORDUNIT *)e->field_D18)->matrix.t[2] = c;
     }
-    func_8005922C(e->field_D18, 0);
+    func_8005922C((GsCOORDUNIT *)e->field_D18, 0);
 }

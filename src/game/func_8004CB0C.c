@@ -167,7 +167,7 @@ void func_8004CB0C(s32 index, u8 *hmd, s32 size, s32 flags)
                     }
                 masktest:
                     if (ev.type & 0x800000) {
-                        base->entries = (u8 *)GsMapCoordUnit((u32 *)hmd, (u32 *)ev.ptr);
+                        base->entries = (u32)GsMapCoordUnit((u32 *)hmd, (u32 *)ev.ptr);
                         ev.type &= 0xFF7FFFFF;
                     }
                 dispatch:
@@ -227,13 +227,13 @@ void func_8004CB0C(s32 index, u8 *hmd, s32 size, s32 flags)
         }
         base->field_E18 = i;
         q = GS_COORD_UNIT_VIEW(base->entries) + i;
-        base->field_D18 = q;
+        base->field_D18 = (u32)q;
         base->field_E19 = func_8005A3D0(base, q);
         if (!(base->field_E19 < base->entry_count)) {
             base->field_E19 = base->field_E18;
         }
         cur = GS_COORD_UNIT_VIEW(base->entries) + base->field_E19;
-        base->field_D1C = cur;
+        base->field_D1C = (u32)cur;
     retry:
         slot = GS_UNIT_VIEW(base->field_000);
         loaded_limit = base->field_E1A;
@@ -244,7 +244,7 @@ void func_8004CB0C(s32 index, u8 *hmd, s32 size, s32 flags)
         claimed:
             if (slot->coord != 0 && slot->primtop != 0) {
                 if (*slot->primtop != sentinel || *(slot->primtop + 2) != 0) {
-                    if (slot->coord->super == cur) {
+                    if ((GsCOORDUNIT *)slot->coord->super == cur) {
                         goto scanned;
                     }
                 }
@@ -266,15 +266,15 @@ void func_8004CB0C(s32 index, u8 *hmd, s32 size, s32 flags)
         cur = (GsCOORDUNIT *)base->entries + next;
         goto retry;
     found:
-        rec = cur->super;
-        if (rec != base->field_D18) {
-            base->field_D1C = rec;
+        rec = (GsCOORDUNIT *)cur->super;
+        if ((u32)rec != base->field_D18) {
+            base->field_D1C = (u32)rec;
             if (rec != 0) {
                 base->field_E19 = rec - GS_COORD_UNIT_VIEW(base->entries);
             }
         }
     }
     if (base->field_DE0 == 0) {
-        base->field_DE0 = (u8 *)(hmd + size);
+        base->field_DE0 = (u32)(hmd + size);
     }
 }

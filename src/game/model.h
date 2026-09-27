@@ -48,9 +48,17 @@
 #define MODEL_AUX_LOOKUP_RECORD_SIZE 0xB2
 #define MODEL_AUX_LOOKUP_VALUE_OFFSET 0xA0
 
+/* PC-port 64-bit note: ModelSlot/ModelSlotHeadEntry (below) keep explicit
+ * 32-bit guest addresses instead of native pointers on every architecture,
+ * unlike most structs in this tree (see ai.h's AiScriptState for the
+ * general pattern). Unlike those, the per-monster MODEL control modules
+ * (MODEL.MRG, run as raw interpreted MIPS: notes/pc-build.md's "MIPS-only
+ * effects") read and write several of these fields directly at their
+ * literal retail byte offsets, so this struct's exact 32-bit layout is load
+ * bearing at runtime, not just a `make match` nicety. */
 typedef struct {
     u32 field_00;
-    void *field_04;
+    u32 field_04;
 } ModelSlotHeadEntry;
 
 /* One of the MODEL_SLOT_ROW_COUNT accumulator rows at slot offset 0x750.
@@ -215,7 +223,7 @@ typedef struct {
 
 typedef struct {
     ModelSlotHeadEntry field_000[MODEL_SLOT_UNIT_COUNT];
-    ModelSlotPart *field_1E0[MODEL_SLOT_PART_COUNT];
+    u32 field_1E0[MODEL_SLOT_PART_COUNT]; /* ModelSlotPart* guest addresses; see the note above ModelSlotHeadEntry */
     /* The per-animation key table. func_8004D58C fills it with 0xFFFF at a
      * 0x74 stride over MODEL_SLOT_ROW_COUNT rows, func_8004D75C indexes it as
      * [row][part], and Model_ControlSlotAnimation reads the same halfword through the
@@ -233,15 +241,15 @@ typedef struct {
     u8 field_BF7;
     ModelSlotSoundEntry sound_entries[MODEL_SLOT_SOUND_ENTRY_COUNT];
     ModelSlotCF8Block field_CF8;
-    u8 *entries;
+    u32 entries; /* u8* guest address; see the note above ModelSlotHeadEntry */
     /* The slot's own placement unit: one 0x50-byte GsCOORDUNIT out of the
      * MODEL_SLOT_DATA_ENTRY_SIZE-stride run at `entries`. Left incomplete
      * here so this header stays free of the libgte/libgpu/libgs/libhmd
      * chain; sources that reach through it include "../psyq/libhmd.h". */
-    struct _GsCOORDUNIT *field_D18;
+    u32 field_D18; /* struct _GsCOORDUNIT* guest address */
     /* The coordinate func_8004CB0C selects once the units are linked; see
      * that function's header comment. */
-    struct _GsCOORDUNIT *field_D1C;
+    u32 field_D1C; /* struct _GsCOORDUNIT* guest address */
     u8 pad_D20[0x50];
     ModelSlotLightEntry field_D70[3];
     s32 field_DA0[3];
@@ -254,10 +262,10 @@ typedef struct {
      * func_8004D58C out of the two blocks it finds in the command chain.
      * Model_ControlSlotAnimation reads field_DD8 as the base of 4-byte command records and
      * field_DDC / field_DE0 as the source and destination of its transfers. */
-    s32 *field_DD8;
-    u8 *field_DDC;
-    u8 *field_DE0;
-    u8 *field_DE4;
+    u32 field_DD8; /* s32* guest address */
+    u32 field_DDC; /* u8* guest address */
+    u32 field_DE0; /* u8* guest address */
+    u32 field_DE4; /* u8* guest address */
     /* The module data words D_8001001C..D_80010028 func_8004CB0C copies in
      * for slots 0 and 1 (see high_memory_addresses.h). */
     s32 field_DE8;
@@ -428,12 +436,16 @@ typedef char ModelSlotCF8Block_size_must_be_0x1C[
 typedef char ModelSlotCF8BlockWords_size_must_match_block[
     sizeof(ModelSlotCF8BlockWords) == sizeof(ModelSlotCF8Block) ? 1 : -1
 ];
+#ifndef MEMORIES_GLES
 typedef char ModelTransferMetadata_field_CF8_offset_must_be_0x100[
     MODEL_OFFSET(ModelTransferMetadata, field_CF8) == 0x100 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelBytes8_size_must_be_8[
     sizeof(ModelBytes8) == 8 ? 1 : -1
 ];
+#endif
 typedef char ModelSlotCF8Block_field_0A_offset_must_be_0xA[
     MODEL_OFFSET(ModelSlotCF8Block, prefix.bytes.field_0A) == 0xA ? 1 : -1
 ];
@@ -591,41 +603,63 @@ typedef char ModelSlotCF8TailView_field_107_offset_must_be_0x107[
         MODEL_SLOT_CF8_DFF_OFFSET ? 1 : -1
 ];
 
+#ifndef MEMORIES_GLES
 typedef char ModelHandlerRegistryEntry_size_must_be_0x8[
     sizeof(ModelHandlerRegistryEntry) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelHandlerRegistryEntry_handler_value_offset_must_be_0x0[
     MODEL_OFFSET(ModelHandlerRegistryEntry, handler_value) == 0x0 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelHandlerRegistryEntry_key_offset_must_be_0x4[
     MODEL_OFFSET(ModelHandlerRegistryEntry, key) == 0x4 ? 1 : -1
 ];
+#endif
 
+#ifndef MEMORIES_GLES
 typedef char ModelCameraLeg_size_must_be_0x10[
     sizeof(ModelCameraLeg) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelCameraLeg_pair_slot_offset_must_be_0x6[
     MODEL_OFFSET(ModelCameraLeg, pair_slot) == 0x6 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelCameraLeg_end_x_offset_must_be_0x8[
     MODEL_OFFSET(ModelCameraLeg, end_x) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelCameraLeg_slot_offset_must_be_0xE[
     MODEL_OFFSET(ModelCameraLeg, slot) == 0xE ? 1 : -1
 ];
+#endif
 
+#ifndef MEMORIES_GLES
 typedef char ModelCameraMove_size_must_be_0x2C[
     sizeof(ModelCameraMove) == 0x2C ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelCameraMove_duration_offset_must_be_0xA[
     MODEL_OFFSET(ModelCameraMove, duration) == 0xA ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelCameraMove_eye_offset_must_be_0xC[
     MODEL_OFFSET(ModelCameraMove, eye) == 0xC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelCameraMove_target_offset_must_be_0x1C[
     MODEL_OFFSET(ModelCameraMove, target) == 0x1C ? 1 : -1
 ];
+#endif
 
 /* One entry of the eight-byte table at D_80091570.  Every access in the tree
  * is sixteen bits wide: func_8005F5C8 reads field_00, func_8005F27C reads
@@ -648,31 +682,47 @@ typedef struct {
     s16 field_06;
 } ModelEffectCoefficient;
 
+#ifndef MEMORIES_GLES
 typedef char ModelTintColor_size_must_be_0x4[
     sizeof(ModelTintColor) == 0x4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelTintRequest_size_must_be_0x18[
     sizeof(ModelTintRequest) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelTintRequest_elapsed_offset_must_be_0xC[
     MODEL_OFFSET(ModelTintRequest, elapsed) == 0xC ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelTintRequest_start_offset_must_be_0x10[
     MODEL_OFFSET(ModelTintRequest, start) == 0x10 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelTintRequest_end_offset_must_be_0x14[
     MODEL_OFFSET(ModelTintRequest, end) == 0x14 ? 1 : -1
 ];
+#endif
 
+#ifndef MEMORIES_GLES
 typedef char ModelEffectCoefficient_size_must_be_0x8[
     sizeof(ModelEffectCoefficient) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelEffectCoefficient_angle_offset_must_be_0x2[
     MODEL_OFFSET(ModelEffectCoefficient, angle) == 0x2 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelEffectCoefficient_field_04_offset_must_be_0x4[
     MODEL_OFFSET(ModelEffectCoefficient, field_04) == 0x4 ? 1 : -1
 ];
+#endif
 
 #undef MODEL_OFFSET
 

@@ -18,21 +18,31 @@ typedef struct {
     u8 pad_AC[0x06];
 } ModelBackgroundRecord;
 
+#ifndef MEMORIES_GLES
 typedef char ModelBackgroundRecord_stage_height_offset_must_be_0xA4[
     ((u32)&(((ModelBackgroundRecord *)0)->stage_height)) == 0xA4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelBackgroundRecord_texture_width_offset_must_be_0xA6[
     ((u32)&(((ModelBackgroundRecord *)0)->texture_width)) == 0xA6 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelBackgroundRecord_field_A8_offset_must_be_0xA8[
     ((u32)&(((ModelBackgroundRecord *)0)->field_A8)) == 0xA8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelBackgroundRecord_field_AA_offset_must_be_0xAA[
     ((u32)&(((ModelBackgroundRecord *)0)->field_AA)) == 0xAA ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char ModelBackgroundRecord_size_must_be_0xB2[
     sizeof(ModelBackgroundRecord) == 0xB2 ? 1 : -1
 ];
+#endif
 
 typedef struct {
     SVECTOR values[2];

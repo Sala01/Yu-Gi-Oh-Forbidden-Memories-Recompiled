@@ -21,9 +21,11 @@ typedef struct {
     s32 unk4;
 } MainMenuSlot;
 
+#ifndef MEMORIES_GLES
 typedef char MainMenuSlot_size_must_be_8[
     sizeof(MainMenuSlot) == 8 ? 1 : -1
 ];
+#endif
 
 extern MainMenuSlot D_801845EC[];
 

@@ -50,27 +50,41 @@ typedef struct {
     u8 field_1D;    /* 0x1D */
 } DuelEffectRequest;
 
+#ifndef MEMORIES_GLES
 typedef char DuelEffectRequest_size_must_be_0x20[
     sizeof(DuelEffectRequest) == 0x20 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectRequest_field_04_offset_must_be_0x4[
     DUEL_EFFECT_REQUEST_OFFSET(field_04) == 0x4 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectRequest_field_08_offset_must_be_0x8[
     DUEL_EFFECT_REQUEST_OFFSET(field_08) == 0x8 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectRequest_buffer_offset_must_be_0x14[
     DUEL_EFFECT_REQUEST_OFFSET(buffer) == 0x14 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectRequest_id_offset_must_be_0x18[
     DUEL_EFFECT_REQUEST_OFFSET(id) == 0x18 ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectRequest_field_1A_offset_must_be_0x1A[
     DUEL_EFFECT_REQUEST_OFFSET(field_1A) == 0x1A ? 1 : -1
 ];
+#endif
+#ifndef MEMORIES_GLES
 typedef char DuelEffectRequest_flags_offset_must_be_0x1C[
     DUEL_EFFECT_REQUEST_OFFSET(flags) == 0x1C ? 1 : -1
 ];
+#endif
 
 #undef DUEL_EFFECT_REQUEST_OFFSET
 

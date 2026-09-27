@@ -16,7 +16,7 @@ int SD_OpenSequence(u8 *input, short vab_id)
         return -1;
     state = D_8009B458;
     if (state->field_07E0 == -1) {
-        state->field_07E8 = input;
+        state->field_07E8 = (u32)input;
         state->field_07E0 = vab_id;
         state->field_07E2 = 2;
         state->flag_0500 = 0;

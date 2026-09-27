@@ -36,7 +36,7 @@ void SD_SESetVolume(s32 arg0, s32 arg1)
         if (v == ff) {
             return;
         }
-        id = a->field_043C[v];
+        id = ((u16 *)a->field_043C)[v];
         if (id == ff) {
             return;
         }
