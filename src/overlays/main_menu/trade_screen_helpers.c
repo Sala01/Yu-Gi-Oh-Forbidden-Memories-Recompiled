@@ -68,7 +68,7 @@ void MainMenu_DrawCardTypeIcon(s32 x, s32 y, s32 cardID)
     sprite.v2 = 0xD8;
     sprite.u3 = 0x10;
     sprite.v3 = 0xD8;
-    GsSortPoly(&sprite, D_800E9D94, 0x20);
+    GsSortPoly(&sprite, (GsOT *)D_800E9D94, 0x20);
 }
 
 void MainMenu_DrawTradeColumnOverlay(s32 column)

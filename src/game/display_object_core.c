@@ -266,7 +266,7 @@ void DisplayObject_RenderSpriteList(void) {
     POLY_FT4 *g;
     ClipState *h;
     DisplayObject *e;
-    GsOT **tb;
+    u32 *tb;
     DisplayObjectCallback fn;
     s32 i;
     GsOT *ot;
@@ -300,7 +300,7 @@ void DisplayObject_RenderSpriteList(void) {
                 p->cxcy.word = e->field_40.word;
                 p->uv.word = e->field_5C;
                 mode = e->field_14 | 0x10000;
-                ot = tb[idx];
+                ot = (GsOT *)tb[idx];
                 p->tpage = e->field_66;
 
                 if ((e->flags & DISPLAY_OBJECT_FLAG_SCREEN_SPACE) == 0) {

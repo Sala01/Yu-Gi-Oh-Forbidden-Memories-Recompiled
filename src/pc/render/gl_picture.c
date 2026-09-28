@@ -713,9 +713,20 @@ static int make_picture(int wanted)
 int GlPicture_Init(void)
 {
     const char *version = (const char *)glGetString(GL_VERSION), *choice = getenv("MEMORIES_GL_PICTURE");
+    const char *number = version;
     int major = 0;
     if (choice && !strcmp(choice, "0")) return 0;
-    if (!version || sscanf(version, "%d", &major) != 1 || major < 3) {
+    /* Desktop GL_VERSION starts with the number itself ("4.6.0 NVIDIA ...");
+       GLES's starts with a prefix ("OpenGL ES 3.2 V@..."). Skipping to the
+       first digit parses both the same way instead of only the desktop
+       form -- without this, sscanf's leading "O" never matches "%d", major
+       stays 0, and this whole GPU picture pass silently stays off on every
+       GLES target (confirmed on Android: this message printed even though
+       ES 3.2 is plenty, and nothing the game drew ever reached the screen). */
+    if (number) {
+        while (*number && (*number < '0' || *number > '9')) number++;
+    }
+    if (!version || sscanf(number, "%d", &major) != 1 || major < 3) {
         fprintf(stderr, "memories-pc: OpenGL picture: needs OpenGL 3.0, have %s\n", version ? version : "none");
         return 0;
     }
@@ -2023,6 +2034,15 @@ int GlPicture_Replay(void)
     size_t count, at;
     int overflow, wanted_resync;
     struct timespec t0;
+#ifdef MEMORIES_GLES
+    {
+        static int entry_calls;
+        entry_calls++;
+        if (entry_calls <= 5 || entry_calls % 60 == 0) {
+            fprintf(stderr, "memories-pc: DEBUG GlPicture_Replay entry #%d on=%d\n", entry_calls, on);
+        }
+    }
+#endif
     if (!on) return 0;
     clock_gettime(CLOCK_MONOTONIC, &t0);
     /* Take the record: what a tick appends from now on is the next one's. */
@@ -2040,6 +2060,16 @@ int GlPicture_Replay(void)
     want_resync = 0;
     sigprocmask(SIG_SETMASK, &previous, NULL);
     if (!taken) return 0;
+#ifdef MEMORIES_GLES
+    {
+        static int calls;
+        calls++;
+        if (calls <= 5 || calls % 60 == 0) {
+            fprintf(stderr, "memories-pc: DEBUG GlPicture_Replay #%d count=%zu overflow=%d resync=%d scale=%d\n",
+                    calls, count, overflow, wanted_resync, scale);
+        }
+    }
+#endif
     if (!count && !overflow && !wanted_resync && scale < 2) return 0; /* 1x: nothing recorded, nothing to draw */
     if (vertex_array) glBindVertexArray_(vertex_array);
     gl_ActiveTexture(GL_TEXTURE0);

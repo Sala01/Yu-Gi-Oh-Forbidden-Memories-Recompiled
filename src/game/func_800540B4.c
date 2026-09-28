@@ -163,9 +163,9 @@ void func_800540B4(s32 index)
     u8 fl;
 
     if (index < 2) {
-        ot = D_800E9D98[0];
+        ot = (GsOT *)D_800E9D98[0];
     } else {
-        ot = D_800E9D98[1];
+        ot = (GsOT *)D_800E9D98[1];
     }
     slot = &D_800F2C40[index];
     blk = (s8 *)&slot->field_CF8;

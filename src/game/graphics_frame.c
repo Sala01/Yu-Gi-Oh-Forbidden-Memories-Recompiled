@@ -75,11 +75,16 @@ void Graphics_SyncFrame(void)
 void Graphics_BeginFrame(void)
 {
     s32 i;
+#ifdef MEMORIES_GLES
+    u32 *slot;
+    u32 *base;
+#else
     GsOT **slot;
+    GsOT **base;
+#endif
     s32 idx;
     GsOT *ptr;
     u8 *arg;
-    GsOT **base;
 
     if (D_8009B0A8 == 0) {
         D_800FE048[0].isbg = D_8009B0D0;
@@ -123,7 +128,11 @@ void Graphics_BeginFrame(void)
     slot = base + 3;
     do {
         ptr = &gGraphics_pActiveFrameBuffer->ordering_tables[i];
+#ifdef MEMORIES_GLES
+        *slot = (u32)ptr;
+#else
         *slot = ptr;
+#endif
         slot--;
         ptr->length = D_8009B0A0[i];
         GsClearOt(0, 0, ptr);

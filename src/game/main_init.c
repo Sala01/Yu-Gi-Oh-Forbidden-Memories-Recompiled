@@ -42,6 +42,12 @@
 #include "movie_playback_control.h"
 #include "main_mode_state.h"
 #include "../psyq/libgs.h"
+#ifdef MEMORIES_GLES
+#include "../psyq/stdio.h"
+#define CHECKPOINT(n) printf("memories-pc: DEBUG Main_Init checkpoint %d\n", n)
+#else
+#define CHECKPOINT(n)
+#endif
 
 s32 Main_Init(void)
 {
@@ -49,7 +55,9 @@ s32 Main_Init(void)
     s32 t;
     register GraphicsFrameBuffer *p;
 
+    CHECKPOINT(-1);
     __main();
+    CHECKPOINT(-2);
     EnterCriticalSection();
     ResetCallback();
     GsInitVcount();
@@ -57,7 +65,9 @@ s32 Main_Init(void)
     StopCallback();
     SetMem(2);
     SetDispMask(0);
+    CHECKPOINT(-3);
     Fade_DisableOrderingTables();
+    CHECKPOINT(-4);
     p = gGraphics_aFrameBuffers;
     D_8009B0CC = 0;
     D_8009B0C8 = 0;
@@ -73,20 +83,29 @@ s32 Main_Init(void)
     gGraphics_pActiveFrameBuffer = p;
     D_8009B0C4 = t;
     func_80013154(p);
+    CHECKPOINT(1);
     DisplayObject_Reset();
+    CHECKPOINT(2);
     Fade_Init();
     Main_ClearFrameServiceCallbacks();
     Movie_ResetPlaybackState();
     func_80035A64();
+    CHECKPOINT(3);
     Text_InitDecimalDigitGlyphMap();
+    CHECKPOINT(4);
     SD_InitState(D_800E9EC0[0]);
+    CHECKPOINT(5);
     VSyncCallback(Main_VBlankCB);
+    CHECKPOINT(6);
     Sound_InitFrontend();
+    CHECKPOINT(7);
     srand(RAND_BOOT_SEED);
     SetDispMask(1);
     Main_ResetFrontendRuntime();
     Main_ResetFrontendRuntime();
+    CHECKPOINT(8);
     Main_RunBootSequence(0);
+    CHECKPOINT(9);
     r = setjmp(D_800E9DC0);
     Main_ResetFrontendRuntime();
     if (r != 0) {

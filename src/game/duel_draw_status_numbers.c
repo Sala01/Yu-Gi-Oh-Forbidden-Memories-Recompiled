@@ -32,7 +32,7 @@ void func_80016D2C(
         digit->u = temp[i] << 3;
         GsSortFastSprite(
             digit,
-            D_800E9D90[style->ot_index],
+            (GsOT *)D_800E9D90[style->ot_index],
             style->field_14
         );
         digit->x += 8;

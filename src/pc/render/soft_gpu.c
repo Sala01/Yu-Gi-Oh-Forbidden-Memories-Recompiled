@@ -1155,6 +1155,16 @@ void SoftGpu_SetPrecise(const PgxpVertex *vertices, size_t count)
 size_t SoftGpu_Gp0(const uint32_t *words, size_t count)
 {
     size_t at = 0;
+#ifdef MEMORIES_GLES
+    {
+        static size_t calls;
+        calls++;
+        if (calls <= 10 || calls % 300 == 0) {
+            fprintf(stderr, "memories-pc: DEBUG SoftGpu_Gp0 #%zu count=%zu word0=%08x\n",
+                    calls, count, count ? words[0] : 0);
+        }
+    }
+#endif
     if (recorder && scale > 1) {
         if (precise_count && recorder->precise) recorder->precise(precise, precise_count);
         recorder->gp0(words, count);

@@ -76,7 +76,7 @@ void MainMenu_DrawFrontendBackground(void)
         sprite.v2 = 239;
         sprite.u3 = u + 63;
         sprite.v3 = 239;
-        GsSortPoly(&sprite, D_800E9D90[2], 4095);
+        GsSortPoly(&sprite, (GsOT *)D_800E9D90[2], 4095);
     }
     setPolyG4(&shade);
     shade.r2 = 255;

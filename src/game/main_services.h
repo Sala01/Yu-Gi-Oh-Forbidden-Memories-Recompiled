@@ -40,7 +40,23 @@
  * each unit. The per-slot names D_800E9DB8 and D_800E9DBC (0x800E9DB0 + 8
  * and + 12) carry no displacement off D_800E9DB0, so their writers do not
  * appear as `%lo(D_800E9DB0)` references. */
+#ifdef MEMORIES_GLES
+/* D_800E9DC0 (a jmp_buf, just below) sits exactly 16 bytes after this array
+   on retail's layout -- i.e. this really is u32[4], not a real 8-byte
+   function pointer array. On a 64-bit host the real-pointer spelling grows
+   it to 32 bytes, so writes to slot 2/3 miss their own array and land
+   inside D_800E9DC0 instead, corrupting the setjmp recovery point; slot 0/1
+   consumers were still self-consistent (same struct, same host), so this
+   went unnoticed until the whole per-frame service pump quietly never
+   called any scene's draw callback (confirmed on Android: the game ran
+   without crashing, but GlPicture_Replay recorded zero draw commands every
+   single frame). Same treatment as ModelSlot's fields (model.h) and
+   SDSecondaryState.field_050C (sound.h): the guest address of a function,
+   not a real pointer to it. */
+extern u32 D_800E9DB0[4];
+#else
 extern void (*D_800E9DB0[4])(void);
+#endif
 
 /* The recovery point the registry's comment above already places at
  * 0x800E9DC0. Main_Init arms it with setjmp once the boot sequence is up,

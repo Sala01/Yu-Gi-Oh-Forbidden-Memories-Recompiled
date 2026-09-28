@@ -38,7 +38,7 @@
 void func_80015EF4(void *record, POLY_GT4 *prim, POLY_FT4 *sprite, s32 *color)
 {
     DuelCardRenderHolder *holder = record;
-    GsOT **tab;
+    u32 *tab;
     DisplayObject *obj;
     s32 a;
     s32 c;
@@ -175,7 +175,7 @@ void func_80015EF4(void *record, POLY_GT4 *prim, POLY_FT4 *sprite, s32 *color)
     depth[0] = (depth[4] + depth[5]
                           + depth[6] + depth[7]) / 4 >> 2;
     tab = D_800E9D90;
-    GsSortPoly(prim, tab[2], *(u16 *)depth);
+    GsSortPoly(prim, (GsOT *)tab[2], *(u16 *)depth);
 
     c3->vy = 0;
     c2->vy = 0;
@@ -193,5 +193,5 @@ void func_80015EF4(void *record, POLY_GT4 *prim, POLY_FT4 *sprite, s32 *color)
     gte_ldv0((SVECTOR *)0x1F8003D8);
     gte_rtps();
     gte_stsxy(&sprite->x3);
-    GsSortPoly(sprite, tab[2], 0xFFF);
+    GsSortPoly(sprite, (GsOT *)tab[2], 0xFFF);
 }

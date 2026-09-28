@@ -324,7 +324,7 @@ void func_8002ACA4(u8 *state)
             state[1] = flags | 0x80;
             state[2] = 0;
             D_8009B0C0 = 1;
-            D_800E9DB0[2] = (void (*)(void))func_80029934;
+            D_800E9DB0[2] = (u32)func_80029934;
             flags = state[0];
             H(state, 0x10) = 0;
             if (!(flags & 0x40)) {
@@ -462,7 +462,7 @@ void func_8002ACA4(u8 *state)
                 i++;
             } while (i < 9);
             H(D_800EB0F8[3].field_28, 8) |= 0x40;
-            D_800E9DB0[3] = Library_DrawCardGrid;
+            D_800E9DB0[3] = (u32)Library_DrawCardGrid;
             Fade_StartInKeepOverlay();
             state[3] = 2;
             state[1] = 7;
@@ -755,7 +755,7 @@ void func_8002BFCC(void) {
                               (FileTransferCallback)func_8002BD0C, 0, 0);
     File_WaitForTransfers();
     Library_MarkOwnedCards();
-    D_800E9DB0[3] = Library_DrawCardGrid;
+    D_800E9DB0[3] = (u32)Library_DrawCardGrid;
     func_80029590();
     r = D_800EA1E8;
     D_800EA1E8[0] = 0;

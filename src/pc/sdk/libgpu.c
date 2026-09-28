@@ -482,7 +482,16 @@ void GsDrawOt(void *descriptor)
      * game's own tables and are layered by them. Nothing happens while the
      * mods are all off. */
     Mods_DrawFrame();
+#ifdef MEMORIES_GLES
+    /* The GsOT's .tag is a 4-byte guest address (libgs.h), not a real
+     * pointer; reading 8 bytes here the way the ILP32 build does would take
+     * .tag plus 4 bytes of whatever follows the struct as a wild 64-bit
+     * pointer. Guest addresses double as host pointers (the guest RAM
+     * mapping), so widen the 4-byte value instead of reinterpreting bytes. */
+    DrawOTag((u32 *)(uintptr_t)*(u32 *)((char *)descriptor + 16));
+#else
     DrawOTag(*(u32 **)((char *)descriptor + 16));
+#endif
 }
 
 int DrawSync(int mode)

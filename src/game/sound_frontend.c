@@ -6,10 +6,16 @@
 #include "sound_output_state.h"
 #include "sound_output.h"
 #include "sound_state_control.h"
+#ifdef MEMORIES_GLES
+#include "../psyq/stdio.h"
+#endif
 
 void Sound_InitFrontend(void)
 {
     register volatile s32 *lbas = gFile_anLba;
+#ifdef MEMORIES_GLES
+    s32 spins = 0;
+#endif
 
     gSD_bOutputType = -1;
     SD_InitDataSourceFlags(
@@ -17,6 +23,14 @@ void Sound_InitFrontend(void)
         lbas[FILE_LBA_INDEX_SD_BGM],
         lbas[FILE_LBA_INDEX_MASTER_XA]);
     while (SD_GetStatusFlags() & 8) {
+#ifdef MEMORIES_GLES
+        spins++;
+        if (spins <= 10 || spins % 300 == 0) {
+            printf("memories-pc: DEBUG Sound_InitFrontend spin #%d field_003C=%d flags_0040=%04x B0F4=%08x B134=%08x busy=%d\n",
+                   spins, g_SDValue->field_003C, (unsigned)(u16)g_SDValue->flags_0040,
+                   D_8009B0F4, D_8009B134, g_SDValue->busy);
+        }
+#endif
         Main_AdvanceFrame();
     }
 }

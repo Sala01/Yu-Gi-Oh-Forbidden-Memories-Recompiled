@@ -133,8 +133,8 @@ tiles:
             160 * (u16)(BACKGROUND_TEXTURE_WIDTH / 0x500u);
         while (sprite.x < 320) {
             if (sprite.x + sprite.w > 0)
-                GsSortFastSprite(&sprite, D_800E9D90[3],
-                    (u16)((1u << D_800E9D90[3]->length) - 1));
+                GsSortFastSprite(&sprite, ((GsOT *)D_800E9D90[3]),
+                    (u16)((1u << ((GsOT *)D_800E9D90[3])->length) - 1));
             amount = (sprite.u + sprite.w) %
                 (u16)(BACKGROUND_TEXTURE_WIDTH / 10u);
             sprite.x += sprite.w;
@@ -216,16 +216,16 @@ tiles:
         polygons[1].x3 = (u16)polygons[2].x1;
         polygons[1].y3 = (u16)polygons[2].y1;
         if (first_depth >= 0) {
-            GsSortPoly(&polygons[0], D_800E9D90[3],
-                (u16)((1u << D_800E9D90[3]->length) - 1));
+            GsSortPoly(&polygons[0], ((GsOT *)D_800E9D90[3]),
+                (u16)((1u << ((GsOT *)D_800E9D90[3])->length) - 1));
         } else if (second_depth < 0) {
             goto advance;
         }
-        GsSortPoly(&polygons[1], D_800E9D90[3],
-            (u16)((1u << D_800E9D90[3]->length) - 1));
+        GsSortPoly(&polygons[1], ((GsOT *)D_800E9D90[3]),
+            (u16)((1u << ((GsOT *)D_800E9D90[3])->length) - 1));
         if (second_depth >= 0)
-            GsSortPoly(&polygons[2], D_800E9D90[3],
-                (u16)((1u << D_800E9D90[3]->length) - 1));
+            GsSortPoly(&polygons[2], ((GsOT *)D_800E9D90[3]),
+                (u16)((1u << ((GsOT *)D_800E9D90[3])->length) - 1));
 advance:
         phase += 256;
         vertices[0] = vertices[1];

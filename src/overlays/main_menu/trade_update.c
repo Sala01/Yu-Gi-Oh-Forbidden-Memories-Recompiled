@@ -84,7 +84,7 @@ void MainMenu_InitTradeScreen(void)
     D_80185CCF = 0;
     D_80185CD0 = 0;
     D_80185CD1 = 0;
-    D_800E9DB0[1] = MainMenu_DrawTradeOffersAndHighlights;
+    D_800E9DB0[1] = (u32)MainMenu_DrawTradeOffersAndHighlights;
     D_8009B0C0 = 1;
 }
 

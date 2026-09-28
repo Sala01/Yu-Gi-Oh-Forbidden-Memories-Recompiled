@@ -236,7 +236,16 @@ extern FileTransferDescriptor gFile_PrimaryTransferDescriptor;
    the FileTransferDescriptor members; only its image-phase buffer select is
    still an address sum (see func_80013C28.c). */
 extern FileTransferDescriptor *D_8009AF18;
+#ifdef MEMORIES_GLES
+/* Pinned (undefined in C, forced to its retail address by the linker script)
+ * with no backing storage of its own: a real 8-byte pointer here would take
+ * 4 bytes of whatever retail global follows it at link time. Guest addresses
+ * double as host pointers (the guest RAM mapping), so this stays the 4-byte
+ * guest address and every reader/writer widens it explicitly. */
+extern u32 D_8009B0F8;
+#else
 extern u32 *D_8009B0F8;
+#endif
 
 /* func_800140A0 resets these counters before the ready-system callback,
    func_80013C28, increments them. Neither view is volatile or forced .data. */
@@ -269,7 +278,9 @@ extern char D_8009B104[1];
  * by the .data arm below, and gp-relative sw and two lw elsewhere. One TU held a u32 view beside an
  * asm("D_8009B10C") alias of this type; the pointer is what every use
  * assigns and calls. */
-#ifdef D_8009B10C_IN_DATA
+#ifdef MEMORIES_GLES
+extern u32 D_8009B10C;
+#elif defined(D_8009B10C_IN_DATA)
 extern void (*D_8009B10C)(void) __attribute__((section(".data")));
 #else
 extern void (*D_8009B10C)(void);
@@ -294,6 +305,10 @@ void File_SetPositionTable(void);
  * of zero in File_InitTransferState and gp-relative lw in
  * File_StepActiveTransfer, but sw %lo through $at in SD_InitState, whose unit
  * defines the .data arms below for that. Initial value not read. */
+#ifdef MEMORIES_GLES
+extern u32 D_8009B0F0;
+extern u32 D_8009B120;
+#else
 #ifdef D_8009B0F0_IN_DATA
 extern void (*D_8009B0F0)(void) __attribute__((section(".data")));
 #else
@@ -303,6 +318,7 @@ extern void (*D_8009B0F0)(void);
 extern void (*D_8009B120)(void) __attribute__((section(".data")));
 #else
 extern void (*D_8009B120)(void);
+#endif
 #endif
 
 /* A counter the CD and stream paths bump at each step they complete. */

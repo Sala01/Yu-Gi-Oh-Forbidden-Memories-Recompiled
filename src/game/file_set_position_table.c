@@ -15,7 +15,11 @@ void File_SetPositionTable(void)
 
     File_InitTransferState((s32)gLibrary_aCardArtRecord);
 
+#ifdef MEMORIES_GLES
+    D_8009B10C = (u32)File_WaitForTransfers;
+#else
     D_8009B10C = File_WaitForTransfers;
+#endif
     state = &D_800E9DF0;
     state->xy.h.x = 0x120;
     state->xy.h.y = 0xD0;

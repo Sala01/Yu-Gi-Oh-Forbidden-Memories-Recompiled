@@ -29,6 +29,7 @@
 #include <SDL3/SDL.h>
 #ifdef MEMORIES_GLES
 #include <GLES3/gl3.h>
+#include <EGL/egl.h>
 #else
 #include <SDL3/SDL_opengl.h>
 #endif
@@ -1196,9 +1197,32 @@ static void draw_overlay(int *x, int *y, int *w, int *h)
 static void show(void)
 {
     SDL_FRect physical;
+#ifdef MEMORIES_GLES
+    {
+        static int calls;
+        calls++;
+        if (calls <= 5 || calls % 60 == 0) {
+            fprintf(stderr, "memories-pc: DEBUG show() call #%d: use_gl=%d gl_picture=%u gl_overlay=%u window=%p\n",
+                    calls, use_gl, (unsigned)gl_picture, (unsigned)gl_overlay, (void *)window);
+        }
+    }
+#endif
     if (use_gl) {
         int output_w, output_h, effects;
-        if (!gl_picture || !gl_overlay || !SDL_GetWindowSizeInPixels(window, &output_w, &output_h)) return;
+        if (!gl_picture || !gl_overlay || !SDL_GetWindowSizeInPixels(window, &output_w, &output_h)) {
+#ifdef MEMORIES_GLES
+            {
+                static int logged2;
+                if (logged2 < 5) {
+                    logged2++;
+                    fprintf(stderr, "memories-pc: DEBUG show() early return: gl_picture=%u gl_overlay=%u getsize=%d\n",
+                            (unsigned)gl_picture, (unsigned)gl_overlay,
+                            SDL_GetWindowSizeInPixels(window, &output_w, &output_h));
+                }
+            }
+#endif
+            return;
+        }
         glViewport(0, 0, output_w, output_h);
 #ifdef MEMORIES_GLES
         gles_set_ortho(layout.win_w, layout.win_h);
@@ -1249,7 +1273,20 @@ static void show(void)
             save_window_image(); /* the back buffer holds this frame until the swap */
         }
         apply_swap_interval();
+#ifdef MEMORIES_GLES
+        {
+            static int swap_calls;
+            bool ok = SDL_GL_SwapWindow(window);
+            swap_calls++;
+            if (!ok || swap_calls <= 5 || swap_calls % 60 == 0) {
+                fprintf(stderr, "memories-pc: DEBUG SwapWindow #%d ok=%d err=%s glerr=0x%x eglerr=0x%x win_wh=%dx%d dst=%.0f,%.0f %.0fx%.0f\n",
+                        swap_calls, ok, SDL_GetError(), glGetError(), eglGetError(),
+                        layout.win_w, layout.win_h, layout.dst.x, layout.dst.y, layout.dst.w, layout.dst.h);
+            }
+        }
+#else
         SDL_GL_SwapWindow(window);
+#endif
         if (swap_interval == 1) Platform_NotifyPresent(real_now_us(), 1);
         return;
     }
@@ -1720,6 +1757,19 @@ int Platform_Open(const char *title)
      * available for diagnostics and compatibility overrides. */
     block_signals(&previous);
 #ifdef MEMORIES_GLES
+    /* Without this, Android's WindowManager/SurfaceFlinger appear to
+     * disagree with SDL about which rotation the fixed "landscape" manifest
+     * lock actually produces on this device: every composited buffer is
+     * tagged with a non-identity transform (7 = flip-h|flip-v|rot90) that
+     * BLASTBufferQueue rejects outright (logged once, then silently forever
+     * after -- confirmed via dumpsys SurfaceFlinger --latency showing zero
+     * frames ever reaching the layer despite SDL_GL_SwapWindow reporting
+     * success with no GL/EGL error every frame). Declaring the accepted
+     * orientations explicitly through SDL's own hint, independent of the
+     * manifest attribute, is the documented way to resolve that ambiguity. */
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
+#ifdef MEMORIES_GLES
     /* SDL_INIT_GAMEPAD pulls in the joystick subsystem, whose Android
      * backend polls connected devices through JNI (SDLControllerManager).
      * The game's main loop runs on a stack this port mmap's at a fixed, low
@@ -1834,6 +1884,19 @@ static void finish_present(int w, int h)
     } else {
         SDL_UpdateTexture(picture, NULL, picture_pixels, w * 4);
     }
+#ifdef MEMORIES_GLES
+    {
+        static int calls;
+        calls++;
+        if (calls <= 5 || calls % 60 == 0) {
+            size_t i, n = (size_t)w * (size_t)h, nonzero = 0;
+            uint32_t sample = picture_pixels && n ? picture_pixels[0] : 0;
+            for (i = 0; picture_pixels && i < n; i++) if (picture_pixels[i] & 0xFFFFFF) nonzero++;
+            fprintf(stderr, "memories-pc: DEBUG finish_present #%d w=%d h=%d nonzero=%zu/%zu sample=%08x\n",
+                    calls, w, h, nonzero, n, sample);
+        }
+    }
+#endif
     compose_menu_if_changed();
     show();
 }

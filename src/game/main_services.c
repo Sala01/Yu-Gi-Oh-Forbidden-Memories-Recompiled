@@ -51,7 +51,7 @@ void Main_RunFrameServices(void) {
     DisplayObject_RenderFrame();
 
     for (i = 0; i < 4; i++) {
-        fn = D_800E9DB0[i];
+        fn = (void (*)(void))D_800E9DB0[i];
         if (fn != 0) {
             fn();
         }
@@ -196,7 +196,11 @@ void func_80013360(void)
 /* Zeroes D_800E9DB0[0..3] and D_8009B0B8. */
 void Main_ClearFrameServiceCallbacks(void)
 {
+#ifdef MEMORIES_GLES
+    u32 *v0;
+#else
     void (**v0)(void);
+#endif
     int v1;
 
     v1 = 3;

@@ -77,7 +77,7 @@ void Library_DrawCardGrid(void)
 #endif
     p = (GsSPRITE *)0x1F800320;
     n = (gGraphics_sViewportY - 8) / 178;
-    ot = D_800E9D90[3];
+    ot = (GsOT *)D_800E9D90[3];
     if (n < 0) {
         return;
     }

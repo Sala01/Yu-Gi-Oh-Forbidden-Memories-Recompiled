@@ -39,7 +39,7 @@ void func_80029934(void)
     vec = (SVECTOR *)0x1F800038;
     ctl = (long *)0x1F800060;
     par = (SVECTOR *)0x1F800200;
-    ot = D_800E9D90[3];
+    ot = (GsOT *)D_800E9D90[3];
     GsSetLsMatrix(&D_800FE148);
 
     {

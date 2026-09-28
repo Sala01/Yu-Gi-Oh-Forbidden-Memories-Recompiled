@@ -6,6 +6,9 @@
 #include "../psyq/libspu.h"
 #include "file_transfer.h"
 #include "file_ready_sector.h"
+#ifdef MEMORIES_GLES
+#include "../psyq/stdio.h"
+#endif
 
 FileTransferDescriptor *File_TryStartPrimaryTransfer(s32 index, s32 offset)
 {
@@ -68,6 +71,16 @@ void File_TransferReadyCallback(s32 arg)
 
     event = arg & 0xFF;
     D_8009B114++;
+#ifdef MEMORIES_GLES
+    {
+        static int calls;
+        calls++;
+        if (calls <= 20 || calls % 300 == 0) {
+            printf("memories-pc: DEBUG File_TransferReadyCallback #%d arg=%d event=%d done=%d\n",
+                   calls, arg, event, D_8009AF18->done);
+        }
+    }
+#endif
     if (event != 1) {
         return;
     }
@@ -84,7 +97,7 @@ void File_TransferReadyCallback(s32 arg)
             } else {
                 i = 0;
                 t = p;
-                src = D_8009B0F8;
+                src = (u32 *)D_8009B0F8;
                 do {
                     word = src[i];
                     ((u32 *)t->value_08)[i] = word;
@@ -95,7 +108,11 @@ void File_TransferReadyCallback(s32 arg)
         }
         transfer = D_8009AF18;
         remaining = transfer->total_bytes;
+#ifdef MEMORIES_GLES
+        D_8009B0F8 += FILE_SECTOR_SIZE; /* a guest byte address, not a pointer */
+#else
         D_8009B0F8 += FILE_SECTOR_SIZE / sizeof(u32);
+#endif
         remaining -= FILE_SECTOR_SIZE;
         transfer->total_bytes = remaining;
         if (remaining <= 0) {
@@ -128,11 +145,15 @@ void File_TransferReadyCallback(s32 arg)
         if ((D_8009B0F4 & 0x40000000) == 0) {
             CdGetSector(dst, FILE_SECTOR_SIZE / sizeof(u32));
         } else {
-            src = D_8009B0F8;
+            src = (u32 *)D_8009B0F8;
             for (i = 0; i < (s32)(FILE_SECTOR_SIZE / sizeof(u32)); ++i) {
                 ((u32 *)dst)[i] = src[i];
             }
+#ifdef MEMORIES_GLES
+            D_8009B0F8 += FILE_SECTOR_SIZE; /* a guest byte address, not a pointer */
+#else
             D_8009B0F8 += FILE_SECTOR_SIZE / sizeof(u32);
+#endif
         }
         D_8009AF18->total_bytes -= FILE_SECTOR_SIZE;
         if (D_8009AF18->total_bytes <= 0) {
@@ -170,11 +191,15 @@ void File_TransferReadyCallback(s32 arg)
         if ((D_8009B0F4 & 0x40000000) == 0) {
             CdGetSector(dst, n / 4);
         } else {
-            src = D_8009B0F8;
+            src = (u32 *)D_8009B0F8;
             for (i = 0; i < n / 4; ++i) {
                 ((u32 *)dst)[i] = src[i];
             }
+#ifdef MEMORIES_GLES
+            D_8009B0F8 += n; /* a guest byte address, not a pointer */
+#else
             D_8009B0F8 = (u32 *)((u8 *)D_8009B0F8 + n);
+#endif
         }
         D_8009AF18->total_bytes -= FILE_SECTOR_SIZE;
         if (D_8009AF18->total_bytes <= 0) {

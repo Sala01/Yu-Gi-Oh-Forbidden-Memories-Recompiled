@@ -166,7 +166,7 @@ void Fade_DrawOverlay(void) {
         p->attribute = GsALON | GsATWO;
         *(u32 *)&p->w = (FADE_SCREEN_HEIGHT << 16) | FADE_SCREEN_WIDTH;
         *(u32 *)&p->x = 0;
-        ot = D_800E9D94[0];
+        ot = (GsOT *)D_800E9D94[0];
 
         if (flags & FADE_FLAG_BANDED) {
             FADEBOX_H(p) = FADE_BAND_HEIGHT;

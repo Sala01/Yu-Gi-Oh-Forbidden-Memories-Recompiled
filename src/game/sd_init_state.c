@@ -45,8 +45,13 @@ void SD_InitState(u8 arg0)
         *p = 0;
         p++;
     } while (p <= (u32 *)0x801EA7FF);
+#ifdef MEMORIES_GLES
+    D_8009B0F0 = (u32)func_8004666C;
+    D_8009B120 = (u32)func_800466C8;
+#else
     D_8009B0F0 = func_8004666C;
     D_8009B120 = func_800466C8;
+#endif
     *SD_INIT_BLOCK_11_VIEW(g_SDValue->field_1619) =
         *SD_INIT_BLOCK_11_VIEW(D_80010784);
     *SD_INIT_BLOCK_10_VIEW(g_SDValue->field_1629) =

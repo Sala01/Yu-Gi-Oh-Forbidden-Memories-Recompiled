@@ -5,6 +5,7 @@
 #include "../psyq/libgpu.h"
 #include "../psyq/libgs.h"
 #include "../psyq/rand.h"
+#include "../psyq/stdio.h"
 #define GRAPHICS_VIEWPORT_IN_DATA
 #include "graphics_frame.h"
 #include "display_flat_lights.h"
@@ -51,7 +52,7 @@ void DisplayObject_RenderGouraudQuadList(void) {
     POLY_G4 *g;
     u8 *h;
     DisplayObject *e;
-    GsOT **tb;
+    u32 *tb;
     DisplayObjectCallback fn;
     s32 eight;
     s32 hi;
@@ -164,7 +165,7 @@ void DisplayObject_RenderTexturedGouraudQuadList(void) {
     POLY_GT4 *g;
     u8 *h;
     DisplayObject *e;
-    GsOT **tb;
+    u32 *tb;
     DisplayObjectCallback fn;
     s32 twelve;
     s32 hi;
@@ -273,6 +274,17 @@ void DisplayObject_RenderTexturedGouraudQuadList(void) {
 void DisplayObject_RenderFrame(void)
 {
     s32 i;
+#ifdef MEMORIES_GLES
+    {
+        static int calls;
+        calls++;
+        if (calls <= 5 || calls % 300 == 0) {
+            printf("memories-pc: DEBUG DisplayObject_RenderFrame #%d heads:", calls);
+            for (i = 0; i < DISPLAY_OBJECT_LIST_COUNT; i++) printf(" %d", D_800EFE38[i]);
+            printf("\n");
+        }
+    }
+#endif
     SetBackColor(96, 96, 96);
     SetFarColor(0, 0, 0);
     GsSetFlatLight(0, &D_80090FCC);
