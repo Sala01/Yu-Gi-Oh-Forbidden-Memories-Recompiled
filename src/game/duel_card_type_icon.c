@@ -64,7 +64,7 @@ DisplayObject *func_80031574(s32 index, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
         output->field_44.word = 0;
         output->field_18 = field_18;
         output->field_1A = arg4;
-        output->update = (DisplayObjectCallback)func_800313E8;
+        output->update = (u32)func_800313E8;
         output->flags &= 0xFFF7;
         output->attribute &= ~GsROTOFF;
         return output;

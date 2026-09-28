@@ -77,7 +77,11 @@ void AiScript_FindFirstType(void)
     AiActiveCard *cards = gDuel_aActiveCards;
 
     do {
-        s32 index = *(u8 *)(i + (s32)indices);
+        /* indices is a guest data address (always has the high bit set):
+         * (s32)indices is negative, and adding it in signed arithmetic then
+         * casting to a pointer would sign-extend to a wild 64-bit address
+         * on LP64. Route the sum through u32 to zero-extend instead. */
+        s32 index = *(u8 *)(u32)(i + (s32)indices);
         AiActiveCard *card =
             (AiActiveCard *)((u32)&((AiActiveCard *)0)[index] + (s32)cards);
 

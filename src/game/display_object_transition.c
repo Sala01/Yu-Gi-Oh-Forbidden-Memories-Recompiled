@@ -11,6 +11,12 @@
 #include "display_object_helpers.h"
 #include "../unmatched.h"
 #include "display_object_transition.h"
+#ifdef MEMORIES_GLES
+#include "../psyq/stdio.h"
+#define CHECKPOINT(n) printf("memories-pc: DEBUG func_8004365C checkpoint %d\n", n)
+#else
+#define CHECKPOINT(n)
+#endif
 
 void func_8004365C(DisplayObject *a, DisplayObject *b)
 {
@@ -21,6 +27,7 @@ void func_8004365C(DisplayObject *a, DisplayObject *b)
     s32 c;
     s32 v;
 
+    CHECKPOINT(0);
     x = (DisplayObject *)0;
 
     if (a != (DisplayObject *)0) {
@@ -33,13 +40,17 @@ void func_8004365C(DisplayObject *a, DisplayObject *b)
         x->attribute = x->attribute | (GsALON | GsATWO);
         a->attribute = a->attribute | (GsALON | GsAONE);
     }
+    CHECKPOINT(1);
 
     b->field_48.h.field_48 = 0xA0;
     b->field_48.h.field_4A = 0x78;
     b->attribute = b->attribute & ~GsROTOFF;
 
+    CHECKPOINT(2);
     y = DisplayObject_AcquireSlot(DisplayObject_FindFreeGeneralSlot(), 2);
+    CHECKPOINT(3);
     DisplayObject_ConfigureSpriteAtPositionWithResource(y, 0, 0, 0, 0, b->field_69, b->field_66, 0x20D, D_801AF000);
+    CHECKPOINT(4);
     y->attribute = b->attribute;
     DisplayObject_SetDepthOffset(y, -1);
     y->flags = y->flags | DISPLAY_OBJECT_FLAG_SCREEN_SPACE;
@@ -50,7 +61,11 @@ void func_8004365C(DisplayObject *a, DisplayObject *b)
     i = 0;
     hi = 0x80;
 
+    CHECKPOINT(5);
     do {
+#ifdef MEMORIES_GLES
+        printf("memories-pc: DEBUG func_8004365C loop i=%d\n", i);
+#endif
         c = ((i << 16) | (i << 8)) | i;
         b->field_0C = c;
         y->field_0C = c;
@@ -67,8 +82,12 @@ void func_8004365C(DisplayObject *a, DisplayObject *b)
         }
         i += 8;
         Main_AdvanceFrame();
+#ifdef MEMORIES_GLES
+        printf("memories-pc: DEBUG func_8004365C loop returned i=%d\n", i);
+#endif
     } while (i < 0x81);
 
+    CHECKPOINT(6);
     b->field_44.word = 0x10001000;
     b->attribute = (b->attribute | GsROTOFF) & ~(GsALON | GsATWO | GsAONE);
     DisplayObject_ReleaseIfPresent(a);

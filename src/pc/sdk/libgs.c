@@ -329,6 +329,10 @@ static u32 sprite_clut(const Sprite *sprite)
 static void sort_plain_sprite(const Sprite *sprite, u32 *ot, unsigned pri, int mx, int my)
 {
     u32 *packet = (u32 *)(uintptr_t)D_800FE240;
+#ifdef MEMORIES_GLES
+    fprintf(stderr, "memories-pc: DEBUG sort_plain_sprite D_800FE240=0x%08x packet=%p ot=%p\n",
+            D_800FE240, (void *)packet, (void *)ot);
+#endif
     u32 attribute = sprite->attribute;
     packet[1] = 0xe1000200u | ((attribute >> 17) & 0x180) | (sprite->tpage & 0x1f) | ((attribute >> 23) & 0x60);
     packet[2] = sprite_colour(sprite, 0x64000000u);

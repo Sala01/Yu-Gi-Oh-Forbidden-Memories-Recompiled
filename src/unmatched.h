@@ -134,12 +134,33 @@ extern const char D_80011918[];
  * pointer arithmetic on it. Those two arms are selected by
  * D_8009B118_IN_DATA and D_8009B118_IS_POINTER_IN_DATA, the same shape
  * input.h and sound.h use, rather than by re-declaring the symbol locally. */
+/* On LP64, callers cast this straight to a pointer (LoadImage2's (u32 *)
+ * D_8009B118, at fifteen call sites): with the s32 spelling below, any value
+ * with the guest RAM's high bit set (it always does, PS1 RAM lives at
+ * 0x80000000+) is negative and sign-extends to a wild 64-bit pointer instead
+ * of zero-extending to the intended guest/host address. Making it u32 for
+ * MEMORIES_GLES fixes every cast site at once without touching them (ILP32
+ * is untouched, so desktop's retail-matched codegen is unaffected). The
+ * pointer-in-data variant already has the right width for its one arm-only
+ * pointer-arithmetic consumer (duel_load_package_stage.c) once it too is a
+ * guest address rather than a real 8-byte pointer squeezed into this
+ * pinned symbol's 4-byte retail slot. */
+#ifdef MEMORIES_GLES
+#ifdef D_8009B118_IS_POINTER_IN_DATA
+extern u32 D_8009B118 __attribute__((section(".data")));
+#elif defined(D_8009B118_IN_DATA)
+extern u32 D_8009B118 __attribute__((section(".data")));
+#else
+extern u32 D_8009B118;
+#endif
+#else
 #ifdef D_8009B118_IS_POINTER_IN_DATA
 extern u8 *D_8009B118 __attribute__((section(".data")));
 #elif defined(D_8009B118_IN_DATA)
 extern s32 D_8009B118 __attribute__((section(".data")));
 #else
 extern s32 D_8009B118;
+#endif
 #endif
 
 /* Address-only declarations found by re-measuring the note above rather

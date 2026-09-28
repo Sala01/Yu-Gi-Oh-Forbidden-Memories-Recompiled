@@ -2,6 +2,12 @@
 #include "model_record_tables.h"
 #include "display_object_stream_read_next_command.h"
 
+#ifdef MEMORIES_GLES
+#define DISPLAY_OBJECT_STREAM_CURRENT(object) ((u8 *)(u32)(object)->current)
+#else
+#define DISPLAY_OBJECT_STREAM_CURRENT(object) ((object)->current)
+#endif
+
 void DisplayObjectStream_ReadNextCommand(DisplayObjectStreamState *object)
 {
     u8 *p;
@@ -9,7 +15,7 @@ void DisplayObjectStream_ReadNextCommand(DisplayObjectStreamState *object)
     s32 (**table)(DisplayObjectStreamState *, const u8 *);
     s32 value;
 
-    p = object->current + (u16)object->field_58;
+    p = DISPLAY_OBJECT_STREAM_CURRENT(object) + (u16)object->field_58;
     op = *p;
     p++;
 
@@ -19,7 +25,7 @@ void DisplayObjectStream_ReadNextCommand(DisplayObjectStreamState *object)
             if (table[op ^ 0xFF](object, p) == -1) {
                 return;
             }
-            p = object->current + (u16)object->field_58;
+            p = DISPLAY_OBJECT_STREAM_CURRENT(object) + (u16)object->field_58;
             op = *p;
             p++;
         } while (op >= 0xF0);

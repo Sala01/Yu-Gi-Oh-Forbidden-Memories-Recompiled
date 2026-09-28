@@ -11,9 +11,17 @@
 #include "display_object_packet_submit.h"
 #include "display_object_render_sprite_sheet.h"
 
-/* Caching this pointer shortens retail; each use must reload field_4C. */
+/* Caching this pointer shortens retail; each use must reload field_4C.
+ * field_4C is a guest data address here (display_object_stream_read_next_command.c's
+ * `object->field_4C = object->base + value;`), always >= 0x80000000 and so
+ * negative as the field's s32 spelling: casting straight to a pointer would
+ * sign-extend it to a wild 64-bit address on LP64 (confirmed: this crashed
+ * dereferencing the sign-extended pointer). Route it through u32 to
+ * zero-extend instead; identical on ILP32. Other field_4C writers store
+ * (s32) function addresses instead, which are unaffected either way since
+ * this port's own code stays under 0x80000000. */
 #define SPRITE_SHEET_HEADER(object) \
-    ((SpriteSheetHeader *)(object)->field_4C)
+    ((SpriteSheetHeader *)(u32)(object)->field_4C)
 #define GS_SPRITE_VIEW(sprite) ((GsSPRITE *)(sprite))
 #define DISPLAY_OBJECT_COLOR_BYTES(object) ((u8 *)&(object)->field_0C)
 
@@ -78,7 +86,7 @@ retry:
         work->cx += (SPRITE_SHEET_HEADER(object)->clut & 0xF) << 4;
         work->cy += SPRITE_SHEET_HEADER(object)->clut >> 4;
     }
-    sheet = (u8 *)object->field_4C;
+    sheet = (u8 *)(u32)object->field_4C;
     sprite->rotate = object->field_20.h.field_22 * 5760;
     GS_SPRITE_VIEW(sprite)->scalex = object->field_44.h.field_44;
     GS_SPRITE_VIEW(sprite)->scaley = object->field_44.h.field_46;

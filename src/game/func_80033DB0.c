@@ -229,6 +229,10 @@ u32 *func_80033DB0(GsARGUNIT_NORMAL *arg)
             rec++;
         }
     }
+#ifdef MEMORIES_GLES
+    D_800FE240 = (u32)out;
+#else
     D_800FE240 = (u32 *)out;
+#endif
     return primp + 2;
 }

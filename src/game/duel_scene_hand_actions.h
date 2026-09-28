@@ -76,7 +76,11 @@ typedef struct {
     u8 pad_17[0xA];
     u8 face;                    /* 0x21 */
     u8 pad_22[2];
+#ifdef MEMORIES_GLES
+    u32 update;                 /* 0x24: void (*)() guest address */
+#else
     void (*update)();           /* 0x24 */
+#endif
     union { struct { s16 x, y; } xy; s32 word; } target;  /* 0x28 */
     union { struct { u16 x, y; } xy; s32 word; } saved;   /* 0x2C */
     union { struct { u16 x, y; } xy; s32 word; } pos;     /* 0x30 */
@@ -95,11 +99,9 @@ typedef struct {
     u8 field_6C;                /* 0x6C */
 } HandCardObject;
 
-#ifndef MEMORIES_GLES
 typedef char HandCardObject_field_6C_offset_must_be_0x6C[
     (u32)&(((HandCardObject *)0)->field_6C) == 0x6C ? 1 : -1
 ];
-#endif
 
 void DuelScene_UpdateHandActions(void);
 

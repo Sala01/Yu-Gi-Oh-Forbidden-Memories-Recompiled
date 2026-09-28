@@ -1121,11 +1121,31 @@ struct FileTransferDescriptor {
        a volatile member keeps that store out of the slot (+0x1C bytes). */
     s32 total_bytes;
     s32 file_bytes;
+#ifdef MEMORIES_GLES
+    /* Real pointers here (a real u8 pointer, function pointer, or void
+     * pointer, 8 bytes on arm64) grow this struct past its retail 0x48
+     * bytes, which breaks
+     * File_ActivateTransfer's FileTransferDescriptorWords word-for-word
+     * copy: that copy only moves the first 18 words, so on a widened
+     * struct `done`/`substate`/etc. land past the copied span and the
+     * primary descriptor never picks up the secondary's state (confirmed:
+     * gFile_PrimaryTransferDescriptor.done stayed 0 forever). Guest
+     * addresses double as host pointers, so these stay 4-byte guest
+     * addresses/function addresses (the .so's own code is within the low
+     * 32 bits of its fixed load address) and every reader/writer widens
+     * or narrows explicitly. */
+    u32 loader_argument;
+#else
     u8 *loader_argument;
+#endif
     /* Total byte count for the current callback-programmed transfer phase.
        func_8001513C copies it back into phase_remaining after each callback. */
     u32 phase_size;
+#ifdef MEMORIES_GLES
+    u32 phase_callback;
+#else
     FileTransferCallback phase_callback;
+#endif
     s32 absolute_lba;
     s32 phase_remaining;
     u32 status_flags;
@@ -1150,7 +1170,11 @@ struct FileTransferDescriptor {
         u32 word;
     } field_30;
     s32 direct_destination;
+#ifdef MEMORIES_GLES
+    u32 callback_data;
+#else
     void *callback_data;
+#endif
     u32 position;
     u32 result;
     u16 buffer_index;
@@ -1158,76 +1182,54 @@ struct FileTransferDescriptor {
     u8 substate;
 };
 
-#ifndef MEMORIES_GLES
+/* Checked on every build, GLES included: the MEMORIES_GLES branches above
+ * keep every real pointer a 4-byte guest/code address specifically so this
+ * struct stays retail-shaped (see the comment on loader_argument). If one
+ * of these ever trips on Android, some field grew back into a real pointer
+ * and File_ActivateTransfer's word-copy will silently stop moving whatever
+ * comes after it. */
 typedef char FileTransferDescriptor_size_must_be_0x48[
     sizeof(FileTransferDescriptor) == 0x48 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_w_offset_must_be_0x04[
     YGO_TYPE_OFFSET(FileTransferDescriptor, w) == 0x04 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_h_offset_must_be_0x06[
     YGO_TYPE_OFFSET(FileTransferDescriptor, h) == 0x06 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_value_08_offset_must_be_0x08[
     YGO_TYPE_OFFSET(FileTransferDescriptor, value_08) == 0x08 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_total_bytes_offset_must_be_0x10[
     YGO_TYPE_OFFSET(FileTransferDescriptor, total_bytes) == 0x10 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_phase_size_offset_must_be_0x1C[
     YGO_TYPE_OFFSET(FileTransferDescriptor, phase_size) == 0x1C ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_phase_callback_offset_must_be_0x20[
     YGO_TYPE_OFFSET(FileTransferDescriptor, phase_callback) == 0x20 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_absolute_lba_offset_must_be_0x24[
     YGO_TYPE_OFFSET(FileTransferDescriptor, absolute_lba) == 0x24 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_status_flags_offset_must_be_0x2C[
     YGO_TYPE_OFFSET(FileTransferDescriptor, status_flags) == 0x2C ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_counter_offset_must_be_0x30[
     YGO_TYPE_OFFSET(FileTransferDescriptor, field_30.h.counter) == 0x30 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_field_32_offset_must_be_0x32[
     YGO_TYPE_OFFSET(FileTransferDescriptor, field_30.h.field_32) == 0x32 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_callback_data_offset_must_be_0x38[
     YGO_TYPE_OFFSET(FileTransferDescriptor, callback_data) == 0x38 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_done_offset_must_be_0x46[
     YGO_TYPE_OFFSET(FileTransferDescriptor, done) == 0x46 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptor_substate_offset_must_be_0x47[
     YGO_TYPE_OFFSET(FileTransferDescriptor, substate) == 0x47 ? 1 : -1
 ];
-#endif
 
 #define FILE_TRANSFER_DESCRIPTOR_WORD_COUNT 18
 
@@ -1238,11 +1240,9 @@ typedef struct {
     s32 value[FILE_TRANSFER_DESCRIPTOR_WORD_COUNT];
 } FileTransferDescriptorWords;
 
-#ifndef MEMORIES_GLES
 typedef char FileTransferDescriptorWords_size_must_match_descriptor[
     sizeof(FileTransferDescriptorWords) == sizeof(FileTransferDescriptor) ? 1 : -1
 ];
-#endif
 
 /* Sound's staged command and the loader's two request slots are the same
    record: func_80045514 passes it to func_80014C40 for a 0x20-byte copy. */
@@ -1443,19 +1443,32 @@ typedef struct {
     s16 field_4A;
     /* DisplayObjectStream_ReadNextCommand points this at the current opcode's
        operand target: base plus the little-endian halfword that follows the
-       opcode. */
+       opcode.
+
+       This struct is a view over the same memory as DisplayObject
+       (field_4C/current/base alias DisplayObject's field_4C/field_50/
+       field_54): real 8-byte pointers here would desync every offset from
+       current onward relative to that struct, even after DisplayObject's
+       own fields are correctly sized, because THIS struct's layout is
+       computed independently by the compiler. Guest addresses double as
+       host pointers, so these stay 4-byte guest addresses under
+       MEMORIES_GLES and readers/writers widen or narrow explicitly. */
+#ifdef MEMORIES_GLES
+    u32 field_4C;
+    u32 current;
+    u32 base;
+#else
     u8 *field_4C;
     u8 *current;
     u8 *base;
+#endif
     s16 field_58;
     s16 field_5A;
 } DisplayObjectStreamState;
 
-#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_size_must_be_0x5C[
     sizeof(DisplayObjectStreamState) == 0x5C ? 1 : -1
 ];
-#endif
 #ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_22_offset_must_be_0x22[
     (u32)&((DisplayObjectStreamState *)0)->field_22 == 0x22 ? 1 : -1
@@ -1471,26 +1484,18 @@ typedef char DisplayObjectStreamState_field_4A_offset_must_be_0x4A[
     (u32)&((DisplayObjectStreamState *)0)->field_4A == 0x4A ? 1 : -1
 ];
 #endif
-#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_4C_offset_must_be_0x4C[
     (u32)&((DisplayObjectStreamState *)0)->field_4C == 0x4C ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_current_offset_must_be_0x50[
     (u32)&((DisplayObjectStreamState *)0)->current == 0x50 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_base_offset_must_be_0x54[
     (u32)&((DisplayObjectStreamState *)0)->base == 0x54 ? 1 : -1
 ];
-#endif
-#ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_58_offset_must_be_0x58[
     (u32)&((DisplayObjectStreamState *)0)->field_58 == 0x58 ? 1 : -1
 ];
-#endif
 #ifndef MEMORIES_GLES
 typedef char DisplayObjectStreamState_field_5A_offset_must_be_0x5A[
     (u32)&((DisplayObjectStreamState *)0)->field_5A == 0x5A ? 1 : -1

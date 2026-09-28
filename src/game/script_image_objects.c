@@ -77,7 +77,11 @@ void ScriptImage_RequestTransfer(
         0, 0, base + index * stride + 0x21D5, stride,
         ScriptImage_TransferCallback, 0, 0
     );
+#ifdef MEMORIES_GLES
+    object->callback_data = (u32)(stride - 1);
+#else
     object->callback_data = (void *)(stride - 1);
+#endif
     D_8009B0F4 =
         object->status_flags | FILE_TRANSFER_STATE_PRIMARY_ACTIVE;
 }

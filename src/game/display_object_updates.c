@@ -116,9 +116,13 @@ void DisplayObject_RenderSpriteStripList(void)
         u32 *table = D_800E9D90;
 
         do {
-            DisplayObject *object =
-                (DisplayObject *)(i * DISPLAY_OBJECT_RECORD_SIZE + (s32)base);
-            DisplayObjectCallback callback = object->update;
+            /* base's guest address always has the high bit set, so (s32)base
+             * is negative: casting the sum straight to a pointer would
+             * sign-extend it to a wild 64-bit address on LP64. Route it
+             * through u32 to zero-extend instead (identical on ILP32). */
+            DisplayObject *object = (DisplayObject *)(u32)(
+                i * DISPLAY_OBJECT_RECORD_SIZE + (s32)base);
+            DisplayObjectCallback callback = (DisplayObjectCallback)object->update;
             u8 *data = DISPLAY_OBJECT_CALLBACK_BYTES(object);
 
             i = object->next;
@@ -142,7 +146,7 @@ void DisplayObject_RunUpdateCallbackList(void)
 
     while (i >= 0) {
         DisplayObject *object = &D_800EFE48[i];
-        DisplayObjectCallback callback = object->update;
+        DisplayObjectCallback callback = (DisplayObjectCallback)object->update;
 
         i = object->next;
         if (callback != 0) {
@@ -160,9 +164,9 @@ void DisplayObject_RunSecondaryCallbackList(void)
         u32 *table = D_800E9D90;
 
         do {
-            DisplayObject *object =
-                (DisplayObject *)(i * DISPLAY_OBJECT_RECORD_SIZE + (s32)base);
-            DisplayObjectCallback callback = object->update;
+            DisplayObject *object = (DisplayObject *)(u32)(
+                i * DISPLAY_OBJECT_RECORD_SIZE + (s32)base);
+            DisplayObjectCallback callback = (DisplayObjectCallback)object->update;
             u8 *data = DISPLAY_OBJECT_CALLBACK_BYTES(object);
 
             i = object->next;

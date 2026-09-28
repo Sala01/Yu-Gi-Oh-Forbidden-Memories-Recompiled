@@ -145,21 +145,21 @@ void DuelScene_UpdateBattle(void)
         cb = (DisplayObjectCallback)func_8001ED20;
         o->field_2C.h.field_2C = w;
         o->field_6C = one;
-        o->update = cb;
+        o->update = (u32)cb;
         o->position.h.field_2A = o->field_30.h.field_32;
         o = D_8009B21C;
         h = 0x18;
         o->position.h.field_28 = 0x198;
         o->field_2C.h.field_2C = w;
         o->field_6C = one;
-        o->update = cb;
+        o->update = (u32)cb;
         o->position.h.field_2A = o->field_30.h.field_32;
         o = slots[0];
         o->position.h.field_28 = 0x38;
         o->position.h.field_2A = y;
         o->field_2C.h.field_2C = h;
         o->field_6C = one;
-        o->update = cb;
+        o->update = (u32)cb;
         func_80029164(0, S(pw + D_800E9EF0[0]->field_6A * 0x1C + big, 0x36C0));
         o = slots[1];
         D_8009B22A = 0;
@@ -169,7 +169,7 @@ void DuelScene_UpdateBattle(void)
             o->position.h.field_2A = y;
             o->field_2C.h.field_2C = h;
             o->field_6C = one;
-            o->update = cb;
+            o->update = (u32)cb;
         } else {
             D_8009B229 = 0;
         }
@@ -700,13 +700,13 @@ void DuelScene_UpdateBattle(void)
             o->position.h.field_28 = 0xC;
             o->field_2C.h.field_2C = 0x10;
             o->field_6C = 1;
-            o->update = (DisplayObjectCallback)func_8001ED20;
+            o->update = (u32)func_8001ED20;
             o->position.h.field_2A = o->field_30.h.field_32;
             o = D_8009B21C;
             o->position.h.field_28 = 0x118;
             o->field_2C.h.field_2C = 0x10;
             o->field_6C = 1;
-            o->update = (DisplayObjectCallback)func_8001ED20;
+            o->update = (u32)func_8001ED20;
             o->position.h.field_2A = o->field_30.h.field_32;
         }
         if (!(D_8009B174 & 0x40)) {

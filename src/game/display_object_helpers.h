@@ -5,9 +5,18 @@
 #include "display_object.h"
 #include "display_asset_banks.h"
 
+/* base aliases DisplayObject.field_54 (same memory, different view). A real
+ * 8-byte pointer here would disagree with that struct's now-4-byte field on
+ * arm64 (see the comment on DisplayObject.field_54 / DisplayObjectStreamState
+ * in display_object.h / ygo_types.h). Guest addresses double as host
+ * pointers, so this stays a 4-byte guest address under MEMORIES_GLES. */
 typedef struct {
     u8 pad_00[0x54];
+#ifdef MEMORIES_GLES
+    u32 base;
+#else
     u8 *base;
+#endif
 } DisplayObjectStream;
 
 /* The motion view of a display object: a position triple at 0x30 with its

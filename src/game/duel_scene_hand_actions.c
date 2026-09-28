@@ -239,7 +239,7 @@ void DuelScene_UpdateHandActions(void)
                 obj->target.xy.y = 0x5A;
                 obj->saved.xy.x = 0x10;
                 obj->field_6C = 1;
-                obj->update = func_8001EC70;
+                obj->update = (u32)func_8001EC70;
                 DisplayObject_SetDepthOffset(
                     DISPLAY_OBJECT_VIEW(obj), (s8)(obj->depth + 4));
                 side->cursor_object->flags &= 0xFFBF;
@@ -282,7 +282,7 @@ void DuelScene_UpdateHandActions(void)
                     D_8009B174 = 5;
                     return;
                 }
-                obj->update = func_8001EC70;
+                obj->update = (u32)func_8001EC70;
                 SUBSTATE |= 0x5000;
                 *(s32 *)&obj->target = *(s32 *)&obj->saved;
                 obj->saved.xy.x = 0x10;

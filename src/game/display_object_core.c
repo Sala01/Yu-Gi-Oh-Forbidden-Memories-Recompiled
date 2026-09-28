@@ -75,7 +75,7 @@ void *DisplayObject_AcquireSlot(s32 index, s32 key)
         slot->attribute = GsROTOFF;
         slot->flags = DISPLAY_OBJECT_RENDERABLE_MASK;
         slot->ot_index = 2;
-        slot->field_54 = tail_data_start;
+        slot->field_54 = (u32)tail_data_start;
         slot->field_6C = 0;
         slot->update = 0;
         slot->field_1E = key;
@@ -284,7 +284,7 @@ void DisplayObject_RenderSpriteList(void) {
             e = (DisplayObject *)((u8 *)D_800EFE48 + i * DISPLAY_OBJECT_RECORD_SIZE);
             i = e->next;
             while (1) {
-                fn = e->update;
+                fn = (DisplayObjectCallback)e->update;
                 if (fn != (DisplayObjectCallback)0) {
                     fn((u8 *)e);
                 }

@@ -69,13 +69,21 @@ FileTransferDescriptor *File_InitTransferDescriptor(
     s32 length
 )
 {
+#ifdef MEMORIES_GLES
+    transfer->loader_argument = (u32)source;
+#else
     transfer->loader_argument = source;
+#endif
     File_SetTransferLocation(transfer, flags, sector, -vertical);
     transfer->done = 1;
     transfer->substate = 0;
     transfer->buffer_index = 0;
     transfer->phase_size = 0;
+#ifdef MEMORIES_GLES
+    transfer->phase_callback = (u32)callback;
+#else
     transfer->phase_callback = callback;
+#endif
     transfer->result = field_40;
     if (length) {
         if (flags & 0x1000000) {

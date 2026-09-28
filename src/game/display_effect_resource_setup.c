@@ -177,10 +177,18 @@ void func_8003A560(DisplayEffectVramState *a)
         req = File_TryRequestAsyncTransfer(
             0, 0, a->field_30 * 50 + 15182, 50, func_8003A01C, 0, 0
         );
+#ifdef MEMORIES_GLES
+        req->callback_data = (u32)D_801AF000;
+#else
         req->callback_data = D_801AF000;
+#endif
         req->position = a->field_3C;
         if (a->field_3C != 0) {
+#ifdef MEMORIES_GLES
+            req->callback_data = (u32)D_801AF800;
+#else
             req->callback_data = D_801AF800;
+#endif
         }
         D_8009B0F4_abs = req->status_flags | FILE_TRANSFER_STATE_PRIMARY_ACTIVE;
     } else if ((a->state & 0x40) == 0) {

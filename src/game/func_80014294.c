@@ -220,7 +220,11 @@ call_back:
     if (!(D_8009B0F4 & 0x800000)) {
         D_8009B0F4 = D_8009B0F4 | 0x800000;
         if (p->phase_callback != 0) {
+#ifdef MEMORIES_GLES
+            ((FileTransferCallback)p->phase_callback)(p, p->result++);
+#else
             p->phase_callback(p, p->result++);
+#endif
         }
         p->phase_remaining = p->phase_size;
         return;

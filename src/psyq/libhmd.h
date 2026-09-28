@@ -52,6 +52,20 @@ typedef struct {
 	GsCOORDUNIT 	*super;
 }       GsRVIEWUNIT;
 
+/* KNOWN BUG, not yet fixed (see notes/pc-build.md or ask before touching):
+ * model_slot_properties.c reinterprets ModelSlot.field_000 (model.h's
+ * ModelSlotHeadEntry array, confirmed exactly 8 bytes/entry -- the MODEL.MRG
+ * MIPS interpreter reads/writes it at literal retail byte offsets) as an
+ * array of GsUNIT, walked with sizeof(GsUNIT) as the stride. GsUNIT's two
+ * real pointer fields make it 16 bytes on arm64 instead of retail's 8,
+ * doubling that stride and landing every other access on the wrong entry.
+ * Fixing this the way every other pinned/retail-shaped struct in this tree
+ * is fixed (4-byte guest addresses under MEMORIES_GLES) touches dense,
+ * intricate linking logic in func_8004CB0C.c (slot->coord->super chains,
+ * *slot->primtop dereferences, and a `cmd = *(s32 **)cursor` raw HMD-buffer
+ * read that has the same bug independently) that is NOT on the path to the
+ * boot splash/main menu (it is the monster-model loader), so it is left
+ * alone for now rather than half-fixed under time pressure. */
 typedef struct {
 	GsCOORDUNIT	*coord;	/* local dmatrix */
 	u32	*primtop;

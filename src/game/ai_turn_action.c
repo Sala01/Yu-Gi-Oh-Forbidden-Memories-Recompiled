@@ -351,7 +351,10 @@ loop:
     {
         do {
             n = D_8009B1D5 * 20;
-            rec = (DuelCardRecord *)((s32)*(u8 *)(slot + n + (s32)grid) * 28 + (s32)recs);
+            /* grid/recs are guest data addresses (high bit set): signed
+             * arithmetic on them before a pointer cast would sign-extend to
+             * a wild 64-bit address on LP64. Route each sum through u32. */
+            rec = (DuelCardRecord *)(u32)((s32)*(u8 *)(u32)(slot + n + (s32)grid) * 28 + (s32)recs);
             /* Retail tests terrain_modifier and flags as one packed word. */
             if ((*(u32 *)&rec->terrain_modifier & 0xC0000000) == 0x80000000) {
                 v = func_800278A0((DuelSelectionSource *)rec);
@@ -383,7 +386,7 @@ loop:
                 if ((rand() & 1) != 0) {
                     count = 0;
                     i = 0;
-                    scan = (DuelCardRecord *)((s32)((D_8009B1D5 ^ 1) * 15) * 28 + (s32)scanbase);
+                    scan = (DuelCardRecord *)(u32)((s32)((D_8009B1D5 ^ 1) * 15) * 28 + (s32)scanbase);
                     mask = 0x90000000;
                     pp = pool;
                     do {

@@ -17,9 +17,14 @@ void DisplayObject_RenderSpriteSheetList(void) {
         u32 *t = D_800E9D90;
 
         do {
-            DisplayObject *p =
-                (DisplayObject *)(i * DISPLAY_OBJECT_RECORD_SIZE + (s32)base);
-            DisplayObjectCallback f = p->update;
+            /* base's guest address always has the high bit set (PS1 RAM is
+             * 0x80000000+): (s32)base is negative, and casting straight to
+             * a pointer would sign-extend it to a wild 64-bit address on
+             * LP64. Force the sum through u32 so it zero-extends instead;
+             * identical on ILP32. */
+            DisplayObject *p = (DisplayObject *)(u32)(
+                i * DISPLAY_OBJECT_RECORD_SIZE + (s32)base);
+            DisplayObjectCallback f = (DisplayObjectCallback)p->update;
             u8 *q = (u8 *)p;
 
             i = p->next;

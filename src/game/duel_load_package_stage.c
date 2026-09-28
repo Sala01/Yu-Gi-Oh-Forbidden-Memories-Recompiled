@@ -100,7 +100,7 @@ void Duel_LoadPackageStage(FileTransferDescriptor *d, s32 stage)
             D_8009B0F4_abs |= mask;
             d->done = 2;
             d->h = 0x10;
-            image_ptr = D_8009B118;
+            image_ptr = (u8 *)D_8009B118;
             d->value_08 = (u32)image_ptr;
             d->value_0C = (u32)(image_ptr + FILE_SECTOR_SIZE);
             break;
@@ -167,7 +167,7 @@ void Duel_LoadPackageStage(FileTransferDescriptor *d, s32 stage)
             D_8009B0F4_abs |= mask;
             d->done = 2;
             d->h = 0x10;
-            image_ptr = D_8009B118;
+            image_ptr = (u8 *)D_8009B118;
             d->value_08 = (u32)image_ptr;
             d->value_0C = (u32)(image_ptr + FILE_SECTOR_SIZE);
             break;

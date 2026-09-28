@@ -151,7 +151,7 @@ void DuelScene_UpdateCardPlacement(void)
                         object = *cursor;
                         if (object && (cards[object->field_6A].flags & 0x2000)) {
                             object->field_6C = active;
-                            object->update = callback;
+                            object->update = (u32)callback;
                         }
                         n--;
                         cursor--;

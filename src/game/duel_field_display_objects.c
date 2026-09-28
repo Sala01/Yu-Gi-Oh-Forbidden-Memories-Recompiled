@@ -85,7 +85,10 @@ void func_80023144(DuelFieldDisplaySource *source, s32 index)
     if (record->flags & 0x8000) {
         table = gDuel_adwCardStats;
         id = (s16)record->card_id;
-        stats = *(s32 *)((s32)table + ((id - 1) << 2));
+        /* table is a guest data address (high bit set): signed arithmetic
+         * on it before a pointer cast would sign-extend to a wild 64-bit
+         * address on LP64. Route the sum through u32. */
+        stats = *(s32 *)(u32)((s32)table + ((id - 1) << 2));
         D_8009B34E = 1;
         gDuel_wSelectedCardID = id;
         if (((stats >> CARD_STAT_TYPE_SHIFT) & CARD_STAT_TYPE_MASK) <
@@ -214,7 +217,7 @@ void func_800234E4(DuelFieldDisplaySource *source)
     object->flags = object->flags |
                     DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
                     DISPLAY_OBJECT_FLAG_SCREEN_SPACE;
-    object->update = (DisplayObjectCallback)func_80015D18;
+    object->update = (u32)func_80015D18;
     source->object = object;
 }
 
@@ -273,7 +276,7 @@ s32 func_800235C0(void)
                             DUEL_CARD_STAGING_REPLAY_BASE_OFFSET))->record.object;
                         o->field_6C = 1;
                         o->field_60 = 4;
-                        o->update = (DisplayObjectCallback)func_800229F4;
+                        o->update = (u32)func_800229F4;
                     }
                 }
                 D_8009B162 |= 0x4000;
@@ -411,7 +414,7 @@ s32 func_800235C0(void)
                                 DUEL_CARD_STAGING_REPLAY_BASE_OFFSET))->record.object;
                             o->field_6C = 1;
                             o->field_60 = 4;
-                            o->update = (DisplayObjectCallback)func_80022674;
+                            o->update = (u32)func_80022674;
                         }
                     }
                     D_8009B162 |= 0x4000;

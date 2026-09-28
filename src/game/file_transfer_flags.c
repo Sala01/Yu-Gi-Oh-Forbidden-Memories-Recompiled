@@ -127,7 +127,11 @@ void func_8001513C(FileTransferDescriptor *object)
         if (object->phase_callback != 0) {
             s32 count = object->result++;
 
+#ifdef MEMORIES_GLES
+            ((FileTransferCallback)object->phase_callback)(object, count);
+#else
             object->phase_callback(object, count);
+#endif
         }
         object->phase_remaining = object->phase_size;
     }

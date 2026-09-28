@@ -12,7 +12,18 @@
  * libgs.h's GsOUT_PACKET_P, and DivideFT4 also returns the advanced cursor.
  * The model-capacity query needs the same storage loaded as a forced-.data
  * integer address to preserve its retail address construction. */
-#ifdef GPU_PACKET_CURSOR_AS_ADDRESS
+/* Pinned at a fixed guest address (src/pc/sdk/libgs.c declares the same
+ * external symbol as plain `u32`): a real 8-byte pointer here on arm64 would
+ * disagree with that 4-byte view and corrupt whatever guest global follows
+ * it (confirmed: this is what corrupted the packet cursor libgs.c's
+ * sort_plain_sprite read, crashing on the very first sprite the boot logo
+ * submits). Guest addresses double as host pointers, so this stays a 4-byte
+ * guest address under MEMORIES_GLES and every reader/writer widens or
+ * narrows explicitly, the same as the GPU_PACKET_CURSOR_AS_ADDRESS arm
+ * already did for its own reason. */
+#ifdef MEMORIES_GLES
+extern u32 D_800FE240 __attribute__((section(".data")));
+#elif defined(GPU_PACKET_CURSOR_AS_ADDRESS)
 extern s32 D_800FE240 __attribute__((section(".data")));
 #else
 extern u32 *D_800FE240 __attribute__((section(".data")));

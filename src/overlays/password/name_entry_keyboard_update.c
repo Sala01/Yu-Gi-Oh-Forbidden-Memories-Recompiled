@@ -199,7 +199,7 @@ join:
     obj = NameEntry_SpawnGlyphSprite(kind, node);
     ((DisplayObject *)obj)->field_6C = 1;
     ((DisplayObject *)obj)->update =
-        (DisplayObjectCallback)NameEntry_UpdateGlyphPulse;
+        (u32)NameEntry_UpdateGlyphPulse;
     if (node == 0) {
         ((DisplayObject *)obj)->flags &= 0xFFBF;
     }
@@ -209,7 +209,7 @@ join:
         obj = NameEntry_SpawnGlyphSprite(kind, node);
         ((DisplayObject *)obj)->field_6C = 1;
         ((DisplayObject *)obj)->update =
-            (DisplayObjectCallback)NameEntry_UpdateGlyphPulse;
+            (u32)NameEntry_UpdateGlyphPulse;
         ((DisplayObject *)obj)->field_48.h.field_48 = 0;
     }
     if (kind == 1) {
@@ -223,7 +223,7 @@ join:
         obj = NameEntry_SpawnGlyphSprite(1, node);
         ((DisplayObject *)obj)->field_60 = 8;
         ((DisplayObject *)obj)->update =
-            (DisplayObjectCallback)NameEntry_UpdateGlyphTransfer;
+            (u32)NameEntry_UpdateGlyphTransfer;
         ((DisplayObject *)obj)->field_44.h.field_46 = 204;
         ((DisplayObject *)obj)->field_44.h.field_44 =
             D_8016D42C * 16 + 112;

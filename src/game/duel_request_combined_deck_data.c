@@ -59,7 +59,11 @@ void Duel_RequestCombinedDeckData(void)
         0, (u8 *)0, first_id - 1, previous - first_id + 1,
         Duel_StepCardDataTransfer, 0, 0
     );
+#ifdef MEMORIES_GLES
+    result->callback_data = (u32)gDuel_awUniqueDeckCardIds;
+#else
     result->callback_data = gDuel_awUniqueDeckCardIds;
+#endif
     result->position = (u32)table;
     D_8009B0F4_abs =
         result->status_flags | FILE_TRANSFER_STATE_PRIMARY_ACTIVE;

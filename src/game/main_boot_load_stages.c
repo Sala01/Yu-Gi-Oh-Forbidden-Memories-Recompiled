@@ -131,7 +131,11 @@ m2:
     *(u16 *)&p->x = hun;
     *(u16 *)&p->w = hun;
     *(u16 *)&p->h = 4;
-    LoadImage2((RECT *)p, (u32 *)e);
+    /* e is s32 (matching retail): casting a negative value straight to a
+     * pointer would sign-extend it to a wild 64-bit address on LP64 (the
+     * guest RAM range always has the high bit set). Force the widening
+     * through u32 first so it zero-extends instead; identical on ILP32. */
+    LoadImage2((RECT *)p, (u32 *)(u32)e);
     p->value_0C = (u32)D_801AF000;
     p->value_08 = (u32)D_801AF000;
     x = D_8009B0F4;

@@ -164,7 +164,7 @@ void MainMenu_SpawnFrontendEntryAfterimage(DisplayObject *entry)
         DisplayObject_SelectOrderingTable1(object);
         DisplayObject_SetDepthOffset(object, (s8)(-(u8)entry->field_60));
         object->update =
-            (DisplayObjectCallback)MainMenu_UpdateFrontendEntryAfterimage;
+            (u32)MainMenu_UpdateFrontendEntryAfterimage;
         ((u8 *)&object->field_0C)[0] = ((u8 *)&entry->field_0C)[0];
         ((u8 *)&object->field_0C)[1] = ((u8 *)&entry->field_0C)[1];
         ((u8 *)&object->field_0C)[2] = ((u8 *)&entry->field_0C)[2];

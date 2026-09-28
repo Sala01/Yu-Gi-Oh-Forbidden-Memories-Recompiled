@@ -8,7 +8,7 @@
    the next unique card. */
 
 void Duel_StepCardDataTransfer(FileTransferDescriptor *o, int mode) {
-    s16 *p = o->callback_data;
+    s16 *p = (s16 *)o->callback_data;
 
     if (mode == 0) {
         o->field_30.h.counter = *p;
@@ -20,7 +20,11 @@ void Duel_StepCardDataTransfer(FileTransferDescriptor *o, int mode) {
     }
     if (mode == 1) {
         p++;
+#ifdef MEMORIES_GLES
+        o->callback_data = (u32)p;
+#else
         o->callback_data = p;
+#endif
         o->position += DUEL_CARD_DATA_BLOCK_SIZE;
     }
     o->field_30.h.counter++;

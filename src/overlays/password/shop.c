@@ -226,7 +226,7 @@ void Password_InitShopScreen(void)
     o->attribute |= (GsALON | GsAONE);
     DisplayObject_SelectOrderingTable1(o);
     DisplayObject_SetDepthOffset(o, 10);
-    o->update = (DisplayObjectCallback)Password_UpdateDigitCursor;
+    o->update = (u32)Password_UpdateDigitCursor;
     Password_SetDigitCursorTarget((u8 *)o);
     hook = Password_UpdateDigitCursorDecoration;
     slot = D_8016D440;
@@ -242,7 +242,7 @@ void Password_InitShopScreen(void)
         o->attribute |= GsALON;
         DisplayObject_SelectOrderingTable1(o);
         DisplayObject_SetDepthOffset(o, 8);
-        o->update = hook;
+        o->update = (u32)hook;
         o->flags |= DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
                     DISPLAY_OBJECT_FLAG_SCREEN_SPACE;
         *slot = o;

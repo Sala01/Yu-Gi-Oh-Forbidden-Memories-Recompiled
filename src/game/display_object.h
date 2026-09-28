@@ -111,7 +111,11 @@ typedef struct DisplayObject {
             u8 field_23;
         } b;
     } field_20;                    /* 0x20 */
+#ifdef MEMORIES_GLES
+    u32 update;                    /* 0x24: DisplayObjectCallback guest address */
+#else
     DisplayObjectCallback update;  /* 0x24 */
+#endif
     /* 0x28 and 0x30 are each read both ways: display_projection.c and the two
        sprite emitters take whole words, while display_parent_links.c derives a
        parent-relative offset from the halves. A union records both without
@@ -326,7 +330,11 @@ typedef struct DisplayObject {
             s16 field_52;
         } h;
     } field_50;                    /* 0x50 */
+#ifdef MEMORIES_GLES
+    u32 field_54;                  /* 0x54: void* guest address */
+#else
     void *field_54;                /* 0x54 */
+#endif
     /* Named field_58 and field_5A by DisplayObjectStreamState in
        ygo_types.h, on this same record and at this same pair of offsets, on
        the grounds the 0x50 comment above already gives: that view is
@@ -430,11 +438,9 @@ typedef struct DisplayObject {
 
 #define DISPLAY_OBJECT_OFFSET(member) ((u32)&(((DisplayObject *)0)->member))
 
-#ifndef MEMORIES_GLES
 typedef char DisplayObject_size_must_match_record_size[
     sizeof(DisplayObject) == DISPLAY_OBJECT_RECORD_SIZE ? 1 : -1
 ];
-#endif
 #ifndef MEMORIES_GLES
 typedef char DisplayObject_field_22_must_be_at_0x22[
     DISPLAY_OBJECT_OFFSET(field_20.h.field_22) == 0x22 ? 1 : -1

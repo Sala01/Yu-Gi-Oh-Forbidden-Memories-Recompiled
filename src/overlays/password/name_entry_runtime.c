@@ -283,7 +283,7 @@ void NameEntry_UpdateGlyphShatter(u8 *object)
                                   (u16)glyph->field_40.h.field_42);
                     piece->field_6C = 3;
                     piece->update =
-                        (DisplayObjectCallback)NameEntry_UpdateGlyphFragment;
+                        (u32)NameEntry_UpdateGlyphFragment;
                 }
             }
         }
@@ -363,7 +363,7 @@ void NameEntry_UpdateGlyphTransfer(u8 *w)
                       (u16)g->field_40.h.field_40, (u16)g->field_40.h.field_42);
         o->field_0C = 0x606060;
         o->field_60 = 6;
-        o->update = (DisplayObjectCallback)DisplayObject_FadeBrightnessAndRelease;
+        o->update = (u32)DisplayObject_FadeBrightnessAndRelease;
         o->attribute |= (GsALON | GsAONE);
         return;
     }
@@ -382,7 +382,7 @@ void NameEntry_UpdateGlyphTransfer(u8 *w)
         return;
     }
     o = NameEntry_SpawnGlyphSprite(3, node);
-    o->update = NameEntry_UpdateGlyphShatter;
+    o->update = (u32)NameEntry_UpdateGlyphShatter;
     o->field_6C = 5;
 }
 
@@ -496,7 +496,7 @@ s32 NameEntry_AdjustLength(s32 delta, s32 arg)
     D_8016D42C += delta;
     object = (DisplayObject *)D_8016D43C;
     object->field_44.h.field_44 = D_8016D42C * 16 + 0x6B;
-    object->update = (DisplayObjectCallback)NameEntry_UpdateCaretTween;
+    object->update = (u32)NameEntry_UpdateCaretTween;
     object->field_6C = 2;
     object->field_60 = arg;
     object->field_44.h.field_46 = object->field_30.h.field_32;

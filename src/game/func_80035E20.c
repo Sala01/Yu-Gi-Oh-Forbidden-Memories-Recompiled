@@ -38,12 +38,21 @@
    HD text's mark on the glyphs (hd_text.h). */
 static void sort_glyph_sprite(GsSPRITE *spr, GsOT *ot, s32 pri)
 {
+#ifdef MEMORIES_GLES
+    u32 *packet = (u32 *)D_800FE240;
+
+    GsSortFastSprite(spr, ot, pri);
+    if ((u32)packet != D_800FE240) {
+        packet[1] |= spr->tpage & (0x7800 | HD_TEXT_MARK);
+    }
+#else
     u32 *packet = D_800FE240;
 
     GsSortFastSprite(spr, ot, pri);
     if (packet != D_800FE240) {
         packet[1] |= spr->tpage & (0x7800 | HD_TEXT_MARK);
     }
+#endif
 }
 #define GsSortFastSprite sort_glyph_sprite
 #endif

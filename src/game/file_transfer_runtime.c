@@ -124,7 +124,11 @@ void File_TransferReadyCallback(s32 arg)
         if (q->phase_remaining <= 0) {
             q->phase_size = 0;
             if (q->phase_callback != 0) {
+#ifdef MEMORIES_GLES
+                ((FileTransferCallback)q->phase_callback)(q, q->result++);
+#else
                 q->phase_callback(q, q->result++);
+#endif
             }
             q->phase_remaining = q->phase_size;
         }
@@ -217,7 +221,11 @@ void File_TransferReadyCallback(s32 arg)
     step:
         q->phase_size = 0;
         if (q->phase_callback != 0) {
+#ifdef MEMORIES_GLES
+            ((FileTransferCallback)q->phase_callback)(q, q->result++);
+#else
             q->phase_callback(q, q->result++);
+#endif
         }
         q->phase_remaining = q->phase_size;
     counter:

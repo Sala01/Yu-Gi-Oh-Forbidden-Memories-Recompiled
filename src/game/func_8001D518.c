@@ -16,7 +16,7 @@ DisplayObject *func_8001D518(DisplayObject *source)
         DisplayObject_ConfigureSpriteResource(object, 4, 3, 8, 0xB, 0x1F0);
         object->field_6A = source->field_0A;
         DisplayObject_SetDepthOffset(object, 1);
-        object->update = (DisplayObjectCallback)func_80015DB8;
+        object->update = (u32)func_80015DB8;
         object->flags |= DISPLAY_OBJECT_FLAG_SCREEN_SPACE;
     }
     return object;

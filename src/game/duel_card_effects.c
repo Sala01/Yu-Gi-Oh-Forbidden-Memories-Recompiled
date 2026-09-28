@@ -202,7 +202,10 @@ void DuelEffect_ApplyMonsterRemoval(void) {
         cb = gDuel_abMonsterRemovalRules;
         x = gDuel_wEffectCardID;
         while (1) {
-            if (*(u8 *)(i + (s32)cb) +
+            /* cb is a guest data address (high bit set): signed arithmetic
+             * on it before a pointer cast would sign-extend to a wild
+             * 64-bit address on LP64. Route the sum through u32. */
+            if (*(u8 *)(u32)(i + (s32)cb) +
                     DUEL_MONSTER_REMOVAL_CARD_ID_BASE == x) {
                 break;
             }
@@ -242,7 +245,9 @@ next:
     }
 head:
     ix = D_8009B1AE + D_8009B1D5 * DUEL_FIELD_SIDE_GRID_SLOT_COUNT;
-    e = (DuelCardRecord *)(*(u8 *)(ix + (s32)tb) * DUEL_CARD_RECORD_SIZE +
+    /* tb/rb are guest data addresses (high bit set); see the note above
+     * about routing signed sums through u32 before a pointer cast. */
+    e = (DuelCardRecord *)(u32)(*(u8 *)(u32)(ix + (s32)tb) * DUEL_CARD_RECORD_SIZE +
         (s32)rb);
     if ((e->flags & DUEL_CARD_FLAG_OCCUPIED) == 0) {
         goto next;

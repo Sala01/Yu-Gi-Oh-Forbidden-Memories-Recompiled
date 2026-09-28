@@ -276,6 +276,10 @@ u32 *func_80034830(GsARGUNIT_NORMAL *arg)
             rec += 14;
         }
     }
+#ifdef MEMORIES_GLES
+    D_800FE240 = (u32)out;
+#else
     D_800FE240 = (u32 *)out;
+#endif
     return (u32 *)primp + 2;
 }

@@ -16,7 +16,13 @@
  * four texture coordinates from 0x1F800290. */
 #define SCRATCH_VERTEX(i) ((SVECTOR *)0x1F800300 + (i))
 #define GS_SPRITE_VIEW(sprite) ((GsSPRITE *)(sprite))
-#define GS_OT_VIEW(ordering_table) ((GsOT *)(ordering_table))
+/* ordering_table is a guest data address packed into the s32 `ot` parameter
+ * (always >= 0x80000000, negative as s32): casting it straight to a pointer
+ * would sign-extend to a wild 64-bit address on LP64 (confirmed: this is
+ * what produced the wild `ot` pointer that crashed DisplayObject_SubmitPacket
+ * on the very first sprite the boot logo submits). Route it through u32 to
+ * zero-extend instead; identical on ILP32. */
+#define GS_OT_VIEW(ordering_table) ((GsOT *)(u32)(ordering_table))
 #define POLY_G4_VIEW(packet) ((POLY_G4 *)(packet))
 #define POLY_GT4_VIEW(packet) ((POLY_GT4 *)(packet))
 #define POLY_FT4_VIEW(packet) ((POLY_FT4 *)(packet))
@@ -179,10 +185,17 @@ void DisplayObject_SubmitPacket(SpritePrim *sprite, u8 *packet, s32 ot, s32 mode
                 uv[1] = *(u32 *)&POLY_FT4_VIEW(packet)->u1;
                 uv[2] = *(u32 *)&POLY_FT4_VIEW(packet)->u2;
                 uv[3] = *(u32 *)&POLY_FT4_VIEW(packet)->u3;
+#ifdef MEMORIES_GLES
+                D_800FE240 = (u32)DivideFT4(v, v1, v2, v3,
+                                             uv, (u32 *)0x1F800294, (u32 *)0x1F800298, (u32 *)0x1F80029C,
+                                             (CVECTOR *)rgbc, (POLY_FT4 *)D_800FE240,
+                                             (u32 *)GS_OT_VIEW(ot)->org + pri, divp);
+#else
                 D_800FE240 = (u32 *)DivideFT4(v, v1, v2, v3,
                                              uv, (u32 *)0x1F800294, (u32 *)0x1F800298, (u32 *)0x1F80029C,
                                              (CVECTOR *)rgbc, (POLY_FT4 *)D_800FE240,
                                              (u32 *)GS_OT_VIEW(ot)->org + pri, divp);
+#endif
             }
         }
         return;
@@ -250,7 +263,7 @@ void DisplayObject_ConfigureSpriteWithResource(
     void *resource
 )
 {
-    object->field_54 = resource;
+    object->field_54 = (u32)resource;
     DisplayObject_ConfigureSpriteResource(object, arg1, arg2, arg3, arg4, arg5);
 }
 
@@ -266,7 +279,7 @@ void DisplayObject_ConfigureSpriteAtPositionWithResource(
     void *resource
 )
 {
-    object->field_54 = resource;
+    object->field_54 = (u32)resource;
     DisplayObject_ConfigureSpriteAtPosition(object, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }
 
@@ -317,7 +330,7 @@ u8 *DisplayObjectStream_ResolveOffset(
     const u8 *data
 )
 {
-    return object->base + ((data[1] << 8) | data[0]);
+    return (u8 *)(u32)(object->base + ((data[1] << 8) | data[0]));
 }
 
 void DisplayObject_ResetVelocity(DisplayObjectVelocity *object)

@@ -82,7 +82,7 @@ void DisplayObject_RenderGouraudQuadList(void) {
 
         do {
             e = &D_800EFE48[i];
-            fn = e->update;
+            fn = (DisplayObjectCallback)e->update;
             i = e->next;
             if (fn != (DisplayObjectCallback)0) {
                 fn(DISPLAY_OBJECT_BYTES(e));
@@ -195,7 +195,7 @@ void DisplayObject_RenderTexturedGouraudQuadList(void) {
 
         do {
             e = &D_800EFE48[i];
-            fn = e->update;
+            fn = (DisplayObjectCallback)e->update;
             i = e->next;
             if (fn != (DisplayObjectCallback)0) {
                 fn(DISPLAY_OBJECT_BYTES(e));
@@ -367,9 +367,15 @@ s32 DisplayObjectStream_JumpToRandomOffset(
     data += i * 2 + 1;
     hi = data[1];
     lo = data[0];
+#ifdef MEMORIES_GLES
+    base = (u8 *)object->base;
+    object->field_58 = 0;
+    object->current = (u32)(base + ((hi << 8) | lo));
+#else
     base = object->base;
     object->field_58 = 0;
     object->current = base + ((hi << 8) | lo);
+#endif
     return 1;
 }
 
