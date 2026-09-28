@@ -39,9 +39,17 @@ void func_80056D7C(FileTransferDescriptor *d, s32 stage)
     case 0: {
         u8 *destination;
         if (index == 0) {
+#ifdef MEMORIES_GLES
+            destination = (u8 *)D_80010000;
+#else
             destination = D_80010000;
+#endif
         } else {
+#ifdef MEMORIES_GLES
+            destination = (u8 *)D_80010004;
+#else
             destination = D_80010004;
+#endif
         }
         d->value_08 = d->value_0C = (u32)destination;
         d->phase_size = 96 * FILE_SECTOR_SIZE;

@@ -40,36 +40,48 @@ void MainMenu_InitFrontendMenu(s32 unused, s32 menu)
     gMain_bMenuID = menu % 11;
 
     object = DisplayObject_AcquireSlot(DisplayObject_FindFreeGeneralSlot(), 2);
+#ifdef MEMORIES_GLES
+    D_80184558 = (u32)object;
+#else
     D_80184558 = object;
+#endif
     if (object != 0) {
         DisplayObject_ConfigureSpriteAtPositionWithResource(object, 0, 0, 5, 0, 0, 0x1A, 1, D_801AF800);
-        D_80184558->attribute |= 0x1000000;
-        D_80184558->flags |= DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
+        object->attribute |= 0x1000000;
+        object->flags |= DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
                             DISPLAY_OBJECT_FLAG_SCREEN_SPACE;
-        DisplayObject_SetDepthOffset(D_80184558, 0);
+        DisplayObject_SetDepthOffset(object, 0);
     }
 
     object = DisplayObject_AcquireSlot(DisplayObject_FindFreeGeneralSlot(), 2);
+#ifdef MEMORIES_GLES
+    D_8018455C = (u32)object;
+#else
     D_8018455C = object;
+#endif
     if (object != 0) {
         DisplayObject_ConfigureSpriteAtPositionWithResource(object, 0, 8, 5, 0, 2, 0x1A, 1, D_801AF800);
-        D_8018455C->attribute |= 0x1000000;
-        D_8018455C->flags |= DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
+        object->attribute |= 0x1000000;
+        object->flags |= DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
                             DISPLAY_OBJECT_FLAG_SCREEN_SPACE;
-        DisplayObject_SetDepthOffset(D_8018455C, 1);
+        DisplayObject_SetDepthOffset(object, 1);
     }
 
     object = DisplayObject_AcquireSlot(DisplayObject_FindFreeGeneralSlot(), 2);
+#ifdef MEMORIES_GLES
+    D_80184560 = (u32)object;
+#else
     D_80184560 = object;
+#endif
     if (object != 0) {
         DisplayObject_ConfigureSpriteAtPositionWithResource(object, 0, 8, 5, 0, 1, 0x1A, 1, D_801AF800);
-        D_80184560->attribute |= 0x1000000;
-        D_80184560->flags |= DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
+        object->attribute |= 0x1000000;
+        object->flags |= DISPLAY_OBJECT_FLAG_TEXTURE_CELL_OFFSET |
                             DISPLAY_OBJECT_FLAG_SCREEN_SPACE;
-        DisplayObject_SelectOrderingTable1(D_80184560);
-        third = D_80184560;
+        DisplayObject_SelectOrderingTable1(object);
+        third = object;
         third->field_6C = 0x3C;
-        fourth = D_80184560;
+        fourth = object;
         third->field_60 = -2;
         fourth->field_34.h.field_36 = 0;
     }
@@ -90,7 +102,11 @@ void MainMenu_InitFrontendMenu(s32 unused, s32 menu)
                 ~DISPLAY_OBJECT_FLAG_RENDERABLE;
             DisplayObject_SetResourceVariant((DisplayObjectConfig *)entry, value);
             DisplayObject_SelectOrderingTable1(entry);
+#ifdef MEMORIES_GLES
+            gMain_apMenuEntries[i] = (u32)entry;
+#else
             gMain_apMenuEntries[i] = (u8 *)entry;
+#endif
         } else {
             gMain_apMenuEntries[i] = 0;
         }
@@ -100,9 +116,16 @@ void MainMenu_InitFrontendMenu(s32 unused, s32 menu)
     D_80184596 = 0;
     D_80184597 = 0;
     if (gMain_bMenuID != 0) {
+#ifdef MEMORIES_GLES
+        DisplayObject *d60 = (DisplayObject *)D_80184560;
+        state = d60->flags;
+        D_80184597 = 0x80;
+        d60->flags = state & ~DISPLAY_OBJECT_FLAG_RENDERABLE;
+#else
         state = D_80184560->flags;
         D_80184597 = 0x80;
         D_80184560->flags = state & ~DISPLAY_OBJECT_FLAG_RENDERABLE;
+#endif
     }
     D_80184598 = 0;
     D_80184599 = 0;

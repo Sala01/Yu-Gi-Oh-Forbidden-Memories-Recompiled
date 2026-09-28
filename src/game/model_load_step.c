@@ -43,10 +43,18 @@ void func_80056828(s32 index)
         s32 size = 0xC000;
         switch (index) {
         case 0:
+#ifdef MEMORIES_GLES
+            payload = (u8 *)D_80010000;
+#else
             payload = D_80010000;
+#endif
             break;
         case 1:
+#ifdef MEMORIES_GLES
+            payload = (u8 *)D_80010004;
+#else
             payload = D_80010004;
+#endif
             break;
         }
         if (*(s32 *)payload != 0) {

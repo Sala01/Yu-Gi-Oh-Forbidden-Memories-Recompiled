@@ -105,26 +105,32 @@ void MainMenu_StartFrontendEntryTransition(s32 mode)
 {
     s32 i;
     s32 offset;
-    /* The entries are display objects; gMain_apMenuEntries keeps its u8 *
-       declaration for its other users. */
-    DisplayObject **entries = (DisplayObject **)gMain_apMenuEntries;
 
     for (i = 0; i < 0xB; i++) {
+        /* gMain_apMenuEntries is a guest-address array (see frontend.h): a
+         * real DisplayObject** view would read 8-byte-strided pointers from
+         * a 4-byte-per-entry array on arm64. Read the raw entry and cast it
+         * individually instead. */
+#ifdef MEMORIES_GLES
+        DisplayObject *entry = (DisplayObject *)gMain_apMenuEntries[i];
+#else
+        DisplayObject *entry = (DisplayObject *)(void *)gMain_apMenuEntries[i];
+#endif
         if (i & 1) {
             offset = 0x1E0;
         } else {
             offset = -0xA0;
         }
-        if (entries[i] != 0) {
+        if (entry != 0) {
             if (mode != 0) {
-                entries[i]->field_34.h.field_36 = 0xA0;
-                entries[i]->field_38.h.field_38 = offset;
+                entry->field_34.h.field_36 = 0xA0;
+                entry->field_38.h.field_38 = offset;
             } else {
-                entries[i]->field_34.h.field_36 = offset;
-                entries[i]->field_38.h.field_38 = 0xA0;
+                entry->field_34.h.field_36 = offset;
+                entry->field_38.h.field_38 = 0xA0;
             }
-            entries[i]->field_30.h.field_30 = entries[i]->field_34.h.field_36;
-            entries[i]->field_60 = 0x10;
+            entry->field_30.h.field_30 = entry->field_34.h.field_36;
+            entry->field_60 = 0x10;
         }
     }
     D_80184596 = mode;
@@ -135,15 +141,15 @@ void MainMenu_DestroyFrontendMenu(void)
 {
     s32 i;
 
-    DisplayObject_ReleaseIfPresent(D_80184558);
+    DisplayObject_ReleaseIfPresent((void *)(u32)D_80184558);
     D_80184558 = 0;
-    DisplayObject_ReleaseIfPresent(D_8018455C);
+    DisplayObject_ReleaseIfPresent((void *)(u32)D_8018455C);
     D_8018455C = 0;
-    DisplayObject_ReleaseIfPresent(D_80184560);
+    DisplayObject_ReleaseIfPresent((void *)(u32)D_80184560);
     D_80184560 = 0;
     for (i = 0; i < 0xB; i++) {
         if (gMain_apMenuEntries[i] != 0) {
-            DisplayObject_ReleaseIfPresent(gMain_apMenuEntries[i]);
+            DisplayObject_ReleaseIfPresent((void *)(u32)gMain_apMenuEntries[i]);
             gMain_apMenuEntries[i] = 0;
         }
     }

@@ -27,8 +27,17 @@ s32 MainMenu_UpdateFrontendMenu(void)
     DisplayObject *ent3;
     DisplayObject *entry;
     DisplayObject *ent6;
+#ifdef MEMORIES_GLES
+    /* gMain_apMenuEntries is now a 4-byte-per-entry guest-address array (see
+     * frontend.h); a u8** walk would advance 8 bytes per step, skipping
+     * every other entry. u32* matches the array's real stride, and every
+     * dereference below already casts *slot to a pointer type explicitly. */
+    u32 *slot;
+    u32 *slot2;
+#else
     u8 **slot;
     u8 **slot2;
+#endif
     s32 step;
     s32 level;
     s16 timer;
@@ -122,19 +131,19 @@ s32 MainMenu_UpdateFrontendMenu(void)
         }
     fade_done:
         if (D_80184598 < 0) {
-            ent2 = D_80184560;
+            ent2 = (DisplayObject *)(void *)(u32)D_80184560;
             ((u8 *)&ent2->field_0C)[2] = 0x80;
             ((u8 *)&ent2->field_0C)[1] = 0x80;
             ((u8 *)&ent2->field_0C)[0] = 0x80;
             ent2->flags |= DISPLAY_OBJECT_FLAG_RENDERABLE;
-            D_80184560->field_6C = 0x3C;
-            D_80184560->field_34.h.field_36 = 0;
+            ent2->field_6C = 0x3C;
+            ent2->field_34.h.field_36 = 0;
         }
         D_80184598 = 0;
         goto ret_m1;
     }
 
-    entry = D_80184560;
+    entry = (DisplayObject *)(void *)(u32)D_80184560;
     if (entry != 0 &&
         (entry->flags & DISPLAY_OBJECT_FLAG_RENDERABLE) != 0) {
         if (entry->field_6C != 0) {
@@ -144,26 +153,26 @@ s32 MainMenu_UpdateFrontendMenu(void)
             ((u8 *)&entry->field_0C)[2] = lvl;
             ((u8 *)&entry->field_0C)[1] = lvl;
             ((u8 *)&entry->field_0C)[0] = lvl;
-            entry = D_80184560;
+            entry = (DisplayObject *)(void *)(u32)D_80184560;
             chr = ((u8 *)&entry->field_0C)[0];
             if ((u32)(chr - 0x41) >= 0x3F) {
                 if ((s8)chr < 0) {
                     entry->field_6C = 0x3C;
                 }
-                ent5 = D_80184560;
+                ent5 = (DisplayObject *)(void *)(u32)D_80184560;
                 neg = ent5->field_60;
                 ent5->field_60 = -neg;
             }
         }
         if ((gInput_wPad1Pressed & PAD_BUTTON_START) != 0) {
             SD_SEPlay(7, 0xFF, 0);
-            ent3 = D_80184560;
+            ent3 = (DisplayObject *)(void *)(u32)D_80184560;
             ent3->flags &= ~DISPLAY_OBJECT_FLAG_RENDERABLE;
             MainMenu_StartFrontendEntryTransition(0);
             D_80184598 = 1;
             goto ret_m1;
         }
-        ent6 = D_80184560;
+        ent6 = (DisplayObject *)(void *)(u32)D_80184560;
         acc = (u16)ent6->field_34.h.field_36 + (u16)D_8009B0D8;
         ent6->field_34.h.field_36 = acc;
         if ((s16)acc >= 0xBB8) {

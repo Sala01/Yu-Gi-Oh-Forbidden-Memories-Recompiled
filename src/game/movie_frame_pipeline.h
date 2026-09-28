@@ -99,7 +99,19 @@ typedef struct {
     RECT strip;
 } MovieWorkArea;
 
+/* Pinned (undefined in C, forced to its retail address) with no backing
+ * storage of its own: a real 8-byte pointer here on arm64 spills into
+ * D_8009B49C right after it (the CD stream position CdlLOC this pipeline
+ * syncs playback against), corrupting it on every assignment. Guest
+ * addresses double as host pointers, so this stays a 4-byte guest address
+ * under MEMORIES_GLES; arithmetic on it (D_8009B498 + offset) already
+ * produces a plain unsigned sum that widens correctly, so only the direct
+ * assignment sites need an explicit cast. */
+#ifdef MEMORIES_GLES
+extern u32 D_8009B498;
+#else
 extern u8 *D_8009B498;
+#endif
 extern CdlLOC D_8009B49C;
 
 #endif

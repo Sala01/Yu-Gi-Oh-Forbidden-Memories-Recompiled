@@ -65,7 +65,11 @@ u8 *DuelEffect_AllocateRequest(s32 arg0)
         u32 *t;
         s32 b;
 
+#ifdef MEMORIES_GLES
+        q = (u8 *)D_80010000;
+#else
         q = D_80010000;
+#endif
         p->flags = DUEL_EFFECT_REQUEST_FLAG_ACTIVE;
         t = D_800E9D90;
         p->id = arg0;

@@ -24,14 +24,18 @@ s32 func_8005B8A0(CdlLOC *src, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5) {
     D_8009B065 = 0xFF;
     D_8009B070 = a3;
     D_8009B060 = a4;
+#ifdef MEMORIES_GLES
+    D_8009B498 = (u32)D_80010000;
+#else
     D_8009B498 = D_80010000;
+#endif
     D_8009B061 = a5;
     if (D_8009B060 != 0) {
         /* Retail sets $a0 and $a1 here even though GsGetActiveBuff takes
            no arguments. The call goes through a two-argument view of the
            libgs.h declaration so that setup survives with the prototype in
            scope, instead of through an implicit declaration. */
-        m = ((int (*)(void *, s32))GsGetActiveBuff)(D_80010000, a5);
+        m = ((int (*)(void *, s32))GsGetActiveBuff)((void *)(u32)D_80010000, a5);
         rect.x = m * 0x140;
         rect.y = 0;
         rect.w = gGraphics_CurrentWidth.pixels;

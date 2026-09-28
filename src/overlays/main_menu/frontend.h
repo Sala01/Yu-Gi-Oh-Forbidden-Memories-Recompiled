@@ -46,12 +46,30 @@ typedef void (*MainMenuEntryEffectUpdate)(u8 *object);
  * MainMenu_InitFrontendMenu. Their matching and candidate consumers use the
  * shared DisplayObject fields rather than deriving the layout again.
  */
+/* Pinned (not defined in C, per the comment above): a real 8-byte pointer
+ * here on arm64 spills into the next 4-byte retail slot, and even a
+ * READ pulls in 4 bytes of the neighbour's own data as garbage high bits
+ * (confirmed: this is what handed DisplayObject_Release a wild pointer via
+ * MainMenu_DestroyFrontendMenu, crashing on the very first frontend-menu
+ * teardown). Guest addresses double as host pointers, so these stay 4-byte
+ * guest addresses under MEMORIES_GLES; every reader/writer widens or
+ * narrows explicitly. */
+#ifdef MEMORIES_GLES
+extern u32 D_80184558;
+extern u32 D_8018455C;
+extern u32 D_80184560;
+#else
 extern struct DisplayObject *D_80184558;
 extern struct DisplayObject *D_8018455C;
 extern struct DisplayObject *D_80184560;
+#endif
 extern s8 D_80184598;
 extern u8 gMain_bMenuID;
+#ifdef MEMORIES_GLES
+extern u32 gMain_apMenuEntries[];
+#else
 extern u8 *gMain_apMenuEntries[];
+#endif
 extern u8 D_80184595;
 extern u8 D_80184596;
 extern u8 D_80184597;

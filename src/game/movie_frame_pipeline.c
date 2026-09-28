@@ -309,8 +309,13 @@ void func_8005C1F4(void) {
             D_800F5D44 = 0;
         }
     }
+#ifdef MEMORIES_GLES
+    dst = (u8 *)(D_8009B498 + (u32)&((RECT *)0)[D_8009B067] + 0x40000);
+    src = (u8 *)(D_8009B498 + 0x40000);
+#else
     dst = D_8009B498 + (u32)&((RECT *)0)[D_8009B067] + 0x40000;
     src = D_8009B498 + 0x40000;
+#endif
     ((MovieWorkArea *)dst)->slots[0] = ((MovieWorkArea *)src)->strip;
     idx = D_8009B067;
     LoadImage((RECT *)(D_8009B498 + 0x42400 + (u32)&((RECT *)0)[idx]),
